@@ -1,5 +1,5 @@
 //
-//  VaultLogger.swift
+//  VaultLoggerProtocol.swift
 //  clevertap-ios-vault-sdk
 //
 //  Created by Nishant Kumar on 01/07/25.
@@ -24,7 +24,7 @@ enum VaultLogLevel: Int {
 }
 
 /// Protocol defining logging operations for the Vault SDK
-protocol VaultLogger {
+protocol VaultLoggerProtocol {
     /// Current log level
     var currentLogLevel: VaultLogLevel { get set }
     
