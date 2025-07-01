@@ -11,6 +11,7 @@ class AuthRepositoryImpl: AuthRepository {
     
     private let networkProvider: NetworkProvider
     private let keychainManager: KeychainManager
+    private let logger: VaultLogger
     private let clientId: String
     private let clientSecret: String
     
@@ -23,22 +24,24 @@ class AuthRepositoryImpl: AuthRepository {
     init(networkProvider: NetworkProvider,
          keychainManager: KeychainManager,
          clientId: String,
-         clientSecret: String) {
+         clientSecret: String,
+         logger: VaultLogger = VaultLogger.shared) {
         self.networkProvider = networkProvider
         self.keychainManager = keychainManager
         self.clientId = clientId
         self.clientSecret = clientSecret
+        self.logger = logger
         
         loadTokenFromKeychain()
     }
     
     func getAccessToken() async -> Result<String, VaultError> {
         if isTokenValid(), let token = currentAccessToken {
-            print("Using existing auth token")
+            logger.info("Using existing auth token", file: #file, function: #function, line: #line)
             return .success(token)
         }
         
-        print("Requesting new auth token")
+        logger.info("Requesting new auth token", file: #file, function: #function, line: #line)
         return await requestNewAccessToken()
     }
     
@@ -67,7 +70,7 @@ class AuthRepositoryImpl: AuthRepository {
 
             switch result {
             case .success(let response):
-                print("Auth token refreshed, expires in \(response.expiresIn) seconds")
+                logger.debug("Auth token refreshed, expires in \(response.expiresIn) seconds", file: #file, function: #function, line: #line)
                 self.currentAccessToken = response.accessToken
                 self.tokenExpiryDate = Date().addingTimeInterval(TimeInterval(response.expiresIn))
 
