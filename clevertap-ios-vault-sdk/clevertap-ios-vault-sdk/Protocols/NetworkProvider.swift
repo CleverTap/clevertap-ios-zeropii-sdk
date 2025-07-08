@@ -36,7 +36,7 @@ protocol NetworkProvider {
     ///   - accessToken: Valid OAuth2 access token for authentication
     /// - Returns: Result containing DetokenizeResponse with original value or VaultError on failure
     /// - Note: Use encrypted version for production environments
-    func detokenize(_ request: DetokenizeRequest, accessToken: String) async throws -> DetokenizeResponse
+    func detokenize(_ request: DetokenizeRequest, accessToken: String) async throws -> Result<DetokenizeResponse, VaultError>
     
     // MARK: - Batch Operations
     
