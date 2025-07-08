@@ -15,6 +15,7 @@ actor TokenRepositoryImpl: TokenRepository {
     private let cacheProvider: CacheProvider
     private let logger: VaultLogger
     private let initialRetryDelayMs: Int = 1000
+    private let maxBatchSizeTokenize: Int = 1000
     
     // MARK: - Initialization
     init(networkProvider: NetworkProvider,
@@ -60,7 +61,7 @@ actor TokenRepositoryImpl: TokenRepository {
     }
     
     
-    func detokenize(_ token: String) async -> DetokenizeResult {
+    public func detokenize(_ token: String) async -> DetokenizeResult {
         guard !token.isEmpty else {
             logger.warning("Empty token provided for detokenization", file: #file, function: #function, line: #line)
             return .error(message: "Empty token passed")
@@ -87,12 +88,44 @@ actor TokenRepositoryImpl: TokenRepository {
         }
     }
     
-    func batchTokenize(_ values: [String]) async -> BatchTokenizeResult {
-        // TODO
-        return .error(message: "TODO")
+    public func batchTokenize(_ values: [String]) async -> BatchTokenizeResult {
+        guard !values.isEmpty else {
+            logger.warning("Batch tokenize request contains no values", file: #file, function: #function, line: #line)
+            return .error(message: "Empty values passed")
+        }
+        
+        guard values.count <= maxBatchSizeTokenize else {
+            logger.error("Batch size \(values.count) exceeds maximum \(maxBatchSizeTokenize)", file: #file, function: #function, line: #line)
+            return .error(message: "Batch size exceeds maximum limit")
+        }
+        
+        var (cachedResults, uncachedValues) = separateCachedValues(values)
+        logger.debug("Batch tokenize: \(cachedResults.count) cached, \(uncachedValues.count) uncached", file: #file, function: #function, line: #line)
+        
+        // If all values are cached, return immediately
+        if uncachedValues.isEmpty {
+            logger.debug("All tokens found in cache", file: #file, function: #function, line: #line)
+            return .success(results: cachedResults, summary: BatchTokenizeSummary(processedCount: values.count, existingCount: values.count, newlyCreatedCount: 0))
+        }
+        
+        // Process uncached values
+        let result = await performWithRetry(operation: "batchTokenize", maxAttempts: 3) {
+            await self.performBatchTokenization(values: uncachedValues)
+        }
+        
+        switch result {
+        case .success(let response):
+            cachedResults.append(contentsOf: response.results)
+            return .success(results: cachedResults,
+                            summary: BatchTokenizeSummary(processedCount: cachedResults.count,
+                                                          existingCount: cachedResults.count { $0.exists },
+                                                          newlyCreatedCount: cachedResults.count { $0.newlyCreated }))
+        case .failure(let error):
+            return .error(message: error.localizedDescription)
+        }
     }
     
-    func batchDetokenize(_ tokens: [String]) async -> BatchDetokenizeResult {
+    public func batchDetokenize(_ tokens: [String]) async -> BatchDetokenizeResult {
         // TODO
         return .error(message: "TODO")
     }
@@ -169,6 +202,64 @@ actor TokenRepositoryImpl: TokenRepository {
         } catch {
             return.failure(.authenticationFailed)
         }
+    }
+    
+    private func performBatchTokenization(values: [String]) async -> Result<BatchTokenizeResponse, VaultError> {
+        do {
+            let tokenResult = try await authRepository.getAccessToken()
+            guard case .success(let accessToken) = tokenResult else {
+                logger.error("Failed to get access token for batch tokenization", file: #file, function: #function, line: #line)
+                return .failure(.authenticationFailed)
+            }
+            
+            let request = BatchTokenizeRequest(values: values)
+            do {
+                let networkResult = try await networkProvider.batchTokenize(request, accessToken: accessToken)
+                
+                switch networkResult {
+                case .success(let response):
+                    // Cache the result if caching is enabled
+                    if cacheProvider.isEnabled() {
+                        for item in response.results {
+                            if item.exists || item.newlyCreated {
+                                cacheProvider.putToken(value: item.originalValue, token: item.token)
+                                cacheProvider.putValue(token: item.token, value: item.originalValue)
+                            }
+                        }
+                    }
+                    
+                    logger.debug("Batch Tokenization successful", file: #file, function: #function, line: #line)
+                    return .success(response)
+                    
+                case .failure(_):
+                    logger.error("Detokenization failed", file: #file, function: #function, line: #line)
+                    return .failure(.invalidBatchTetokenisationResponse)
+                }
+            } catch {
+                return .failure(.batchTokenisationFalied)
+            }
+        } catch {
+            return.failure(.authenticationFailed)
+        }
+    }
+    
+    private func separateCachedValues(_ values: [String]) -> ([BatchTokenItem], [String]) {
+        if !cacheProvider.isEnabled() {
+            return ([], values)
+        }
+        
+        var cachedResults: [BatchTokenItem] = []
+        var uncachedValues: [String] = []
+        
+        for (index, value) in values.enumerated() {
+            if let cachedToken = cacheProvider.getToken(for: value) {
+                cachedResults.append(BatchTokenItem(originalValue: value, token: cachedToken, exists: true, newlyCreated: false, dataType: "string"))
+            } else {
+                uncachedValues.append(value)
+            }
+        }
+        
+        return (cachedResults, uncachedValues)
     }
     
     // MARK: - Retry Logic
