@@ -18,7 +18,9 @@ enum VaultError: Int, Error {
     case detokenisationFalied = 1005
     case invalidDetokenisationResponse = 1006
     case batchTokenisationFalied = 1007
-    case invalidBatchTetokenisationResponse = 1008
+    case invalidBatchTokenisationResponse = 1008
+    case batchDetokenisationFalied = 1009
+    case invalidBatchDetokenisationResponse = 1010
     
     // MARK: - Localized Error Description
     public var errorDescription: String? {
@@ -41,8 +43,12 @@ enum VaultError: Int, Error {
             return "Invalid detokenization response type."
         case .batchTokenisationFalied:
             return "Batch tokenisation failed error."
-        case .invalidBatchTetokenisationResponse:
+        case .invalidBatchTokenisationResponse:
             return "Invalid batch tokenization response type."
+        case .batchDetokenisationFalied:
+            return "Batch detokenisation failed error."
+        case .invalidBatchDetokenisationResponse:
+            return "Invalid batch detokenization response type."
         }
     }
 }

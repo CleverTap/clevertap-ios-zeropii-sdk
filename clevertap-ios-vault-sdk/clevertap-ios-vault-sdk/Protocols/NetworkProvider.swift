@@ -54,5 +54,5 @@ protocol NetworkProvider {
     ///   - accessToken: Valid OAuth2 access token for authentication
     /// - Returns: Result containing BatchDetokenizeResponse with values array or VaultError on failure
     /// - Note: Batch size is limited by Constants.maxBatchSize
-    func batchDetokenize(_ request: BatchDetokenizeRequest, accessToken: String) async throws -> BatchDetokenizeResponse
+    func batchDetokenize(_ request: BatchDetokenizeRequest, accessToken: String) async throws -> Result<BatchDetokenizeResponse, VaultError>
 }
