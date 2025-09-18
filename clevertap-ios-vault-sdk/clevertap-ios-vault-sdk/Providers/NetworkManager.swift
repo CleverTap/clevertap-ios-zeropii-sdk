@@ -11,10 +11,30 @@ class NetworkManager: NetworkProvider {
     
     private let session: URLSession
     private let logger: VaultLoggerProtocol
+    private var networkConfiguration: NetworkConfiguration
+    private let requestBuilder: NetworkRequestBuilder
+    private let responseHandler: NetworkResponseHandler
     
-    public init(logger: VaultLoggerProtocol = VaultLogger.shared) {
+    public var configuration: NetworkConfiguration {
+        return networkConfiguration
+    }
+    
+    public init(configuration: NetworkConfiguration, logger: VaultLoggerProtocol = VaultLogger.shared) {
+        self.networkConfiguration = configuration
         self.logger = logger
-        self.session = URLSession.shared
+        let sessionConfig = URLSessionConfiguration.default
+        sessionConfig.timeoutIntervalForRequest = 15
+        sessionConfig.timeoutIntervalForResource = 15 * 2
+        sessionConfig.requestCachePolicy = .reloadIgnoringLocalCacheData
+        
+        // Add custom headers
+        for (key, value) in configuration.customHeaders {
+            sessionConfig.httpAdditionalHeaders?[key] = value
+        }
+        
+        self.session = URLSession(configuration: sessionConfig)
+        self.requestBuilder = NetworkRequestBuilder(configuration: configuration, logger: logger)
+        self.responseHandler = NetworkResponseHandler(logger: logger)
     }
     
     func getAccessToken(clientId: String, clientSecret: String) async throws -> Result<AuthTokenResponse, VaultError> {
