@@ -38,8 +38,27 @@ class NetworkManager: NetworkProvider {
     }
     
     func getAccessToken(clientId: String, clientSecret: String) async throws -> Result<AuthTokenResponse, VaultError> {
-        // TODO
-        return .failure(.unauthorized)
+        let operation = "getAccessToken"
+        
+        do {
+            let request = try requestBuilder.buildAuthRequest(clientId: clientId, clientSecret: clientSecret)
+
+            let result = await performRequest(request: request, operation: operation) { data, response in
+                return self.responseHandler.handleAuthResponse(data: data, response: response)
+            }
+            
+            switch result {
+            case .success(let authResponse):
+                return .success(authResponse)
+            case .failure(let error):
+                logger.error("Failed to get auth response", file: #file, function: #function, line: #line)
+                return .failure(error)
+            }
+            
+        } catch {
+            logger.error("Failed to build auth request", file: #file, function: #function, line: #line)
+            return .failure(.authRequestError)
+        }
     }
     
     func tokenize(_ request: TokenizeRequest, accessToken: String) async throws -> Result<TokenizeResponse, VaultError> {
@@ -60,5 +79,30 @@ class NetworkManager: NetworkProvider {
     func batchDetokenize(_ request: BatchDetokenizeRequest, accessToken: String) async throws -> Result<BatchDetokenizeResponse, VaultError> {
         // TODO
         return .failure(.unauthorized)
+    }
+    
+    private func performRequest<T>(
+        request: URLRequest,
+        operation: String,
+        handler: @escaping (Data, URLResponse) -> Result<T, VaultError>
+    ) async -> Result<T, VaultError> {
+        do {
+            let (data, response) = try await session.data(for: request)
+            let result = handler(data, response)
+            
+            switch result {
+            case .success:
+                logger.info("Operation \(operation) succeeded", file: #file, function: #function, line: #line)
+                return result
+                
+            case .failure(let error):
+                logger.error("Operation \(operation) failed: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+            }
+            
+        } catch {
+            logger.error("Network operation \(operation) failed with exception: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+        }
+        
+        return .failure(.networkError)
     }
 }

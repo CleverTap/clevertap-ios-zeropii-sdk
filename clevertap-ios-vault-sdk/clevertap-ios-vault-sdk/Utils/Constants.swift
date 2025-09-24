@@ -9,5 +9,5 @@ import Foundation
 
 struct Constants {
     static let oauthTokenEndpoint: String = "" // TODO
-    static let oauthGrantType: String = "" // TODO
+    static let oauthGrantType: String = "client_credentials"
 }
