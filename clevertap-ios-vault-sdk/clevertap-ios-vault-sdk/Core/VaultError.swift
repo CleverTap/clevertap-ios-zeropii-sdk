@@ -25,6 +25,7 @@ enum VaultError: Int, Error {
     case jsonParsingError = 1012
     case serverError = 1013
     case authRequestError = 1014
+    case buildRequestError = 1015
     
     // MARK: - Localized Error Description
     public var errorDescription: String? {
@@ -61,6 +62,8 @@ enum VaultError: Int, Error {
             return "Server error"
         case .authRequestError:
             return "Failed to build auth request"
+        case .buildRequestError:
+            return "Failed to build request"
         }
     }
 }

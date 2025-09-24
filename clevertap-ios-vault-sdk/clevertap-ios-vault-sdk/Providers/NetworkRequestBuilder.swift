@@ -45,8 +45,7 @@ class NetworkRequestBuilder {
     func buildRequest<T: Codable>(
         endpoint: String,
         body: T,
-        accessToken: String,
-        encrypted: Bool
+        accessToken: String
     ) throws -> URLRequest {
         
         guard let url = URL(string: configuration.tokenizationBaseURL + endpoint) else {
