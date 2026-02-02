@@ -229,6 +229,32 @@ import Foundation
         type: T.Type,
         callback: @escaping (TokenizeResult) -> Void
     ) {
+        sdkQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            Task { @MainActor in
+                let typeName = String(describing: type)
+                self.logger.debug("Tokenizing \(typeName) value", file: #file, function: #function, line: #line)
+                
+                guard let converter = TypeConverterRegistry.getConverter(for: type) else {
+                    let tokenizeResult = TokenizeResult(result: .error(message: "Unsupported type: \(typeName)"))
+                    callback(tokenizeResult)
+                    return
+                }
+                
+                // Convert typed value to string for repository layer
+                let stringValue = converter.toString(value)
+                
+                // Call repository with string value
+                let repoResult = await self.tokenRepository.tokenize(stringValue)
+                
+                // Convert repository result to public result
+                let tokenizeResult = TokenizeResult(result: repoResult)
+                self.logger.debug("Tokenization result: \(typeName) value: \(repoResult)", file: #file, function: #function, line: #line)
+                
+                callback(tokenizeResult)
+            }
+        }
     }
 
     /// Internal method to perform batch tokenization
@@ -237,5 +263,39 @@ import Foundation
             type: T.Type,
             callback: @escaping (BatchTokenizeResult) -> Void
     ) {
+        sdkQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            Task { @MainActor in
+                if values.isEmpty {
+                    let result = BatchTokenResult.error(message: "Batch tokenize request contains no values")
+                    let batchTokenizeResult = BatchTokenizeResult(result: result)
+                    callback(batchTokenizeResult)
+                    return
+                }
+                
+                let typeName = String(describing: type)
+                self.logger.debug("Batch tokenizing \(values.count) \(typeName) values", file: #file, function: #function, line: #line)
+                
+                guard let converter = TypeConverterRegistry.getConverter(for: type) else {
+                    let result = BatchTokenResult.error(message: "Unsupported type: \(typeName)")
+                    let batchTokenizeResult = BatchTokenizeResult(result: result)
+                    callback(batchTokenizeResult)
+                    return
+                }
+                
+                // Convert typed values to strings for repository layer
+                let stringValues = values.map { converter.toString($0) }
+                
+                // Call repository with string values
+                let repoResult = await self.tokenRepository.batchTokenize(stringValues)
+                
+                // Convert repository result to public result
+                self.logger.debug("Batch tokenization result: \(typeName) values: \(repoResult)", file: #file, function: #function, line: #line)
+                
+                let batchTokenizeResult = BatchTokenizeResult(result: repoResult)
+                callback(batchTokenizeResult)
+            }
+        }
     }
 }
