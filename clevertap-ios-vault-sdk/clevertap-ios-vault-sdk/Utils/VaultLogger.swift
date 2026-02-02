@@ -8,12 +8,12 @@
 import Foundation
 import os.log
 
-class VaultLogger: VaultLoggerProtocol {
-    var currentLogLevel: VaultLogLevel = .warning
+@objc public class VaultLogger: NSObject, VaultLoggerProtocol {
+    @objc public var logLevel: VaultLogLevel = .warning
     private var osLog = OSLog(subsystem: "CleverTap", category: "VaultSDK")
     
-    static let shared = VaultLogger()
-    private init() {}
+    @objc public static let shared = VaultLogger()
+    private override init() {}
     
     func debug(_ message: String, file: String, function: String, line: Int) {
         log(message, level: .debug, file: file, function: function, line: line)
@@ -38,6 +38,8 @@ class VaultLogger: VaultLoggerProtocol {
         let logMessage = "\(fileName):\(line) \(function) - \(message)"
         
         switch level {
+            case .off:
+                break
             case .debug:
                 os_log(.debug, log: osLog, "%{public}@", logMessage)
             case .info:

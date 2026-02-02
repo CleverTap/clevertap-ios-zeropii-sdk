@@ -64,19 +64,61 @@ struct BatchDetokenizeResponse: Codable {
 }
 
 /// Represents the result for an individual item in a batch tokenization operation.
-struct BatchTokenItem: Codable {
-    let originalValue: String
-    let token: String
-    let exists: Bool
-    let newlyCreated: Bool
-    let dataType: String?
+@objc public class BatchTokenItem: NSObject, Codable {
+    @objc public let originalValue: String
+    @objc public let token: String
+    @objc public let exists: Bool
+    @objc public let newlyCreated: Bool
+    @objc public let dataType: String?
+    
+    init(originalValue: String, token: String, exists: Bool, newlyCreated: Bool, dataType: String?) {
+        self.originalValue = originalValue
+        self.token = token
+        self.exists = exists
+        self.newlyCreated = newlyCreated
+        self.dataType = dataType
+        super.init()
+    }
+    
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.originalValue = try container.decode(String.self, forKey: .originalValue)
+        self.token = try container.decode(String.self, forKey: .token)
+        self.exists = try container.decode(Bool.self, forKey: .exists)
+        self.newlyCreated = try container.decode(Bool.self, forKey: .newlyCreated)
+        self.dataType = try container.decodeIfPresent(String.self, forKey: .dataType)
+        super.init()
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case originalValue, token, exists, newlyCreated, dataType
+    }
 }
 
 /// Summary statistics for a batch tokenization operation.
-struct BatchTokenizeSummary: Codable {
-    let processedCount: Int
-    let existingCount: Int
-    let newlyCreatedCount: Int
+@objc public class BatchTokenizeSummary: NSObject, Codable {
+    @objc public let processedCount: Int
+    @objc public let existingCount: Int
+    @objc public let newlyCreatedCount: Int
+    
+    init(processedCount: Int, existingCount: Int, newlyCreatedCount: Int) {
+        self.processedCount = processedCount
+        self.existingCount = existingCount
+        self.newlyCreatedCount = newlyCreatedCount
+        super.init()
+    }
+    
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.processedCount = try container.decode(Int.self, forKey: .processedCount)
+        self.existingCount = try container.decode(Int.self, forKey: .existingCount)
+        self.newlyCreatedCount = try container.decode(Int.self, forKey: .newlyCreatedCount)
+        super.init()
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case processedCount, existingCount, newlyCreatedCount
+    }
 }
 
 /// Represents the result for an individual item in a batch detokenization operation.

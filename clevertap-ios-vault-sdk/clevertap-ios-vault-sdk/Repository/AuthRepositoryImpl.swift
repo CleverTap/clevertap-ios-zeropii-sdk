@@ -10,7 +10,7 @@ import Foundation
 class AuthRepositoryImpl: AuthRepository {
     
     private let networkProvider: NetworkProvider
-    private let keychainManager: KeychainManager
+    private let keychainManager: KeychainManager = KeychainManager()
     private let logger: VaultLogger
     private let clientId: String
     private let clientSecret: String
@@ -22,12 +22,10 @@ class AuthRepositoryImpl: AuthRepository {
     private let tokenExpiryKey = "vault_token_expiry"
     
     init(networkProvider: NetworkProvider,
-         keychainManager: KeychainManager,
          clientId: String,
          clientSecret: String,
          logger: VaultLogger = VaultLogger.shared) {
         self.networkProvider = networkProvider
-        self.keychainManager = keychainManager
         self.clientId = clientId
         self.clientSecret = clientSecret
         self.logger = logger

@@ -7,7 +7,8 @@
 
 import Foundation
 
-enum VaultLogLevel: Int {
+@objc public enum VaultLogLevel: Int {
+    case off = -1
     case debug = 0
     case info = 1
     case warning = 2
@@ -15,6 +16,7 @@ enum VaultLogLevel: Int {
     
     var description: String {
         switch self {
+            case .off: return "OFF"
             case .debug: return "DEBUG"
             case .info: return "INFO"
             case .warning: return "WARNING"
@@ -26,7 +28,7 @@ enum VaultLogLevel: Int {
 /// Protocol defining logging operations for the Vault SDK
 protocol VaultLoggerProtocol {
     /// Current log level
-    var currentLogLevel: VaultLogLevel { get set }
+    var logLevel: VaultLogLevel { get set }
     
     /// Logs a debug message (for development and troubleshooting)
     /// - Parameters:

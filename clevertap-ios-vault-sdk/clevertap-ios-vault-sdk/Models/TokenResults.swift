@@ -9,7 +9,7 @@ import Foundation
 
 /// Represents the result of a tokenization process, which can either be a success with token details
 /// or an error with a descriptive message.
-enum TokenizeResult {
+enum TokenResult {
 
     /// Represents a successful tokenization result.
     ///
@@ -48,7 +48,7 @@ enum DetokenizeResult {
 
 /// Represents the result of a batch tokenization operation, which can either be a success
 /// containing multiple individual tokenization results and a summary, or an error describing the failure.
-enum BatchTokenizeResult {
+enum BatchTokenResult {
     
     /// Indicates a successful batch tokenization.
     ///

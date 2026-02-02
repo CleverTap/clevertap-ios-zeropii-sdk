@@ -11,7 +11,7 @@ actor TokenRepositoryImpl: TokenRepository {
     
     // MARK: - Dependencies
     private let networkProvider: NetworkProvider
-    private let authRepository: AuthRepository
+    private let authRepository: AuthRepositoryImpl
     private let cacheProvider: CacheProvider
     private let logger: VaultLogger
     private let initialRetryDelayMs: Int = 1000
@@ -20,7 +20,7 @@ actor TokenRepositoryImpl: TokenRepository {
     
     // MARK: - Initialization
     init(networkProvider: NetworkProvider,
-        authRepository: AuthRepository,
+        authRepository: AuthRepositoryImpl,
         cacheProvider: CacheProvider,
         logger: VaultLogger = VaultLogger.shared) {
         
@@ -34,7 +34,7 @@ actor TokenRepositoryImpl: TokenRepository {
     
     // MARK: - TokenRepository Protocol Implementation
     
-    public func tokenize(_ value: String) async -> TokenizeResult {
+    public func tokenize(_ value: String) async -> TokenResult {
         guard !value.isEmpty else {
             logger.warning("Empty value provided for tokenization", file: #file, function: #function, line: #line)
             return .error(message: "Empty value passed")
@@ -89,7 +89,7 @@ actor TokenRepositoryImpl: TokenRepository {
         }
     }
     
-    public func batchTokenize(_ values: [String]) async -> BatchTokenizeResult {
+    public func batchTokenize(_ values: [String]) async -> BatchTokenResult {
         guard !values.isEmpty else {
             logger.warning("Batch tokenize request contains no values", file: #file, function: #function, line: #line)
             return .error(message: "Empty values passed")

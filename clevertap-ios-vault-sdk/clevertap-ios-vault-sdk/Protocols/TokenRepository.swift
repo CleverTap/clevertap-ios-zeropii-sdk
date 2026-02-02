@@ -15,7 +15,7 @@ protocol TokenRepository {
     /// Tokenizes a single sensitive value
     /// - Parameter value: The sensitive value to tokenize
     /// - Returns: The tokenization result
-    func tokenize(_ value: String) async -> TokenizeResult
+    func tokenize(_ value: String) async -> TokenResult
     
     /// Retrieves the original value for a given token
     /// - Parameter token: The token to detokenize
@@ -27,7 +27,7 @@ protocol TokenRepository {
     /// Tokenizes multiple sensitive values in a single operation
     /// - Parameter values: Array of sensitive values to tokenize
     /// - Returns: The batch tokenization result
-    func batchTokenize(_ values: [String]) async -> BatchTokenizeResult
+    func batchTokenize(_ values: [String]) async -> BatchTokenResult
     
     /// Retrieves original values for multiple tokens in a single operation
     /// - Parameter tokens: Array of tokens to detokenize
