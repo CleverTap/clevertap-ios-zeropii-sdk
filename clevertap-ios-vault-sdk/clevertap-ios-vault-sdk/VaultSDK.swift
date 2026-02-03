@@ -29,10 +29,7 @@ import Foundation
     // MARK: - Singleton
     
     @objc public static var shared: VaultSDK {
-        guard let instance = _instance else {
-            fatalError("VaultSDK is not initialized. Call initialize() first.")
-        }
-        return instance
+        return getInstance()
     }
     
     private static var _instance: VaultSDK?
@@ -113,6 +110,16 @@ import Foundation
             objc_sync_exit(self)
         }
         return _instance!
+    }
+    
+    /// Gets the VaultSDK instance.
+    /// - Returns: The VaultSDK instance
+    /// - Throws: Fatal error if not initialized
+    @objc public static func getInstance() -> VaultSDK {
+        guard let instance = _instance else {
+            fatalError("VaultSDK is not initialized. Call initialize() first.")
+        }
+        return instance
     }
     
     // MARK: - Tokenization Methods
