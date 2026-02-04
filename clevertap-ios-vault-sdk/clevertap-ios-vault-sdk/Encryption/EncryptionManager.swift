@@ -40,4 +40,31 @@ public class EncryptionManager {
         
         return networkEncryptionManager.decrypt(encryptedPayload: encryptedPayload, iv: iv)
     }
+    
+    func createEncryptedRequest(_ request: Any) -> EncryptedRequest? {
+        // Convert request object to JSON
+        guard let requestData = try? JSONSerialization.data(withJSONObject: request, options: []),
+              let requestJson = String(data: requestData, encoding: .utf8) else {
+            logger.error("Failed to serialize request to JSON", file: #file, function: #function, line: #line)
+            return nil
+        }
+        
+        logger.debug("Request before encryption: \(requestJson)", file: #file, function: #function, line: #line)
+        
+        // Perform encryption
+        let encryptionResult = encrypt(data: requestJson)
+        
+        switch encryptionResult {
+        case .success(let encryptedPayload, let sessionKey, let iv):
+            return EncryptedRequest(
+                itp: encryptedPayload,
+                itk: sessionKey,
+                itv: iv
+            )
+        default:
+            logger.error("Encryption failed: \(encryptionResult)", file: #file, function: #function, line: #line)
+            return nil
+        }
+    }
+
 }

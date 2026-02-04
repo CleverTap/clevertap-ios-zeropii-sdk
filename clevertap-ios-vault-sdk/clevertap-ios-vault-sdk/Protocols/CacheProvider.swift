@@ -14,27 +14,27 @@ protocol CacheProvider {
     ///
     /// - Parameter value: The value to look up.
     /// - Returns: The corresponding token, or `nil` if not found.
-    func getToken(for value: String) -> String?
+    func getToken(for value: String) -> (token: String, dataType: String)?
 
     /// Retrieves the value associated with a given token.
     ///
     /// - Parameter token: The token to look up.
     /// - Returns: The corresponding value, or `nil` if not found.
-    func getValue(for token: String) -> String?
+    func getValue(for token: String) -> (value: String, dataType: String)?
 
     /// Stores a token-to-value mapping.
     ///
     /// - Parameters:
     ///   - token: The token.
     ///   - value: The corresponding value.
-    func putValue(token: String, value: String)
+    func putValue(token: String, value: String, dataType: String?)
 
     /// Stores a value-to-token mapping.
     ///
     /// - Parameters:
     ///   - value: The value.
     ///   - token: The corresponding token.
-    func putToken(value: String, token: String)
+    func putToken(value: String, token: String, dataType: String?)
     
     /// Checks if caching is enabled.
     func isEnabled() -> Bool

@@ -81,6 +81,7 @@ import Foundation
             networkProvider: networkProvider,
             authRepository: authRepository,
             cacheProvider: tokenCacheManager,
+            encryptionManager: encryptionManager,
             logger: logger
         )
         

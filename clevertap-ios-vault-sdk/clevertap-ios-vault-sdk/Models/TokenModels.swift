@@ -135,3 +135,16 @@ struct BatchDetokenizeSummary: Codable {
     let foundCount: Int
     let notFoundCount: Int
 }
+
+/// Encrypted request model
+struct EncryptedRequest: Codable {
+    let itp: String
+    let itk: String
+    let itv: String
+}
+
+/// Encrypted response model
+struct EncryptedResponse: Codable {
+    let itp: String
+    let itv: String
+}

@@ -28,7 +28,7 @@ protocol NetworkProvider {
     ///   - accessToken: Valid OAuth2 access token for authentication
     /// - Returns: Result containing TokenizeResponse with the token or VaultError on failure
     /// - Note: Use encrypted version for production environments
-    func tokenize(_ request: TokenizeRequest, accessToken: String) async throws -> Result<TokenizeResponse, VaultError>
+    func tokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, VaultError>
     
     /// Detokenizes a single token to retrieve the original value using plain text transmission
     /// - Parameters:

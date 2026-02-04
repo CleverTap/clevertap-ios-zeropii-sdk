@@ -61,12 +61,12 @@ class NetworkManager: NetworkProvider {
         }
     }
     
-    func tokenize(_ request: TokenizeRequest, accessToken: String) async throws -> Result<TokenizeResponse, VaultError> {
+    func tokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, VaultError> {
         return await performOperation(
             endpoint: Constants.tokenizeEndpoint,
             request: request,
             accessToken: accessToken,
-            responseType: TokenizeResponse.self,
+            responseType: EncryptedResponse.self,
             operationType: .tokenize
         )
     }

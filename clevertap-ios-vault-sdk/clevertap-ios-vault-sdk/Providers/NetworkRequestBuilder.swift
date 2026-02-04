@@ -57,6 +57,7 @@ class NetworkRequestBuilder {
         request.httpMethod = "POST"
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("true", forHTTPHeaderField: "Encrypted")
         
         for (key, value) in configuration.customHeaders {
             request.setValue(value, forHTTPHeaderField: key)

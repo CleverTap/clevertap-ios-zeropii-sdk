@@ -13,6 +13,7 @@ actor TokenRepositoryImpl: TokenRepository {
     private let networkProvider: NetworkProvider
     private let authRepository: AuthRepositoryImpl
     private let cacheProvider: CacheProvider
+    private let encryptionManager: EncryptionManager
     private let logger: VaultLogger
     private let initialRetryDelayMs: Int = 1000
     private let maxBatchSizeTokenize: Int = 1000
@@ -22,11 +23,13 @@ actor TokenRepositoryImpl: TokenRepository {
     init(networkProvider: NetworkProvider,
         authRepository: AuthRepositoryImpl,
         cacheProvider: CacheProvider,
+        encryptionManager: EncryptionManager,
         logger: VaultLogger = VaultLogger.shared) {
         
         self.networkProvider = networkProvider
         self.authRepository = authRepository
         self.cacheProvider = cacheProvider
+        self.encryptionManager = encryptionManager
         self.logger = logger
         
         logger.debug("TokenRepository initialized", file: #file, function: #function, line: #line)
@@ -42,9 +45,9 @@ actor TokenRepositoryImpl: TokenRepository {
         
         // Check cache first if enabled
         if cacheProvider.isEnabled() {
-            if let cachedToken = cacheProvider.getToken(for: value) {
+            if let tokenDetails = cacheProvider.getToken(for: value) {
                 logger.debug("Token found in cache", file: #file, function: #function, line: #line)
-                return .success(token: cachedToken, exists: true, newlyCreated: false, dataType: "string")
+                return .success(token: tokenDetails.token, exists: true, newlyCreated: false, dataType: tokenDetails.dataType)
             }
         }
         
@@ -70,9 +73,9 @@ actor TokenRepositoryImpl: TokenRepository {
         
         // Check cache first if enabled
         if cacheProvider.isEnabled() {
-            if let cachedValue = cacheProvider.getValue(for: token) {
+            if let valueDetails = cacheProvider.getValue(for: token) {
                 logger.debug("Value found in cache", file: #file, function: #function, line: #line)
-                return .success(value: cachedValue, exists: true, dataType: "string")
+                return .success(value: valueDetails.value, exists: true, dataType: valueDetails.dataType)
             }
         }
         
@@ -166,36 +169,54 @@ actor TokenRepositoryImpl: TokenRepository {
     // MARK: - Private Implementation Methods
     
     private func performTokenization(value: String) async -> Result<TokenizeResponse, VaultError> {
+        let tokenResult = await authRepository.getAccessToken()
+        guard case .success(let accessToken) = tokenResult else {
+            logger.error("Failed to get access token for tokenization", file: #file, function: #function, line: #line)
+            return .failure(.authenticationFailed)
+        }
+        
+        let request = TokenizeRequest(value: value)
+        guard let encryptedRequest = encryptionManager.createEncryptedRequest(request) else {
+            // TODO: Check for encrypted request failed case
+            logger.error("Failed to get access token for tokenization", file: #file, function: #function, line: #line)
+            return .failure(.tokenisationFalied)
+        }
         do {
-            let tokenResult = try await authRepository.getAccessToken()
-            guard case .success(let accessToken) = tokenResult else {
-                logger.error("Failed to get access token for tokenization", file: #file, function: #function, line: #line)
-                return .failure(.authenticationFailed)
-            }
+            let networkResult = try await networkProvider.tokenize(encryptedRequest, accessToken: accessToken)
             
-            let request = TokenizeRequest(value: value)
-            do {
-                let networkResult = try await networkProvider.tokenize(request, accessToken: accessToken)
-                
-                switch networkResult {
-                case .success(let response):
-                    // Cache the result if caching is enabled
-                    if cacheProvider.isEnabled() {
-                        cacheProvider.putToken(value: value, token: response.token)
+            switch networkResult {
+            case .success(let response):
+                let decryptedResult = encryptionManager.decrypt(encryptedPayload: response.itp, iv: response.itv)
+                switch decryptedResult {
+                case .success(let dataString):
+                    guard let jsonData = dataString.data(using: .utf8) else {
+                        logger.error("Failed to convert decrypted string to data.", file: #file, function: #function, line: #line)
+                        return .failure(.tokenisationFalied)
                     }
                     
-                    logger.debug("Tokenization successful", file: #file, function: #function, line: #line)
-                    return .success(response)
-                    
-                case .failure(_):
-                    logger.error("Tokenisation failed", file: #file, function: #function, line: #line)
-                    return .failure(.invalidTokenisationResponse)
+                    do {
+                        let decodedObject = try JSONDecoder().decode(TokenizeResponse.self, from: jsonData)
+                        // Cache the result if caching is enabled
+                        if cacheProvider.isEnabled() {
+                            cacheProvider.putToken(value: value, token: decodedObject.token, dataType: decodedObject.dataType)
+                        }
+                        
+                        logger.debug("Tokenization successful", file: #file, function: #function, line: #line)
+                        return .success(decodedObject)
+                    } catch {
+                        logger.error("Failed to parse decrypted response.", file: #file, function: #function, line: #line)
+                        return .failure(.tokenisationFalied)
+                    }
+                case .failure(message: let message):
+                    logger.error("Failed to parse tokenization response: \(message)", file: #file, function: #function, line: #line)
+                    return .failure(.tokenisationFalied)
                 }
-            } catch {
-                return .failure(.tokenisationFalied)
+            case .failure(_):
+                logger.error("Tokenisation failed", file: #file, function: #function, line: #line)
+                return .failure(.invalidTokenisationResponse)
             }
         } catch {
-            return.failure(.authenticationFailed)
+            return .failure(.tokenisationFalied)
         }
     }
     
@@ -219,7 +240,7 @@ actor TokenRepositoryImpl: TokenRepository {
                     
                     // Cache the result if caching is enabled
                     if cacheProvider.isEnabled() {
-                        cacheProvider.putValue(token: token, value: value)
+                        cacheProvider.putValue(token: token, value: value, dataType: response.dataType)
                     }
                     
                     logger.debug("Detokenization successful", file: #file, function: #function, line: #line)
@@ -255,8 +276,8 @@ actor TokenRepositoryImpl: TokenRepository {
                     if cacheProvider.isEnabled() {
                         for item in response.results {
                             if item.exists || item.newlyCreated {
-                                cacheProvider.putToken(value: item.originalValue, token: item.token)
-                                cacheProvider.putValue(token: item.token, value: item.originalValue)
+                                cacheProvider.putToken(value: item.originalValue, token: item.token, dataType: item.dataType)
+                                cacheProvider.putValue(token: item.token, value: item.originalValue, dataType: item.dataType)
                             }
                         }
                     }
@@ -295,7 +316,7 @@ actor TokenRepositoryImpl: TokenRepository {
                     if cacheProvider.isEnabled() {
                         for item in response.results {
                             if let value = item.value, item.exists {
-                                cacheProvider.putValue(token: item.token, value: value)
+                                cacheProvider.putValue(token: item.token, value: value, dataType: item.dataType)
                             }
                         }
                     }
@@ -324,8 +345,8 @@ actor TokenRepositoryImpl: TokenRepository {
         var uncachedValues: [String] = []
         
         for (_, value) in values.enumerated() {
-            if let cachedToken = cacheProvider.getToken(for: value) {
-                cachedResults.append(BatchTokenItem(originalValue: value, token: cachedToken, exists: true, newlyCreated: false, dataType: "string"))
+            if let tokenDetails = cacheProvider.getToken(for: value) {
+                cachedResults.append(BatchTokenItem(originalValue: value, token: tokenDetails.token, exists: true, newlyCreated: false, dataType: tokenDetails.dataType))
             } else {
                 uncachedValues.append(value)
             }
@@ -343,8 +364,8 @@ actor TokenRepositoryImpl: TokenRepository {
         var uncachedTokens: [String] = []
         
         for (_, token) in tokens.enumerated() {
-            if let cachedValue = cacheProvider.getValue(for: token) {
-                cachedResults.append(BatchDetokenItem(token: token, value: cachedValue, exists: true, dataType: "string"))
+            if let valueDetails = cacheProvider.getValue(for: token) {
+                cachedResults.append(BatchDetokenItem(token: token, value: valueDetails.value, exists: true, dataType: valueDetails.dataType))
             } else {
                 uncachedTokens.append(token)
             }
@@ -382,14 +403,11 @@ actor TokenRepositoryImpl: TokenRepository {
                 // Handle token refresh for 401 errors
                 if error == .unauthorized {
                     logger.debug("Attempting token refresh for unauthorized 401 error", file: #file, function: #function, line: #line)
-                    do {
-                        let refreshResult = try await authRepository.refreshAccessToken()
-                        if case .failure(let refreshError) = refreshResult {
-                            logger.error("Token refresh failed: \(refreshError.localizedDescription)", file: #file, function: #function, line: #line)
-                            return .failure(refreshError)
-                        }
-                    } catch {
-                        return .failure(.refreshTokenError)
+
+                    let refreshResult = await authRepository.refreshAccessToken()
+                    if case .failure(let refreshError) = refreshResult {
+                        logger.error("Token refresh failed: \(refreshError.localizedDescription)", file: #file, function: #function, line: #line)
+                        return .failure(refreshError)
                     }
                 }
                 
