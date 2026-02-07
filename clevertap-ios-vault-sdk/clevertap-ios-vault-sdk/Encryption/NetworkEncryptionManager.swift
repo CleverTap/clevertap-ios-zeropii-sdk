@@ -38,16 +38,9 @@ public class NetworkEncryptionManager {
     }
     
     /// Encrypts data for network transmission
-    func encrypt(data: String) -> EncryptionResult {
+    func encrypt(data: Data) -> EncryptionResult {
         if #available(iOS 13.0, tvOS 13.0, *) {
             do {
-                guard JSONSerialization.isValidJSONObject(data),
-                      let data = try? JSONSerialization.data(withJSONObject: data, options: []) else {
-                    let failureMessage = "Encryption failed, invalid JSON object."
-                    logger.debug(failureMessage, file: #file, function: #function, line: #line)
-                    return EncryptionResult.failure(message: failureMessage)
-                }
-                
                 let key = getOrGenerateSessionKey()
                 let nonce = AES.GCM.Nonce()
                 let nonceData = Data(nonce).base64EncodedString()
@@ -87,7 +80,7 @@ public class NetworkEncryptionManager {
                                                       tag: encryptedData.suffix(16)) // Last 16 bytes are the authentication tag
                 
                 let decryptedData = try AES.GCM.open(sealedBox, using: getOrGenerateSessionKey())
-                return DecryptionResult.success(data: decryptedData.base64EncodedString())
+                return DecryptionResult.success(data: decryptedData)
             } catch {
                 let errorMessage = "Decryption in transit error: \(error.localizedDescription)"
                 logger.error(errorMessage, file: #file, function: #function, line: #line)

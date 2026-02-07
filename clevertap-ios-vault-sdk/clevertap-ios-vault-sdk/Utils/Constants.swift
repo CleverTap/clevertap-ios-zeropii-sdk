@@ -8,9 +8,9 @@
 import Foundation
 
 struct Constants {
-    static let oauthTokenEndpoint: String = "" // TODO
+    static let oauthTokenEndpoint: String = "protocol/openid-connect/token" // TODO
     static let oauthGrantType: String = "client_credentials"
-    static let tokenizeEndpoint: String = "" // TODO
+    static let tokenizeEndpoint: String = "api/tokenization/getToken" // TODO
     static let detokenizeEndpoint: String = "" // TODO
     static let batchTokenizeEndpoint: String = "" // TODO
     static let batchDetokenizeEndpoint: String = "" // TODO

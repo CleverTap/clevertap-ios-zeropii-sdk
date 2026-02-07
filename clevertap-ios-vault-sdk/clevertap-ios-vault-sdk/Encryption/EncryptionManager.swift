@@ -24,7 +24,7 @@ public class EncryptionManager {
     }
 
     /// Encrypts the provided data
-    func encrypt(data: String) -> EncryptionResult {
+    func encrypt(data: Data) -> EncryptionResult {
         guard enabled else {
             return .failure(message: "Encryption is disabled")
         }
@@ -41,28 +41,33 @@ public class EncryptionManager {
         return networkEncryptionManager.decrypt(encryptedPayload: encryptedPayload, iv: iv)
     }
     
-    func createEncryptedRequest(_ request: Any) -> EncryptedRequest? {
-        // Convert request object to JSON
-        guard let requestData = try? JSONSerialization.data(withJSONObject: request, options: []),
-              let requestJson = String(data: requestData, encoding: .utf8) else {
-            logger.error("Failed to serialize request to JSON", file: #file, function: #function, line: #line)
-            return nil
-        }
-        
-        logger.debug("Request before encryption: \(requestJson)", file: #file, function: #function, line: #line)
-        
-        // Perform encryption
-        let encryptionResult = encrypt(data: requestJson)
-        
-        switch encryptionResult {
-        case .success(let encryptedPayload, let sessionKey, let iv):
-            return EncryptedRequest(
-                itp: encryptedPayload,
-                itk: sessionKey,
-                itv: iv
-            )
-        default:
-            logger.error("Encryption failed: \(encryptionResult)", file: #file, function: #function, line: #line)
+    func createEncryptedRequest<T: Encodable>(_ request: T) -> EncryptedRequest? {
+        do {
+            let dataToEncrypt: Data
+            if let stringValue = request as? String {
+                dataToEncrypt = Data(stringValue.utf8)
+            } else {
+                dataToEncrypt = try JSONEncoder().encode(request)
+            }
+            logger.debug("Request before encryption: \(dataToEncrypt)", file: #file, function: #function, line: #line)
+            
+            // Perform encryption
+            let encryptionResult = encrypt(data: dataToEncrypt)
+            
+            switch encryptionResult {
+            case .success(let encryptedPayload, let sessionKey, let iv):
+                return EncryptedRequest(
+                    itp: encryptedPayload,
+                    itk: sessionKey,
+                    itv: iv
+                )
+            default:
+                logger.error("Encryption failed: \(encryptionResult)", file: #file, function: #function, line: #line)
+                return nil
+            }
+        } catch {
+            let errorMessage = "Encryption error: \(error.localizedDescription)"
+            logger.error(errorMessage, file: #file, function: #function, line: #line)
             return nil
         }
     }

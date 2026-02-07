@@ -14,6 +14,14 @@ struct AuthTokenResponse: Codable {
     let refreshExpiresIn: Int
     let tokenType: String
     let scope: String
+    
+    enum CodingKeys: String, CodingKey {
+        case accessToken   = "access_token"
+        case expiresIn     = "expires_in"
+        case refreshExpiresIn = "refresh_expires_in"
+        case tokenType     = "token_type"
+        case scope
+    }
 }
 
 /// Request model for tokenizing a single value.

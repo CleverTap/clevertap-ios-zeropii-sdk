@@ -68,9 +68,6 @@ class TypeConverterRegistry {
     
     /// Initialize built-in converters
     static func initialize() {
-        lock.lock()
-        defer { lock.unlock() }
-        
         if converters.isEmpty {
             register(String.self, converter: StringConverter())
             register(Int.self, converter: IntConverter())

@@ -18,7 +18,7 @@ enum EncryptionResult {
 /// Enum representing the result of a decryption operation
 enum DecryptionResult {
     /// Successful decryption
-    case success(data: String)
+    case success(data: Data)
     /// Failed decryption with an error message
     case failure(message: String)
 }

@@ -85,6 +85,7 @@ import Foundation
             logger: logger
         )
         
+        TypeConverterRegistry.initialize()
         logger.debug("VaultSDK initialization complete", file: #file, function: #function, line: #line)
     }
     

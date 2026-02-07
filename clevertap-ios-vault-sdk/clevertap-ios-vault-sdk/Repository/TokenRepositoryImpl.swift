@@ -52,7 +52,7 @@ actor TokenRepositoryImpl: TokenRepository {
         }
         
         // Perform tokenization with retry logic
-        let result = await performWithRetry(operation: "tokenize", maxAttempts: 3) {
+        let result = await performWithRetry(operation: "tokenize", maxAttempts: 1) {
             await self.performTokenization(value: value)
         }
         
@@ -188,12 +188,7 @@ actor TokenRepositoryImpl: TokenRepository {
             case .success(let response):
                 let decryptedResult = encryptionManager.decrypt(encryptedPayload: response.itp, iv: response.itv)
                 switch decryptedResult {
-                case .success(let dataString):
-                    guard let jsonData = dataString.data(using: .utf8) else {
-                        logger.error("Failed to convert decrypted string to data.", file: #file, function: #function, line: #line)
-                        return .failure(.tokenisationFalied)
-                    }
-                    
+                case .success(let jsonData):
                     do {
                         let decodedObject = try JSONDecoder().decode(TokenizeResponse.self, from: jsonData)
                         // Cache the result if caching is enabled
@@ -221,118 +216,106 @@ actor TokenRepositoryImpl: TokenRepository {
     }
     
     private func performDetokenization(token: String) async -> Result<DetokenizeResponse, VaultError> {
+        let tokenResult = await authRepository.getAccessToken()
+        guard case .success(let accessToken) = tokenResult else {
+            logger.error("Failed to get access token for detokenization", file: #file, function: #function, line: #line)
+            return .failure(.authenticationFailed)
+        }
+        
+        let request = DetokenizeRequest(token: token)
         do {
-            let tokenResult = try await authRepository.getAccessToken()
-            guard case .success(let accessToken) = tokenResult else {
-                logger.error("Failed to get access token for detokenization", file: #file, function: #function, line: #line)
-                return .failure(.authenticationFailed)
-            }
+            let networkResult = try await networkProvider.detokenize(request, accessToken: accessToken)
             
-            let request = DetokenizeRequest(token: token)
-            do {
-                let networkResult = try await networkProvider.detokenize(request, accessToken: accessToken)
-                
-                switch networkResult {
-                case .success(let response):
-                    guard let value = response.value else {
-                        return .failure(.invalidDetokenisationResponse)
-                    }
-                    
-                    // Cache the result if caching is enabled
-                    if cacheProvider.isEnabled() {
-                        cacheProvider.putValue(token: token, value: value, dataType: response.dataType)
-                    }
-                    
-                    logger.debug("Detokenization successful", file: #file, function: #function, line: #line)
-                    return .success(response)
-                    
-                case .failure(_):
-                    logger.error("Detokenization failed", file: #file, function: #function, line: #line)
+            switch networkResult {
+            case .success(let response):
+                guard let value = response.value else {
                     return .failure(.invalidDetokenisationResponse)
                 }
-            } catch {
-                return .failure(.detokenisationFalied)
+                
+                // Cache the result if caching is enabled
+                if cacheProvider.isEnabled() {
+                    cacheProvider.putValue(token: token, value: value, dataType: response.dataType)
+                }
+                
+                logger.debug("Detokenization successful", file: #file, function: #function, line: #line)
+                return .success(response)
+                
+            case .failure(_):
+                logger.error("Detokenization failed", file: #file, function: #function, line: #line)
+                return .failure(.invalidDetokenisationResponse)
             }
         } catch {
-            return.failure(.authenticationFailed)
+            return .failure(.detokenisationFalied)
         }
     }
     
     private func performBatchTokenization(values: [String]) async -> Result<BatchTokenizeResponse, VaultError> {
+        let tokenResult = await authRepository.getAccessToken()
+        guard case .success(let accessToken) = tokenResult else {
+            logger.error("Failed to get access token for batch tokenization", file: #file, function: #function, line: #line)
+            return .failure(.authenticationFailed)
+        }
+        
+        let request = BatchTokenizeRequest(values: values)
         do {
-            let tokenResult = try await authRepository.getAccessToken()
-            guard case .success(let accessToken) = tokenResult else {
-                logger.error("Failed to get access token for batch tokenization", file: #file, function: #function, line: #line)
-                return .failure(.authenticationFailed)
-            }
+            let networkResult = try await networkProvider.batchTokenize(request, accessToken: accessToken)
             
-            let request = BatchTokenizeRequest(values: values)
-            do {
-                let networkResult = try await networkProvider.batchTokenize(request, accessToken: accessToken)
-                
-                switch networkResult {
-                case .success(let response):
-                    // Cache the result if caching is enabled
-                    if cacheProvider.isEnabled() {
-                        for item in response.results {
-                            if item.exists || item.newlyCreated {
-                                cacheProvider.putToken(value: item.originalValue, token: item.token, dataType: item.dataType)
-                                cacheProvider.putValue(token: item.token, value: item.originalValue, dataType: item.dataType)
-                            }
+            switch networkResult {
+            case .success(let response):
+                // Cache the result if caching is enabled
+                if cacheProvider.isEnabled() {
+                    for item in response.results {
+                        if item.exists || item.newlyCreated {
+                            cacheProvider.putToken(value: item.originalValue, token: item.token, dataType: item.dataType)
+                            cacheProvider.putValue(token: item.token, value: item.originalValue, dataType: item.dataType)
                         }
                     }
-                    
-                    logger.debug("Batch Tokenization successful", file: #file, function: #function, line: #line)
-                    return .success(response)
-                    
-                case .failure(_):
-                    logger.error("Batch Tokenization failed", file: #file, function: #function, line: #line)
-                    return .failure(.invalidBatchTokenisationResponse)
                 }
-            } catch {
-                return .failure(.batchTokenisationFalied)
+                
+                logger.debug("Batch Tokenization successful", file: #file, function: #function, line: #line)
+                return .success(response)
+                
+            case .failure(_):
+                logger.error("Batch Tokenization failed", file: #file, function: #function, line: #line)
+                return .failure(.invalidBatchTokenisationResponse)
             }
         } catch {
-            return.failure(.authenticationFailed)
+            return .failure(.batchTokenisationFalied)
         }
     }
     
     private func performBatchDetokenization(tokens: [String]) async -> Result<BatchDetokenizeResponse, VaultError> {
+        let tokenResult = await authRepository.getAccessToken()
+        guard case .success(let accessToken) = tokenResult else {
+            logger.error("Failed to get access token for batch detokenization", file: #file, function: #function, line: #line)
+            return .failure(.authenticationFailed)
+        }
+        
+        
+        let request = BatchDetokenizeRequest(tokens: tokens)
         do {
-            let tokenResult = try await authRepository.getAccessToken()
-            guard case .success(let accessToken) = tokenResult else {
-                logger.error("Failed to get access token for batch detokenization", file: #file, function: #function, line: #line)
-                return .failure(.authenticationFailed)
-            }
+            let networkResult = try await networkProvider.batchDetokenize(request, accessToken: accessToken)
             
-            
-            let request = BatchDetokenizeRequest(tokens: tokens)
-            do {
-                let networkResult = try await networkProvider.batchDetokenize(request, accessToken: accessToken)
-                
-                switch networkResult {
-                case .success(let response):
-                    // Cache the result if caching is enabled
-                    if cacheProvider.isEnabled() {
-                        for item in response.results {
-                            if let value = item.value, item.exists {
-                                cacheProvider.putValue(token: item.token, value: value, dataType: item.dataType)
-                            }
+            switch networkResult {
+            case .success(let response):
+                // Cache the result if caching is enabled
+                if cacheProvider.isEnabled() {
+                    for item in response.results {
+                        if let value = item.value, item.exists {
+                            cacheProvider.putValue(token: item.token, value: value, dataType: item.dataType)
                         }
                     }
-                    
-                    logger.debug("Batch Detokenization successful", file: #file, function: #function, line: #line)
-                    return .success(response)
-                    
-                case .failure(_):
-                    logger.error("Batch Detokenization failed", file: #file, function: #function, line: #line)
-                    return .failure(.invalidBatchDetokenisationResponse)
                 }
-            } catch {
-                return .failure(.batchDetokenisationFalied)
+                
+                logger.debug("Batch Detokenization successful", file: #file, function: #function, line: #line)
+                return .success(response)
+                
+            case .failure(_):
+                logger.error("Batch Detokenization failed", file: #file, function: #function, line: #line)
+                return .failure(.invalidBatchDetokenisationResponse)
             }
         } catch {
-            return.failure(.authenticationFailed)
+            return .failure(.batchDetokenisationFalied)
         }
     }
     
