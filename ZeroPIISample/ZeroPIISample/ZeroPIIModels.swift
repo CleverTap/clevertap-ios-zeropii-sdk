@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import clevertap_ios_vault_sdk
 
 // MARK: - Data Types
 enum DataType: String, CaseIterable {
@@ -403,30 +404,6 @@ struct DetokenizeData<T> {
     let value: T?
     let exists: Bool
     let dataType: String?
-}
-
-enum BatchTokenizeResult {
-    case success(BatchTokenizeData)
-    case failure(Error)
-}
-
-struct BatchTokenizeData {
-    let results: [BatchTokenItem]
-    let summary: BatchTokenizeSummary
-}
-
-struct BatchTokenItem {
-    let originalValue: String
-    let token: String
-    let exists: Bool
-    let newlyCreated: Bool
-    let dataType: String
-}
-
-struct BatchTokenizeSummary {
-    let processedCount: Int
-    let existingCount: Int
-    let newlyCreatedCount: Int
 }
 
 enum BatchDetokenizeResult<T> {

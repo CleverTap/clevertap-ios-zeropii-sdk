@@ -113,7 +113,7 @@ actor TokenRepositoryImpl: TokenRepository {
         }
         
         // Process uncached values
-        let result = await performWithRetry(operation: "batchTokenize", maxAttempts: 3) {
+        let result = await performWithRetry(operation: "batchTokenize", maxAttempts: 1) {
             await self.performBatchTokenization(values: uncachedValues)
         }
         
@@ -257,24 +257,41 @@ actor TokenRepositoryImpl: TokenRepository {
         }
         
         let request = BatchTokenizeRequest(values: values)
+        guard let encryptedRequest = encryptionManager.createEncryptedRequest(request) else {
+            // TODO: Check for encrypted request failed case
+            logger.error("Failed to get access token for tokenization", file: #file, function: #function, line: #line)
+            return .failure(.tokenisationFalied)
+        }
         do {
-            let networkResult = try await networkProvider.batchTokenize(request, accessToken: accessToken)
+            let networkResult = try await networkProvider.batchTokenize(encryptedRequest, accessToken: accessToken)
             
             switch networkResult {
             case .success(let response):
-                // Cache the result if caching is enabled
-                if cacheProvider.isEnabled() {
-                    for item in response.results {
-                        if item.exists || item.newlyCreated {
-                            cacheProvider.putToken(value: item.originalValue, token: item.token, dataType: item.dataType)
-                            cacheProvider.putValue(token: item.token, value: item.originalValue, dataType: item.dataType)
+                let decryptedResult = encryptionManager.decrypt(encryptedPayload: response.itp, iv: response.itv)
+                switch decryptedResult {
+                case .success(let jsonData):
+                    do {
+                        let decodedObject = try JSONDecoder().decode(BatchTokenizeResponse.self, from: jsonData)
+                        // Cache the result if caching is enabled
+                        if cacheProvider.isEnabled() {
+                            for item in decodedObject.results {
+                                if item.exists || item.newlyCreated {
+                                    cacheProvider.putToken(value: item.originalValue, token: item.token, dataType: item.dataType)
+                                    cacheProvider.putValue(token: item.token, value: item.originalValue, dataType: item.dataType)
+                                }
+                            }
                         }
+                        
+                        logger.debug("Batch Tokenization successful", file: #file, function: #function, line: #line)
+                        return .success(decodedObject)
+                    } catch (let error) {
+                        logger.error("Failed to parse decrypted response: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+                        return .failure(.batchTokenisationFalied)
                     }
+                case .failure(message: let message):
+                    logger.error("Failed to parse batch tokenization response: \(message)", file: #file, function: #function, line: #line)
+                    return .failure(.batchTokenisationFalied)
                 }
-                
-                logger.debug("Batch Tokenization successful", file: #file, function: #function, line: #line)
-                return .success(response)
-                
             case .failure(_):
                 logger.error("Batch Tokenization failed", file: #file, function: #function, line: #line)
                 return .failure(.invalidBatchTokenisationResponse)

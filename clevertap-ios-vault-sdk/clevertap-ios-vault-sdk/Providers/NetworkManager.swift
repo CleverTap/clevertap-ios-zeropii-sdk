@@ -81,12 +81,12 @@ class NetworkManager: NetworkProvider {
         )
     }
     
-    func batchTokenize(_ request: BatchTokenizeRequest, accessToken: String) async throws -> Result<BatchTokenizeResponse, VaultError> {
+    func batchTokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, VaultError> {
         return await performOperation(
             endpoint: Constants.batchTokenizeEndpoint,
             request: request,
             accessToken: accessToken,
-            responseType: BatchTokenizeResponse.self,
+            responseType: EncryptedResponse.self,
             operationType: .batchTokenize
         )
     }

@@ -168,32 +168,33 @@ class ZeroPIIViewModel: ObservableObject {
     }
     
     private func performBatchTokenize(_ data: [Any], isImported: Bool) {
-//        switch selectedDataType {
-//        case .string:
-//            zeroPIISDK.batchTokenizeStrings(data as! [String]) { [weak self] result in
-//                self?.handleBatchTokenizeResult(result, isImported: isImported)
-//            }
-//        case .int:
-//            zeroPIISDK.batchTokenizeInts(data as! [Int]) { [weak self] result in
-//                self?.handleBatchTokenizeResult(result, isImported: isImported)
-//            }
-//        case .long:
-//            zeroPIISDK.batchTokenizeLongs(data as! [Int64]) { [weak self] result in
-//                self?.handleBatchTokenizeResult(result, isImported: isImported)
-//            }
-//        case .float:
-//            zeroPIISDK.batchTokenizeFloats(data as! [Float]) { [weak self] result in
-//                self?.handleBatchTokenizeResult(result, isImported: isImported)
-//            }
-//        case .double:
-//            zeroPIISDK.batchTokenizeDoubles(data as! [Double]) { [weak self] result in
-//                self?.handleBatchTokenizeResult(result, isImported: isImported)
-//            }
-//        case .boolean:
-//            zeroPIISDK.batchTokenizeBooleans(data as! [Bool]) { [weak self] result in
-//                self?.handleBatchTokenizeResult(result, isImported: isImported)
-//            }
-//        }
+        let zeroPIISDK = VaultSDK.getInstance()
+        switch selectedDataType {
+        case .string:
+            zeroPIISDK.batchTokenizeStringValues(data as! [String]) { [weak self] result in
+                self?.handleBatchTokenizeResult(result, isImported: isImported)
+            }
+        case .int:
+            zeroPIISDK.batchTokenizeIntValues(data as! [Int]) { [weak self] result in
+                self?.handleBatchTokenizeResult(result, isImported: isImported)
+            }
+        case .long:
+            zeroPIISDK.batchTokenizeLongValues(data as! [Int64]) { [weak self] result in
+                self?.handleBatchTokenizeResult(result, isImported: isImported)
+            }
+        case .float:
+            zeroPIISDK.batchTokenizeFloatValues(data as! [Float]) { [weak self] result in
+                self?.handleBatchTokenizeResult(result, isImported: isImported)
+            }
+        case .double:
+            zeroPIISDK.batchTokenizeDoubleValues(data as! [Double]) { [weak self] result in
+                self?.handleBatchTokenizeResult(result, isImported: isImported)
+            }
+        case .boolean:
+            zeroPIISDK.batchTokenizeBoolValues(data as! [Bool]) { [weak self] result in
+                self?.handleBatchTokenizeResult(result, isImported: isImported)
+            }
+        }
     }
     
     private func batchDetokenizeImportedValues() {
@@ -399,18 +400,16 @@ class ZeroPIIViewModel: ObservableObject {
     private func handleBatchTokenizeResult(_ result: BatchTokenizeResult, isImported: Bool) {
         DispatchQueue.main.async {
             self.removeLastLoadingItem()
-            
-            switch result {
-            case .success(let data):
+            if result.isSuccess {
                 self.addResult(.batchTokenize(
-                    results: data.results,
-                    summary: data.summary,
+                    results: result.results,
+                    summary: result.summary ?? BatchTokenizeSummary(processedCount: 0, existingCount: 0, newlyCreatedCount: 0),
                     inputDataType: self.selectedDataType,
                     isImported: isImported,
                     fileName: isImported ? self.importedFileName : nil
                 ))
-            case .failure(let error):
-                self.addResult(.error("\(self.selectedDataType.displayName) Batch Tokenize Error", error.localizedDescription))
+            } else {
+                self.addResult(.error("\(self.selectedDataType.displayName) Batch Tokenize Error", "Batch tokenization failed. Check the console for more details."))
             }
         }
     }

@@ -109,7 +109,7 @@ struct BatchDetokenizeResponse: Codable {
     @objc public let existingCount: Int
     @objc public let newlyCreatedCount: Int
     
-    init(processedCount: Int, existingCount: Int, newlyCreatedCount: Int) {
+    @objc public init(processedCount: Int, existingCount: Int, newlyCreatedCount: Int) {
         self.processedCount = processedCount
         self.existingCount = existingCount
         self.newlyCreatedCount = newlyCreatedCount
