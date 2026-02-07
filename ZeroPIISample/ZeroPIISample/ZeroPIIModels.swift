@@ -133,11 +133,8 @@ enum TokenDisplayItem: Identifiable {
             }
             
             text += "\nResults:\n"
-            for result in results.prefix(3) {
+            for result in results {
                 text += "• \(result.originalValue) → \(result.token)\n"
-            }
-            if results.count > 3 {
-                text += "... and \(results.count - 3) more"
             }
             
             return text

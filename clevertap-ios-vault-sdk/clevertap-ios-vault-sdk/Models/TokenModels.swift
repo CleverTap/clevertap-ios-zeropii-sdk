@@ -91,7 +91,17 @@ struct BatchDetokenizeResponse: Codable {
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.originalValue = try container.decode(String.self, forKey: .originalValue)
-        self.token = try container.decode(String.self, forKey: .token)
+        // token can be String or Number
+        let decodedToken: String
+        if let stringValue = try? container.decode(String.self, forKey: .token) {
+            decodedToken = stringValue
+        } else if let intValue = try? container.decode(Int.self, forKey: .token) {
+            decodedToken = "\(intValue)"
+        } else {
+            // Fallback if neither String nor number
+            decodedToken = ""
+        }
+        self.token = decodedToken
         self.exists = try container.decode(Bool.self, forKey: .exists)
         self.newlyCreated = try container.decode(Bool.self, forKey: .newlyCreated)
         self.dataType = try container.decodeIfPresent(String.self, forKey: .dataType)
