@@ -68,30 +68,30 @@ class ZeroPIIViewModel: ObservableObject {
                 self?.handleTokenizeResult(originalValue: valueString, result: result)
             }
         case .int:
-            let valueString = value as! Int
-//            zeroPIISDK.tokenizeString(valueString) { [weak self] result in
-//                self?.handleTokenizeResult(originalValue: valueString, result: result)
-//            }
+            let valueInt = value as! Int
+            zeroPIISDK.tokenizeInt(valueInt) { [weak self] result in
+                self?.handleTokenizeResult(originalValue: valueInt, result: result)
+            }
         case .long:
-            let valueString = value as! CLong
-//            zeroPIISDK.tokenizeString(valueString) { [weak self] result in
-//                self?.handleTokenizeResult(originalValue: valueString, result: result)
-//            }
+            let valueLong = value as! Int64
+            zeroPIISDK.tokenizeLong(valueLong) { [weak self] result in
+                self?.handleTokenizeResult(originalValue: valueLong, result: result)
+            }
         case .float:
-            let valueString = value as! Float
-//            zeroPIISDK.tokenizeString(valueString) { [weak self] result in
-//                self?.handleTokenizeResult(originalValue: valueString, result: result)
-//            }
+            let valueFloat = value as! Float
+            zeroPIISDK.tokenizeFloat(valueFloat) { [weak self] result in
+                self?.handleTokenizeResult(originalValue: valueFloat, result: result)
+            }
         case .double:
-            let valueString = value as! Double
-//            zeroPIISDK.tokenizeString(valueString) { [weak self] result in
-//                self?.handleTokenizeResult(originalValue: valueString, result: result)
-//            }
+            let valueDouble = value as! Double
+            zeroPIISDK.tokenizeDouble(valueDouble) { [weak self] result in
+                self?.handleTokenizeResult(originalValue: valueDouble, result: result)
+            }
         case .boolean:
-            let valueString = value as! Bool
-//            zeroPIISDK.tokenizeString(valueString) { [weak self] result in
-//                self?.handleTokenizeResult(originalValue: valueString, result: result)
-//            }
+            let valueBool = value as! Bool
+            zeroPIISDK.tokenizeBool(valueBool) { [weak self] result in
+                self?.handleTokenizeResult(originalValue: valueBool, result: result)
+            }
         }
     }
     
@@ -358,15 +358,16 @@ class ZeroPIIViewModel: ObservableObject {
     }
     
     // MARK: - Result Handlers
-    private func handleTokenizeResult(originalValue: String, result: TokenizeResult) {
+    private func handleTokenizeResult<T>(originalValue: T, result: TokenizeResult) {
         guard let token = result.token else {
             self.addResult(.error("\(self.selectedDataType.displayName) Tokenize Error", "Failed to tokenize \(self.selectedDataType.displayName) value"))
             return
         }
+        let originalString = String(describing: originalValue)
         DispatchQueue.main.async {
             self.removeLastLoadingItem()
             self.addResult(.singleTokenize(
-                originalValue: originalValue,
+                originalValue: originalString,
                 token: token,
                 exists: result.exists,
                 newlyCreated: result.newlyCreated,

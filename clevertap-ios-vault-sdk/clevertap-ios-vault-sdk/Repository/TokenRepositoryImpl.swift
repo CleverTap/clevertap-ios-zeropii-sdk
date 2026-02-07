@@ -58,7 +58,7 @@ actor TokenRepositoryImpl: TokenRepository {
         
         switch result {
         case .success(let response):
-            return .success(token: response.token, exists: response.exists, newlyCreated: response.newlyCreated, dataType: response.dataType)
+            return .success(token: response.token.stringValue, exists: response.exists, newlyCreated: response.newlyCreated, dataType: response.dataType)
         case .failure(let error):
             return .error(message: error.localizedDescription)
         }
@@ -193,13 +193,13 @@ actor TokenRepositoryImpl: TokenRepository {
                         let decodedObject = try JSONDecoder().decode(TokenizeResponse.self, from: jsonData)
                         // Cache the result if caching is enabled
                         if cacheProvider.isEnabled() {
-                            cacheProvider.putToken(value: value, token: decodedObject.token, dataType: decodedObject.dataType)
+                            cacheProvider.putToken(value: value, token: decodedObject.token.stringValue, dataType: decodedObject.dataType)
                         }
                         
                         logger.debug("Tokenization successful", file: #file, function: #function, line: #line)
                         return .success(decodedObject)
-                    } catch {
-                        logger.error("Failed to parse decrypted response.", file: #file, function: #function, line: #line)
+                    } catch (let error) {
+                        logger.error("Failed to parse decrypted response: \(error.localizedDescription)", file: #file, function: #function, line: #line)
                         return .failure(.tokenisationFalied)
                     }
                 case .failure(message: let message):

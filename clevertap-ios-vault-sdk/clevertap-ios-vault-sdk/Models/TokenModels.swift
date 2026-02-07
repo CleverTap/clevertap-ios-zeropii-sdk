@@ -31,7 +31,7 @@ struct TokenizeRequest: Codable {
 
 /// Response model for tokenizing a single value.
 struct TokenizeResponse: Codable {
-    let token: String
+    let token: StringOrInt
     let exists: Bool
     let newlyCreated: Bool
     let dataType: String?

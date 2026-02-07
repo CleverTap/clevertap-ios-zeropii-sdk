@@ -392,7 +392,7 @@ struct ResultItemView: View {
             Text(item.content)
                 .font(.caption)
                 .foregroundColor(.secondary)
-                .lineLimit(3)
+                .lineLimit(5)
             
             if item.isExpandable {
                 Button {
