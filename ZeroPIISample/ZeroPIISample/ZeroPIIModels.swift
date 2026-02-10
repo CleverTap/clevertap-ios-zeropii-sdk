@@ -392,16 +392,6 @@ struct SampleDataProvider {
 }
 
 // MARK: - SDK Result Types (from SDK - included here for sample app completeness)
-enum DetokenizeResult<T> {
-    case success(DetokenizeData<T>)
-    case failure(Error)
-}
-
-struct DetokenizeData<T> {
-    let value: T?
-    let exists: Bool
-    let dataType: String?
-}
 
 enum BatchDetokenizeResult<T> {
     case success(BatchDetokenizeData<T>)

@@ -29,7 +29,7 @@ enum TokenResult {
 
 /// Represents the result of a detokenization process, which can either be a success
 /// containing the original value and metadata, or an error describing what went wrong.
-enum DetokenizeResult {
+enum DetokenResult {
     
     /// Indicates a successful detokenization operation.
     ///

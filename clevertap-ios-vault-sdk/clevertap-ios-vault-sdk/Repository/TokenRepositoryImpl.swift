@@ -65,31 +65,22 @@ actor TokenRepositoryImpl: TokenRepository {
     }
     
     
-    public func detokenize(_ token: String) async -> DetokenizeResult {
+    public func detokenize(_ token: String) async -> DetokenResult {
         guard !token.isEmpty else {
             logger.warning("Empty token provided for detokenization", file: #file, function: #function, line: #line)
             return .error(message: "Empty token passed")
         }
-        
-        // Check cache first if enabled
+
+        // Local-only lookup from cache (backed by encrypted preferences)
         if cacheProvider.isEnabled() {
             if let valueDetails = cacheProvider.getValue(for: token) {
-                logger.debug("Value found in cache", file: #file, function: #function, line: #line)
+                logger.debug("Value found in local store", file: #file, function: #function, line: #line)
                 return .success(value: valueDetails.value, exists: true, dataType: valueDetails.dataType)
             }
         }
-        
-        // Perform detokenization with retry logic
-        let result = await performWithRetry(operation: "detokenize", maxAttempts: 3) {
-            await self.performDetokenization(token: token)
-        }
-        
-        switch result {
-        case .success(let response):
-            return .success(value: response.value, exists: response.exists, dataType: response.dataType)
-        case .failure(let error):
-            return .error(message: error.localizedDescription)
-        }
+
+        logger.debug("Token not found in local store", file: #file, function: #function, line: #line)
+        return .error(message: "Token not found in local store")
     }
     
     public func batchTokenize(_ values: [String]) async -> BatchTokenResult {
@@ -134,36 +125,29 @@ actor TokenRepositoryImpl: TokenRepository {
             logger.warning("Batch detokenize request contains no tokens", file: #file, function: #function, line: #line)
             return .error(message: "Empty tokens passed")
         }
-        
+
         guard tokens.count <= maxBatchSizeDetokenize else {
             logger.error("Batch size \(tokens.count) exceeds maximum \(maxBatchSizeDetokenize)", file: #file, function: #function, line: #line)
             return .error(message: "Batch size exceeds maximum limit")
         }
-        
-        var (cachedResults, uncachedTokens) = separateCachedTokens(tokens)
-        logger.debug("Batch detokenize: \(cachedResults.count) cached, \(uncachedTokens.count) uncached", file: #file, function: #function, line: #line)
-        
-        // If all tokens are cached, return immediately
-        if uncachedTokens.isEmpty {
-            logger.debug("All values found in cache", file: #file, function: #function, line: #line)
-            return .success(results: cachedResults, summary: BatchDetokenizeSummary(processedCount: cachedResults.count, foundCount: cachedResults.count, notFoundCount: 0))
-        }
-        
-        // Process uncached tokens
-        let result = await performWithRetry(operation: "batchDetokenize", maxAttempts: 3) {
-            await self.performBatchDetokenization(tokens: uncachedTokens)
+
+        // Local-only lookup from cache (backed by encrypted preferences)
+        var results = [BatchDetokenItem]()
+        var foundCount = 0
+        var notFoundCount = 0
+
+        for token in tokens {
+            if cacheProvider.isEnabled(), let valueDetails = cacheProvider.getValue(for: token) {
+                results.append(BatchDetokenItem(token: token, value: valueDetails.value, exists: true, dataType: valueDetails.dataType))
+                foundCount += 1
+            } else {
+                results.append(BatchDetokenItem(token: token, value: nil, exists: false, dataType: nil))
+                notFoundCount += 1
+            }
         }
 
-        switch result {
-        case .success(let response):
-            cachedResults.append(contentsOf: response.results)
-            return .success(results: cachedResults,
-                            summary: BatchDetokenizeSummary(processedCount: cachedResults.count,
-                                                            foundCount: cachedResults.count { $0.exists },
-                                                            notFoundCount: cachedResults.count { !$0.exists }))
-        case .failure(let error):
-            return .error(message: error.localizedDescription)
-        }
+        logger.debug("Batch detokenize local lookup: \(foundCount) found, \(notFoundCount) not found", file: #file, function: #function, line: #line)
+        return .success(results: results, summary: BatchDetokenizeSummary(processedCount: tokens.count, foundCount: foundCount, notFoundCount: notFoundCount))
     }
     
     // MARK: - Private Implementation Methods
@@ -194,6 +178,7 @@ actor TokenRepositoryImpl: TokenRepository {
                         // Cache the result if caching is enabled
                         if cacheProvider.isEnabled() {
                             cacheProvider.putToken(value: value, token: decodedObject.token.stringValue, dataType: decodedObject.dataType)
+                            cacheProvider.putValue(token: decodedObject.token.stringValue, value: value, dataType: decodedObject.dataType)
                         }
                         
                         logger.debug("Tokenization successful", file: #file, function: #function, line: #line)
@@ -212,40 +197,6 @@ actor TokenRepositoryImpl: TokenRepository {
             }
         } catch {
             return .failure(.tokenisationFalied)
-        }
-    }
-    
-    private func performDetokenization(token: String) async -> Result<DetokenizeResponse, VaultError> {
-        let tokenResult = await authRepository.getAccessToken()
-        guard case .success(let accessToken) = tokenResult else {
-            logger.error("Failed to get access token for detokenization", file: #file, function: #function, line: #line)
-            return .failure(.authenticationFailed)
-        }
-        
-        let request = DetokenizeRequest(token: token)
-        do {
-            let networkResult = try await networkProvider.detokenize(request, accessToken: accessToken)
-            
-            switch networkResult {
-            case .success(let response):
-                guard let value = response.value else {
-                    return .failure(.invalidDetokenisationResponse)
-                }
-                
-                // Cache the result if caching is enabled
-                if cacheProvider.isEnabled() {
-                    cacheProvider.putValue(token: token, value: value, dataType: response.dataType)
-                }
-                
-                logger.debug("Detokenization successful", file: #file, function: #function, line: #line)
-                return .success(response)
-                
-            case .failure(_):
-                logger.error("Detokenization failed", file: #file, function: #function, line: #line)
-                return .failure(.invalidDetokenisationResponse)
-            }
-        } catch {
-            return .failure(.detokenisationFalied)
         }
     }
     
@@ -301,41 +252,6 @@ actor TokenRepositoryImpl: TokenRepository {
         }
     }
     
-    private func performBatchDetokenization(tokens: [String]) async -> Result<BatchDetokenizeResponse, VaultError> {
-        let tokenResult = await authRepository.getAccessToken()
-        guard case .success(let accessToken) = tokenResult else {
-            logger.error("Failed to get access token for batch detokenization", file: #file, function: #function, line: #line)
-            return .failure(.authenticationFailed)
-        }
-        
-        
-        let request = BatchDetokenizeRequest(tokens: tokens)
-        do {
-            let networkResult = try await networkProvider.batchDetokenize(request, accessToken: accessToken)
-            
-            switch networkResult {
-            case .success(let response):
-                // Cache the result if caching is enabled
-                if cacheProvider.isEnabled() {
-                    for item in response.results {
-                        if let value = item.value, item.exists {
-                            cacheProvider.putValue(token: item.token, value: value, dataType: item.dataType)
-                        }
-                    }
-                }
-                
-                logger.debug("Batch Detokenization successful", file: #file, function: #function, line: #line)
-                return .success(response)
-                
-            case .failure(_):
-                logger.error("Batch Detokenization failed", file: #file, function: #function, line: #line)
-                return .failure(.invalidBatchDetokenisationResponse)
-            }
-        } catch {
-            return .failure(.batchDetokenisationFalied)
-        }
-    }
-    
     private func separateCachedValues(_ values: [String]) -> ([BatchTokenItem], [String]) {
         if !cacheProvider.isEnabled() {
             return ([], values)
@@ -353,25 +269,6 @@ actor TokenRepositoryImpl: TokenRepository {
         }
         
         return (cachedResults, uncachedValues)
-    }
-    
-    private func separateCachedTokens(_ tokens: [String]) -> ([BatchDetokenItem], [String]) {
-        if !cacheProvider.isEnabled() {
-            return ([], tokens)
-        }
-        
-        var cachedResults: [BatchDetokenItem] = []
-        var uncachedTokens: [String] = []
-        
-        for (_, token) in tokens.enumerated() {
-            if let valueDetails = cacheProvider.getValue(for: token) {
-                cachedResults.append(BatchDetokenItem(token: token, value: valueDetails.value, exists: true, dataType: valueDetails.dataType))
-            } else {
-                uncachedTokens.append(token)
-            }
-        }
-        
-        return (cachedResults, uncachedTokens)
     }
     
     // MARK: - Retry Logic

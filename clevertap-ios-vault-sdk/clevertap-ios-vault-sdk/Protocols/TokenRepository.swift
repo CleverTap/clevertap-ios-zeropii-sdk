@@ -20,7 +20,7 @@ protocol TokenRepository {
     /// Retrieves the original value for a given token
     /// - Parameter token: The token to detokenize
     /// - Returns: The detokenization result
-    func detokenize(_ token: String) async -> DetokenizeResult
+    func detokenize(_ token: String) async -> DetokenResult
     
     // MARK: - Batch Operations
     

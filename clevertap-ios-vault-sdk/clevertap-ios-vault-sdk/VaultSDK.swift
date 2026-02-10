@@ -65,9 +65,13 @@ import Foundation
         
         // Setup encryption manager if enabled
         encryptionManager = EncryptionManager(enabled: true, logger: logger)
-        
-        // Initialize token cache if enabled
-        tokenCacheManager = TokenCacheManager(enabled: true)
+
+        // Initialize preference manager for encrypted persistence
+        let keychainManager = KeychainManager()
+        let preferenceManager = VaultPreferenceManager(keychainManager: keychainManager, encryptionManager: encryptionManager, logger: logger)
+
+        // Initialize token cache with preference-backed persistence
+        tokenCacheManager = TokenCacheManager(enabled: true, preferenceManager: preferenceManager)
         
         // Create repositories
         authRepository = AuthRepositoryImpl(
@@ -174,6 +178,56 @@ import Foundation
         performTokenization(value: value, type: Bool.self, callback: callback)
     }
     
+    // MARK: - Detokenization Methods
+
+    /// Detokenizes a token and returns the original String value from local store
+    /// - Parameters:
+    ///   - token: The token to detokenize
+    ///   - callback: The callback to receive the result
+    @objc public func detokenizeString(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
+        performDetokenization(token: token, type: String.self, callback: callback)
+    }
+
+    /// Detokenizes a token and returns the original Int value from local store
+    /// - Parameters:
+    ///   - token: The token to detokenize
+    ///   - callback: The callback to receive the result
+    @objc public func detokenizeInt(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
+        performDetokenization(token: token, type: Int.self, callback: callback)
+    }
+
+    /// Detokenizes a token and returns the original Int64 (Long) value from local store
+    /// - Parameters:
+    ///   - token: The token to detokenize
+    ///   - callback: The callback to receive the result
+    @objc public func detokenizeLong(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
+        performDetokenization(token: token, type: Int64.self, callback: callback)
+    }
+
+    /// Detokenizes a token and returns the original Float value from local store
+    /// - Parameters:
+    ///   - token: The token to detokenize
+    ///   - callback: The callback to receive the result
+    @objc public func detokenizeFloat(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
+        performDetokenization(token: token, type: Float.self, callback: callback)
+    }
+
+    /// Detokenizes a token and returns the original Double value from local store
+    /// - Parameters:
+    ///   - token: The token to detokenize
+    ///   - callback: The callback to receive the result
+    @objc public func detokenizeDouble(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
+        performDetokenization(token: token, type: Double.self, callback: callback)
+    }
+
+    /// Detokenizes a token and returns the original Boolean value from local store
+    /// - Parameters:
+    ///   - token: The token to detokenize
+    ///   - callback: The callback to receive the result
+    @objc public func detokenizeBool(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
+        performDetokenization(token: token, type: Bool.self, callback: callback)
+    }
+
     // MARK: - Batch Tokenization Methods
         
     /// Tokenizes multiple String values in a single batch operation
@@ -262,6 +316,45 @@ import Foundation
                 self.logger.debug("Tokenization result: \(typeName) value: \(repoResult)", file: #file, function: #function, line: #line)
                 
                 callback(tokenizeResult)
+            }
+        }
+    }
+
+    /// Internal method to perform detokenization with type validation
+    private func performDetokenization<T>(
+        token: String,
+        type: T.Type,
+        callback: @escaping (DetokenizeResult) -> Void
+    ) {
+        sdkQueue.async { [weak self] in
+            guard let self = self else { return }
+
+            Task { @MainActor in
+                let typeName = String(describing: type)
+                self.logger.debug("Detokenizing for \(typeName) type", file: #file, function: #function, line: #line)
+
+                // Call repository (local-only lookup from encrypted preferences)
+                let repoResult = await self.tokenRepository.detokenize(token)
+
+                // Validate the returned value can be converted to the expected type
+                switch repoResult {
+                case .success(let value, let exists, let dataType):
+                    if let value = value, let converter = TypeConverterRegistry.getConverter(for: type) {
+                        let converted = converter.fromStringNullable(value)
+                        if converted == nil {
+                            let result = DetokenizeResult(result: .error(message: "Value cannot be converted to \(typeName)"))
+                            callback(result)
+                            return
+                        }
+                    }
+                    let result = DetokenizeResult(result: .success(value: value, exists: exists, dataType: dataType))
+                    self.logger.debug("Detokenization result: \(typeName): \(repoResult)", file: #file, function: #function, line: #line)
+                    callback(result)
+
+                case .error(let message):
+                    let result = DetokenizeResult(result: .error(message: message))
+                    callback(result)
+                }
             }
         }
     }

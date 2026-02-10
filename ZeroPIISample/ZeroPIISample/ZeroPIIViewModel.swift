@@ -102,33 +102,33 @@ class ZeroPIIViewModel: ObservableObject {
         }
         
         addResult(.loading("Detokenizing \(inputText) as \(selectedDataType.displayName)..."))
-        
-//        switch selectedDataType {
-//        case .string:
-//            zeroPIISDK.detokenizeAsString(inputText) { [weak self] result in
-//                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-//            }
-//        case .int:
-//            zeroPIISDK.detokenizeAsInt(inputText) { [weak self] result in
-//                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-//            }
-//        case .long:
-//            zeroPIISDK.detokenizeAsLong(inputText) { [weak self] result in
-//                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-//            }
-//        case .float:
-//            zeroPIISDK.detokenizeAsFloat(inputText) { [weak self] result in
-//                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-//            }
-//        case .double:
-//            zeroPIISDK.detokenizeAsDouble(inputText) { [weak self] result in
-//                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-//            }
-//        case .boolean:
-//            zeroPIISDK.detokenizeAsBoolean(inputText) { [weak self] result in
-//                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-//            }
-//        }
+        let zeroPIISDK = VaultSDK.getInstance()
+        switch selectedDataType {
+        case .string:
+            zeroPIISDK.detokenizeString(inputText) { [weak self] result in
+                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
+            }
+        case .int:
+            zeroPIISDK.detokenizeInt(inputText) { [weak self] result in
+                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
+            }
+        case .long:
+            zeroPIISDK.detokenizeLong(inputText) { [weak self] result in
+                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
+            }
+        case .float:
+            zeroPIISDK.detokenizeFloat(inputText) { [weak self] result in
+                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
+            }
+        case .double:
+            zeroPIISDK.detokenizeDouble(inputText) { [weak self] result in
+                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
+            }
+        case .boolean:
+            zeroPIISDK.detokenizeBool(inputText) { [weak self] result in
+                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
+            }
+        }
     }
     
     // MARK: - Batch Operations
@@ -350,7 +350,7 @@ class ZeroPIIViewModel: ObservableObject {
     
     // MARK: - Utility
     func clearCache() {
-//        zeroPIISDK.clearCache()
+        VaultSDK.getInstance().clearCache()
         addResult(.cacheCleared)
     }
     
@@ -360,41 +360,44 @@ class ZeroPIIViewModel: ObservableObject {
     
     // MARK: - Result Handlers
     private func handleTokenizeResult<T>(originalValue: T, result: TokenizeResult) {
+        self.removeLastLoadingItem()
+
         guard let token = result.token else {
             self.addResult(.error("\(self.selectedDataType.displayName) Tokenize Error", "Failed to tokenize \(self.selectedDataType.displayName) value"))
             return
         }
         let originalString = String(describing: originalValue)
-        DispatchQueue.main.async {
-            self.removeLastLoadingItem()
-            self.addResult(.singleTokenize(
-                originalValue: originalString,
-                token: token,
-                exists: result.exists,
-                newlyCreated: result.newlyCreated,
-                dataType: result.dataType ?? "unknown",
-                inputDataType: self.selectedDataType
-            ))
-        }
+
+        self.addResult(.singleTokenize(
+            originalValue: originalString,
+            token: token,
+            exists: result.exists,
+            newlyCreated: result.newlyCreated,
+            dataType: result.dataType ?? "unknown",
+            inputDataType: self.selectedDataType
+        ))
     }
     
-    private func handleDetokenizeResult<T>(token: String, result: DetokenizeResult<T>) {
-        DispatchQueue.main.async {
-            self.removeLastLoadingItem()
-            
-            switch result {
-            case .success(let data):
-                self.addResult(.singleDetokenize(
-                    token: token,
-                    originalValue: String(describing: data.value as? String ?? "null"),
-                    exists: data.exists,
-                    dataType: data.dataType ?? "unknown",
-                    outputDataType: self.selectedDataType
-                ))
-            case .failure(let error):
-                self.addResult(.error("\(self.selectedDataType.displayName) Detokenize Error", error.localizedDescription))
-            }
+    private func handleDetokenizeResult(token: String, result: DetokenizeResult) {
+        self.removeLastLoadingItem()
+
+        if !result.isSuccess {
+            self.addResult(.error("\(self.selectedDataType.displayName) Detokenize Error", result.errorMessage ?? "Failed to detokenize \(self.selectedDataType.displayName) value"))
+            return
         }
+
+        guard let value = result.value else {
+            self.addResult(.error("\(self.selectedDataType.displayName) Detokenize Error", "Failed to detokenize \(self.selectedDataType.displayName) value"))
+            return
+        }
+
+        self.addResult(.singleDetokenize(
+            token: token,
+            originalValue: value,
+            exists: result.exists,
+            dataType: result.dataType ?? "unknown",
+            outputDataType: self.selectedDataType
+        ))
     }
     
     private func handleBatchTokenizeResult(_ result: BatchTokenizeResult, isImported: Bool) {
@@ -510,8 +513,10 @@ class ZeroPIIViewModel: ObservableObject {
     }
     
     private func removeLastLoadingItem() {
-        if let index = results.firstIndex(where: { if case .loading = $0 { return true } else { return false } }) {
-            results.remove(at: index)
+        DispatchQueue.main.async { [weak self] in
+            if let index = self?.results.firstIndex(where: { if case .loading = $0 { return true } else { return false } }) {
+                self?.results.remove(at: index)
+            }
         }
     }
     

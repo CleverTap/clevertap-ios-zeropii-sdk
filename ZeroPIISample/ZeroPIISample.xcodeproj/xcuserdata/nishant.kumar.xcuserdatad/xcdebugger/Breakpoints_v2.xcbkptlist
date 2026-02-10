@@ -32,7 +32,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "52"
             endingLineNumber = "52"
-            landmarkName = "createEncryptedRequest(_:)"
+            landmarkName = "encryptData(_:using:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -48,7 +48,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "57"
             endingLineNumber = "57"
-            landmarkName = "createEncryptedRequest(_:)"
+            landmarkName = "encryptData(_:using:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -62,40 +62,10 @@
             filePath = "../clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/Repository/TokenRepositoryImpl.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "268"
-            endingLineNumber = "268"
-            landmarkName = "performBatchTokenization(values:)"
+            startingLineNumber = "269"
+            endingLineNumber = "269"
+            landmarkName = "separateCachedValues(_:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "873E5268-32A6-4533-9C09-569FB1392EDF - 25c90e41426256e3"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(5) suspend resume partial function for clevertap_ios_vault_sdk.TokenRepositoryImpl.performBatchTokenization(values: Swift.Array&lt;Swift.String&gt;) async -&gt; Swift.Result&lt;clevertap_ios_vault_sdk.BatchTokenizeResponse, clevertap_ios_vault_sdk.VaultError&gt;"
-                  moduleName = "clevertap_ios_vault_sdk"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nishant.kumar/clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/Repository/TokenRepositoryImpl.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "269"
-                  endingLineNumber = "269">
-               </Location>
-               <Location
-                  uuid = "873E5268-32A6-4533-9C09-569FB1392EDF - 25c90e41426256e3"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(5) suspend resume partial function for clevertap_ios_vault_sdk.TokenRepositoryImpl.performBatchTokenization(values: Swift.Array&lt;Swift.String&gt;) async -&gt; Swift.Result&lt;clevertap_ios_vault_sdk.BatchTokenizeResponse, clevertap_ios_vault_sdk.VaultError&gt;"
-                  moduleName = "clevertap_ios_vault_sdk"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nishant.kumar/clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/Repository/TokenRepositoryImpl.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "269"
-                  endingLineNumber = "269">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -127,6 +97,134 @@
             startingLineNumber = "92"
             endingLineNumber = "92"
             landmarkName = "init(from:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B763C0AE-3DC0-4F6B-BA4A-7B8174C2CAAF"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/Providers/TokenCacheManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "50"
+            endingLineNumber = "50"
+            landmarkName = "putValue(token:value:dataType:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0CE09922-A3BE-4161-9CAC-026C7571FD63"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/Providers/TokenCacheManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "60"
+            endingLineNumber = "60"
+            landmarkName = "putToken(value:token:dataType:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8B74EA56-3FB5-4D07-9F16-3E69E038014B"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/Providers/VaultPreferenceManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "123"
+            endingLineNumber = "123"
+            landmarkName = "VaultPreferenceManager"
+            landmarkType = "3">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "665C6659-BB25-4576-A060-9B13C9C00BC5"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/Providers/VaultPreferenceManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "80"
+            endingLineNumber = "80"
+            landmarkName = "saveTokenToValueMap(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "EC579406-5588-454B-A060-C13890F80718"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/Providers/VaultPreferenceManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "95"
+            endingLineNumber = "95"
+            landmarkName = "saveValueToTokenMap(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "520D90A5-4882-4545-B11B-BCB3517A2FAF"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/Providers/TokenCacheManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "43"
+            endingLineNumber = "43"
+            landmarkName = "getValue(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "35619707-177C-4810-900B-7C5C22A8EE34"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/Providers/TokenCacheManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "37"
+            endingLineNumber = "37"
+            landmarkName = "getToken(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7D56D001-ED03-47B6-9ABD-0C0011940EE1"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../clevertap-ios-vault-sdk/clevertap-ios-vault-sdk/Providers/TokenCacheManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "30"
+            endingLineNumber = "30"
+            landmarkName = "getToken(for:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
