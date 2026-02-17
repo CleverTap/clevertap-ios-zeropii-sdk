@@ -120,7 +120,7 @@ actor TokenRepositoryImpl: TokenRepository {
         }
     }
     
-    public func batchDetokenize(_ tokens: [String]) async -> BatchDetokenizeResult {
+    public func batchDetokenize(_ tokens: [String]) async -> BatchDetokenResult {
         guard !tokens.isEmpty else {
             logger.warning("Batch detokenize request contains no tokens", file: #file, function: #function, line: #line)
             return .error(message: "Empty tokens passed")

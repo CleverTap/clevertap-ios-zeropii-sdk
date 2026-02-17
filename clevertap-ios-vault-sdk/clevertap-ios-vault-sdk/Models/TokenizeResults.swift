@@ -69,7 +69,7 @@ import Foundation
     @objc public let results: [BatchTokenItem]
     @objc public let summary: BatchTokenizeSummary?
     @objc public let errorMessage: String?
-    
+
     internal init(result: BatchTokenResult) {
         switch result {
         case .success(let results, let summary):
@@ -77,7 +77,31 @@ import Foundation
             self.results = results
             self.summary = summary
             self.errorMessage = nil
-            
+
+        case .error(let message):
+            self.isSuccess = false
+            self.results = []
+            self.summary = nil
+            self.errorMessage = message
+        }
+        super.init()
+    }
+}
+
+@objc public class BatchDetokenizeResult: NSObject {
+    @objc public let isSuccess: Bool
+    @objc public let results: [BatchDetokenItem]
+    @objc public let summary: BatchDetokenizeSummary?
+    @objc public let errorMessage: String?
+
+    internal init(result: BatchDetokenResult) {
+        switch result {
+        case .success(let results, let summary):
+            self.isSuccess = true
+            self.results = results
+            self.summary = summary
+            self.errorMessage = nil
+
         case .error(let message):
             self.isSuccess = false
             self.results = []

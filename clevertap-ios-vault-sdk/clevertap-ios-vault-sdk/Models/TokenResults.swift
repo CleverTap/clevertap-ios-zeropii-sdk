@@ -65,7 +65,7 @@ enum BatchTokenResult {
 
 /// Represents the result of a batch detokenization operation, which can either be a success
 /// containing multiple individual detokenization results and a summary, or an error describing the failure.
-enum BatchDetokenizeResult {
+enum BatchDetokenResult {
     
     /// Indicates a successful batch detokenization.
     ///

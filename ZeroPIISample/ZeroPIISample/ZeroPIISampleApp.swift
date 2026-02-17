@@ -47,15 +47,12 @@ struct ContentView: View {
                         
                         // Input Section
                         InputSectionView(viewModel: viewModel)
-                        
-                        // Sample Data Buttons
-                        SampleDataButtonsView(viewModel: viewModel)
-                        
+
                         // File Import Section (Batch only)
                         if viewModel.selectedOperation == .batch {
                             FileImportSectionView(viewModel: viewModel)
                         }
-                        
+
                         // Action Buttons
                         ActionButtonsView(viewModel: viewModel)
                         
@@ -170,44 +167,45 @@ struct OperationTypeSelectionView: View {
 // MARK: - Input Section
 struct InputSectionView: View {
     @ObservedObject var viewModel: ZeroPIIViewModel
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Input")
                 .font(.headline)
-            
-            TextField(viewModel.inputPlaceholder, text: $viewModel.inputText)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-        }
-    }
-}
 
-// MARK: - Sample Data Buttons
-struct SampleDataButtonsView: View {
-    @ObservedObject var viewModel: ZeroPIIViewModel
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Sample Data")
-                .font(.headline)
-            
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
-                ForEach(DataType.allCases, id: \.self) { type in
-                    Button {
-                        viewModel.loadSampleData(for: type)
-                    } label: {
-                        HStack {
-                            Text(type.icon)
-                            Text(type.displayName)
+            if viewModel.selectedOperation == .single {
+                TextField(viewModel.inputPlaceholder, text: $viewModel.inputText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+            } else {
+                ForEach(viewModel.batchInputValues.indices, id: \.self) { index in
+                    HStack(spacing: 8) {
+                        TextField(viewModel.inputPlaceholder, text: $viewModel.batchInputValues[index])
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .autocapitalization(.none)
+                            .disableAutocorrection(true)
+
+                        if viewModel.batchInputValues.count > 1 {
+                            Button {
+                                viewModel.removeBatchInputField(at: index)
+                            } label: {
+                                Image(systemName: "minus.circle.fill")
+                                    .foregroundColor(.red)
+                            }
                         }
-                        .font(.caption)
+                    }
+                }
+
+                Button {
+                    viewModel.addBatchInputField()
+                } label: {
+                    Label("Add Value", systemImage: "plus.circle.fill")
+                        .font(.subheadline)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
                         .background(Color(.systemGray5))
                         .cornerRadius(8)
-                    }
                 }
             }
         }
@@ -218,20 +216,20 @@ struct SampleDataButtonsView: View {
 struct FileImportSectionView: View {
     @ObservedObject var viewModel: ZeroPIIViewModel
     @State private var showingFilePicker = false
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("File Import")
+            Text("Or Import from File")
                 .font(.headline)
-            
+
             if let importStatus = viewModel.importStatus {
                 HStack {
                     Text(importStatus)
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    
+
                     Spacer()
-                    
+
                     Button("Clear") {
                         viewModel.clearImportedData()
                     }
@@ -242,7 +240,7 @@ struct FileImportSectionView: View {
                 .background(Color(.systemGray6))
                 .cornerRadius(8)
             }
-            
+
             Button {
                 showingFilePicker = true
             } label: {

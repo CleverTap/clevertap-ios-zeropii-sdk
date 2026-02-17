@@ -32,5 +32,5 @@ protocol TokenRepository {
     /// Retrieves original values for multiple tokens in a single operation
     /// - Parameter tokens: Array of tokens to detokenize
     /// - Returns: The batch detokenization result
-    func batchDetokenize(_ tokens: [String]) async -> BatchDetokenizeResult
+    func batchDetokenize(_ tokens: [String]) async -> BatchDetokenResult
 }

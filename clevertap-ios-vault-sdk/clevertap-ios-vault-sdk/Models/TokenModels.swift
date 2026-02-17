@@ -140,18 +140,58 @@ struct BatchDetokenizeResponse: Codable {
 }
 
 /// Represents the result for an individual item in a batch detokenization operation.
-struct BatchDetokenItem: Codable {
-    let token: String
-    let value: String?
-    let exists: Bool
-    let dataType: String?
+@objc public class BatchDetokenItem: NSObject, Codable {
+    @objc public let token: String
+    @objc public let value: String?
+    @objc public let exists: Bool
+    @objc public let dataType: String?
+
+    init(token: String, value: String?, exists: Bool, dataType: String?) {
+        self.token = token
+        self.value = value
+        self.exists = exists
+        self.dataType = dataType
+        super.init()
+    }
+
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.token = try container.decode(String.self, forKey: .token)
+        self.value = try container.decodeIfPresent(String.self, forKey: .value)
+        self.exists = try container.decode(Bool.self, forKey: .exists)
+        self.dataType = try container.decodeIfPresent(String.self, forKey: .dataType)
+        super.init()
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case token, value, exists, dataType
+    }
 }
 
 /// Summary statistics for a batch detokenization operation.
-struct BatchDetokenizeSummary: Codable {
-    let processedCount: Int
-    let foundCount: Int
-    let notFoundCount: Int
+@objc public class BatchDetokenizeSummary: NSObject, Codable {
+    @objc public let processedCount: Int
+    @objc public let foundCount: Int
+    @objc public let notFoundCount: Int
+
+    @objc public init(processedCount: Int, foundCount: Int, notFoundCount: Int) {
+        self.processedCount = processedCount
+        self.foundCount = foundCount
+        self.notFoundCount = notFoundCount
+        super.init()
+    }
+
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.processedCount = try container.decode(Int.self, forKey: .processedCount)
+        self.foundCount = try container.decode(Int.self, forKey: .foundCount)
+        self.notFoundCount = try container.decode(Int.self, forKey: .notFoundCount)
+        super.init()
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case processedCount, foundCount, notFoundCount
+    }
 }
 
 /// Encrypted request model

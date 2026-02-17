@@ -15,14 +15,14 @@ class ZeroPIIViewModel: ObservableObject {
     @Published var selectedDataType: DataType = .string
     @Published var selectedOperation: OperationType = .single
     @Published var inputText: String = ""
+    @Published var batchInputValues: [String] = [""]
     @Published var results: [TokenDisplayItem] = []
     @Published var importStatus: String?
     @Published var showError: Bool = false
     @Published var errorMessage: String = ""
-    
+
     private var importedData: [Any] = []
     private var importedFileName: String?
-//    private let zeroPIISDK = ZeroPIISDK.shared
     
     var inputPlaceholder: String {
         switch selectedDataType {
@@ -131,124 +131,117 @@ class ZeroPIIViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Batch Input Management
+    func addBatchInputField() {
+        batchInputValues.append("")
+    }
+
+    func removeBatchInputField(at index: Int) {
+        guard batchInputValues.count > 1 else { return }
+        batchInputValues.remove(at: index)
+    }
+
     // MARK: - Batch Operations
     func batchTokenize() {
         if !importedData.isEmpty {
-            batchTokenizeImportedValues()
+            addResult(.loading("Batch tokenizing \(importedData.count) imported \(selectedDataType.displayName) values from \(importedFileName ?? "file")..."))
+            performBatchTokenize(importedData)
         } else {
-            batchTokenizeSampleValues()
+            let nonEmptyValues = batchInputValues.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+            guard !nonEmptyValues.isEmpty else {
+                showErrorAlert("Please add at least one value to batch tokenize")
+                return
+            }
+
+            var parsedData: [Any] = []
+            for value in nonEmptyValues {
+                guard let parsed = parseInputValue(value) else {
+                    showErrorAlert("Invalid \(selectedDataType.displayName) format: \(value)")
+                    return
+                }
+                parsedData.append(parsed)
+            }
+
+            addResult(.loading("Batch tokenizing \(parsedData.count) \(selectedDataType.displayName) values..."))
+            performBatchTokenize(parsedData)
         }
     }
-    
+
     func batchDetokenize() {
         if !importedData.isEmpty {
-            batchDetokenizeImportedValues()
+            let tokens = importedData.map { String(describing: $0) }
+            addResult(.loading("Batch detokenizing \(tokens.count) imported \(selectedDataType.displayName) tokens from \(importedFileName ?? "file")..."))
+            performBatchDetokenize(tokens)
         } else {
-            batchDetokenizeAvailableTokens()
+            let nonEmptyTokens = batchInputValues.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+            guard !nonEmptyTokens.isEmpty else {
+                showErrorAlert("Please add at least one token to batch detokenize")
+                return
+            }
+
+            addResult(.loading("Batch detokenizing \(nonEmptyTokens.count) \(selectedDataType.displayName) tokens..."))
+            performBatchDetokenize(nonEmptyTokens)
         }
     }
-    
-    private func batchTokenizeSampleValues() {
-        let sampleData = SampleDataProvider.getBatchSample(for: selectedDataType)
-        
-        addResult(.loading("Batch tokenizing \(sampleData.count) sample \(selectedDataType.displayName) values..."))
-        
-        performBatchTokenize(sampleData, isImported: false)
-    }
-    
-    private func batchTokenizeImportedValues() {
-        guard !importedData.isEmpty else {
-            showErrorAlert("No imported data available")
-            return
-        }
-        
-        addResult(.loading("Batch tokenizing \(importedData.count) imported \(selectedDataType.displayName) values from \(importedFileName ?? "file")..."))
-        
-        performBatchTokenize(importedData, isImported: true)
-    }
-    
-    private func performBatchTokenize(_ data: [Any], isImported: Bool) {
+
+    private func performBatchTokenize(_ data: [Any]) {
         let zeroPIISDK = VaultSDK.getInstance()
         switch selectedDataType {
         case .string:
             zeroPIISDK.batchTokenizeStringValues(data as! [String]) { [weak self] result in
-                self?.handleBatchTokenizeResult(result, isImported: isImported)
+                self?.handleBatchTokenizeResult(result)
             }
         case .int:
             zeroPIISDK.batchTokenizeIntValues(data as! [Int]) { [weak self] result in
-                self?.handleBatchTokenizeResult(result, isImported: isImported)
+                self?.handleBatchTokenizeResult(result)
             }
         case .long:
             zeroPIISDK.batchTokenizeLongValues(data as! [Int64]) { [weak self] result in
-                self?.handleBatchTokenizeResult(result, isImported: isImported)
+                self?.handleBatchTokenizeResult(result)
             }
         case .float:
             zeroPIISDK.batchTokenizeFloatValues(data as! [Float]) { [weak self] result in
-                self?.handleBatchTokenizeResult(result, isImported: isImported)
+                self?.handleBatchTokenizeResult(result)
             }
         case .double:
             zeroPIISDK.batchTokenizeDoubleValues(data as! [Double]) { [weak self] result in
-                self?.handleBatchTokenizeResult(result, isImported: isImported)
+                self?.handleBatchTokenizeResult(result)
             }
         case .boolean:
             zeroPIISDK.batchTokenizeBoolValues(data as! [Bool]) { [weak self] result in
-                self?.handleBatchTokenizeResult(result, isImported: isImported)
+                self?.handleBatchTokenizeResult(result)
             }
         }
     }
-    
-    private func batchDetokenizeImportedValues() {
-        guard !importedData.isEmpty else {
-            showErrorAlert("No imported data available")
-            return
-        }
-        
-        let tokens = importedData.map { String(describing: $0) }
-        addResult(.loading("Batch detokenizing \(tokens.count) imported \(selectedDataType.displayName) tokens from \(importedFileName ?? "file")..."))
-        
-        performBatchDetokenize(tokens)
-    }
-    
-    private func batchDetokenizeAvailableTokens() {
-        let availableTokens = extractAvailableTokens()
-        
-        guard !availableTokens.isEmpty else {
-            showErrorAlert("No \(selectedDataType.displayName) tokens available. Please tokenize some \(selectedDataType.displayName) values first.")
-            return
-        }
-        
-        addResult(.loading("Batch detokenizing \(availableTokens.count) \(selectedDataType.displayName) tokens..."))
-        
-        performBatchDetokenize(availableTokens)
-    }
-    
+
     private func performBatchDetokenize(_ tokens: [String]) {
-//        switch selectedDataType {
-//        case .string:
-//            zeroPIISDK.batchDetokenizeAsStrings(tokens) { [weak self] result in
-//                self?.handleBatchDetokenizeResult(result)
-//            }
-//        case .int:
-//            zeroPIISDK.batchDetokenizeAsInts(tokens) { [weak self] result in
-//                self?.handleBatchDetokenizeResult(result)
-//            }
-//        case .long:
-//            zeroPIISDK.batchDetokenizeAsLongs(tokens) { [weak self] result in
-//                self?.handleBatchDetokenizeResult(result)
-//            }
-//        case .float:
-//            zeroPIISDK.batchDetokenizeAsFloats(tokens) { [weak self] result in
-//                self?.handleBatchDetokenizeResult(result)
-//            }
-//        case .double:
-//            zeroPIISDK.batchDetokenizeAsDoubles(tokens) { [weak self] result in
-//                self?.handleBatchDetokenizeResult(result)
-//            }
-//        case .boolean:
-//            zeroPIISDK.batchDetokenizeAsBooleans(tokens) { [weak self] result in
-//                self?.handleBatchDetokenizeResult(result)
-//            }
-//        }
+        let zeroPIISDK = VaultSDK.getInstance()
+        switch selectedDataType {
+        case .string:
+            zeroPIISDK.batchDetokenizeStringValues(tokens) { [weak self] result in
+                self?.handleBatchDetokenizeResult(result)
+            }
+        case .int:
+            zeroPIISDK.batchDetokenizeIntValues(tokens) { [weak self] result in
+                self?.handleBatchDetokenizeResult(result)
+            }
+        case .long:
+            zeroPIISDK.batchDetokenizeLongValues(tokens) { [weak self] result in
+                self?.handleBatchDetokenizeResult(result)
+            }
+        case .float:
+            zeroPIISDK.batchDetokenizeFloatValues(tokens) { [weak self] result in
+                self?.handleBatchDetokenizeResult(result)
+            }
+        case .double:
+            zeroPIISDK.batchDetokenizeDoubleValues(tokens) { [weak self] result in
+                self?.handleBatchDetokenizeResult(result)
+            }
+        case .boolean:
+            zeroPIISDK.batchDetokenizeBoolValues(tokens) { [weak self] result in
+                self?.handleBatchDetokenizeResult(result)
+            }
+        }
     }
     
     // MARK: - File Import
@@ -261,15 +254,15 @@ class ZeroPIIViewModel: ObservableObject {
             showErrorAlert("Failed to import file: \(error.localizedDescription)")
         }
     }
-    
+
     private func importDataFromFile(_ url: URL) {
         guard url.startAccessingSecurityScopedResource() else {
             showErrorAlert("Failed to access file")
             return
         }
-        
+
         defer { url.stopAccessingSecurityScopedResource() }
-        
+
         do {
             let content = try String(contentsOf: url, encoding: .utf8)
             let fileName = url.lastPathComponent
@@ -279,35 +272,34 @@ class ZeroPIIViewModel: ObservableObject {
             addResult(.error("File Import Error", "Failed to read file: \(error.localizedDescription)"))
         }
     }
-    
+
     private func parseFileContent(_ content: String, fileName: String) {
-        // Parse comma or newline separated values
         let rawValues = content.components(separatedBy: CharacterSet(charactersIn: ",\n"))
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
-        
+
         guard !rawValues.isEmpty else {
             showErrorAlert("No valid data found in file")
             return
         }
-        
-        // Validate and convert data
+
         let (validData, invalidCount) = validateAndConvert(rawValues)
-        
+
         guard !validData.isEmpty else {
             showErrorAlert("No valid \(selectedDataType.displayName) values found in file")
             addResult(.error("File Import Error", "No valid \(selectedDataType.displayName) values found in file. Check data format."))
             return
         }
-        
-        // Store imported data
+
         importedData = validData
         importedFileName = fileName
-        
-        // Update status
-        updateImportStatus(validCount: validData.count, invalidCount: invalidCount, fileName: fileName)
-        
-        // Add result
+
+        if invalidCount > 0 {
+            importStatus = "📄 \(fileName): \(validData.count) valid, \(invalidCount) invalid \(selectedDataType.displayName) values"
+        } else {
+            importStatus = "📄 \(fileName): \(validData.count) valid \(selectedDataType.displayName) values"
+        }
+
         let sampleValues = validData.prefix(3).map { String(describing: $0) }
         addResult(.fileImported(
             fileName: fileName,
@@ -318,11 +310,11 @@ class ZeroPIIViewModel: ObservableObject {
             sampleValues: sampleValues
         ))
     }
-    
+
     private func validateAndConvert(_ rawValues: [String]) -> ([Any], Int) {
         var validData: [Any] = []
         var invalidCount = 0
-        
+
         for rawValue in rawValues {
             if let converted = parseInputValue(rawValue) {
                 validData.append(converted)
@@ -330,24 +322,16 @@ class ZeroPIIViewModel: ObservableObject {
                 invalidCount += 1
             }
         }
-        
+
         return (validData, invalidCount)
     }
-    
-    private func updateImportStatus(validCount: Int, invalidCount: Int, fileName: String) {
-        if invalidCount > 0 {
-            importStatus = "📄 \(fileName): \(validCount) valid, \(invalidCount) invalid \(selectedDataType.displayName) values"
-        } else {
-            importStatus = "📄 \(fileName): \(validCount) valid \(selectedDataType.displayName) values"
-        }
-    }
-    
+
     func clearImportedData() {
         importedData = []
         importedFileName = nil
         importStatus = nil
     }
-    
+
     // MARK: - Utility
     func clearCache() {
         VaultSDK.getInstance().clearCache()
@@ -400,16 +384,14 @@ class ZeroPIIViewModel: ObservableObject {
         ))
     }
     
-    private func handleBatchTokenizeResult(_ result: BatchTokenizeResult, isImported: Bool) {
+    private func handleBatchTokenizeResult(_ result: BatchTokenizeResult) {
         DispatchQueue.main.async {
             self.removeLastLoadingItem()
             if result.isSuccess {
                 self.addResult(.batchTokenize(
                     results: result.results,
                     summary: result.summary ?? BatchTokenizeSummary(processedCount: 0, existingCount: 0, newlyCreatedCount: 0),
-                    inputDataType: self.selectedDataType,
-                    isImported: isImported,
-                    fileName: isImported ? self.importedFileName : nil
+                    inputDataType: self.selectedDataType
                 ))
             } else {
                 self.addResult(.error("\(self.selectedDataType.displayName) Batch Tokenize Error", "Batch tokenization failed. Check the console for more details."))
@@ -417,29 +399,18 @@ class ZeroPIIViewModel: ObservableObject {
         }
     }
     
-    private func handleBatchDetokenizeResult<T>(_ result: BatchDetokenizeResult<T>) {
+    private func handleBatchDetokenizeResult(_ result: BatchDetokenizeResult) {
         DispatchQueue.main.async {
             self.removeLastLoadingItem()
-            
-            switch result {
-            case .success(let data):
-                // Convert to string for display
-                let stringResults = data.results.map { item in
-                    BatchDetokenItem(
-                        token: item.token,
-                        value: item.value != nil ? String(describing: item.value!) : nil,
-                        exists: item.exists,
-                        dataType: item.dataType
-                    )
-                }
-                
+
+            if result.isSuccess {
                 self.addResult(.batchDetokenize(
-                    results: stringResults,
-                    summary: data.summary,
+                    results: result.results,
+                    summary: result.summary ?? BatchDetokenizeSummary(processedCount: 0, foundCount: 0, notFoundCount: 0),
                     outputDataType: self.selectedDataType
                 ))
-            case .failure(let error):
-                self.addResult(.error("\(self.selectedDataType.displayName) Batch Detokenize Error", error.localizedDescription))
+            } else {
+                self.addResult(.error("\(self.selectedDataType.displayName) Batch Detokenize Error", result.errorMessage ?? "Batch detokenization failed. Check the console for more details."))
             }
         }
     }
@@ -477,7 +448,7 @@ class ZeroPIIViewModel: ObservableObject {
                 if isDataTypeCompatible(serverType: dataType) {
                     tokens.append(token)
                 }
-            case .batchTokenize(let items, _, _, _, _):
+            case .batchTokenize(let items, _, _):
                 tokens.append(contentsOf: items.filter { isDataTypeCompatible(serverType: $0.dataType) }.map { $0.token })
             default:
                 break

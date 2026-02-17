@@ -59,8 +59,8 @@ enum TokenDisplayItem: Identifiable {
     case loading(String)
     case singleTokenize(originalValue: String, token: String, exists: Bool, newlyCreated: Bool, dataType: String, inputDataType: DataType)
     case singleDetokenize(token: String, originalValue: String, exists: Bool, dataType: String, outputDataType: DataType)
-    case batchTokenize(results: [BatchTokenItem], summary: BatchTokenizeSummary, inputDataType: DataType, isImported: Bool, fileName: String?)
-    case batchDetokenize(results: [BatchDetokenItem<String>], summary: BatchDetokenizeSummary, outputDataType: DataType)
+    case batchTokenize(results: [BatchTokenItem], summary: BatchTokenizeSummary, inputDataType: DataType)
+    case batchDetokenize(results: [BatchDetokenItem], summary: BatchDetokenizeSummary, outputDataType: DataType)
     case fileImported(fileName: String, totalValues: Int, validValues: Int, invalidValues: Int, dataType: DataType, sampleValues: [String])
     case error(String, String)
     case cacheCleared
@@ -81,10 +81,8 @@ enum TokenDisplayItem: Identifiable {
             return "\(inputType.icon) Single Tokenize (\(inputType.displayName))"
         case .singleDetokenize(_, _, _, _, let outputType):
             return "\(outputType.icon) Single Detokenize (\(outputType.displayName))"
-        case .batchTokenize(_, _, let inputType, let isImported, _):
-            let sourceIcon = isImported ? "📄" : inputType.icon
-            let sourceText = isImported ? "Imported Batch" : "Sample Batch"
-            return "\(sourceIcon) \(sourceText) Tokenize (\(inputType.displayName))"
+        case .batchTokenize(_, _, let inputType):
+            return "\(inputType.icon) Batch Tokenize (\(inputType.displayName))"
         case .batchDetokenize(_, _, let outputType):
             return "\(outputType.icon) Batch Detokenize (\(outputType.displayName))"
         case .fileImported:
@@ -119,24 +117,16 @@ enum TokenDisplayItem: Identifiable {
             Output Type: \(outputType.displayName)
             """
             
-        case .batchTokenize(let results, let summary, let inputType, let isImported, let fileName):
-            var text = "Source: \(isImported ? "Imported from \(fileName ?? "file")" : "Sample Data")\n"
-            text += "Summary:\n"
+        case .batchTokenize(let results, let summary, let inputType):
+            var text = "Summary:\n"
             text += "• Processed: \(summary.processedCount)\n"
             text += "• Existing: \(summary.existingCount)\n"
             text += "• New: \(summary.newlyCreatedCount)\n"
             text += "• Input Type: \(inputType.displayName)\n"
-            
-            if isImported && !results.isEmpty {
-                let successRate = Int((Float(summary.processedCount) / Float(results.count)) * 100)
-                text += "• Success Rate: \(successRate)%\n"
-            }
-            
             text += "\nResults:\n"
             for result in results {
                 text += "• \(result.originalValue) → \(result.token)\n"
             }
-            
             return text
             
         case .batchDetokenize(let results, let summary, let outputType):
@@ -172,10 +162,10 @@ enum TokenDisplayItem: Identifiable {
                 text += "... and \(validValues - sampleValues.count) more"
             }
             return text
-            
+
         case .error(_, let message):
             return message
-            
+
         case .cacheCleared:
             return "Token cache has been cleared successfully"
         }
@@ -183,12 +173,10 @@ enum TokenDisplayItem: Identifiable {
     
     var detailedContent: String {
         switch self {
-        case .batchTokenize(let results, let summary, let inputType, let isImported, let fileName):
-            let sourceText = isImported ? "imported from \(fileName ?? "file")" : "sample"
+        case .batchTokenize(let results, let summary, let inputType):
             let successRate = results.isEmpty ? 0 : Int((Float(summary.processedCount) / Float(results.count)) * 100)
-            
+
             var text = "📊 Batch Tokenize Results\n\n"
-            text += "📁 Source: \(sourceText.capitalized)\n"
             text += "🎯 Data Type: \(inputType.displayName)\n\n"
             text += "📈 Statistics:\n"
             text += "• Total Items: \(results.count)\n"
@@ -196,10 +184,7 @@ enum TokenDisplayItem: Identifiable {
             text += "• Existing Tokens: \(summary.existingCount)\n"
             text += "• New Tokens: \(summary.newlyCreatedCount)\n"
             text += "• Success Rate: \(successRate)%\n\n"
-            text += "⚡ Performance:\n"
-            text += "• Batch vs Individual: \(results.count)x faster\n"
-            text += "• API Calls Saved: \(results.count - 1)\n\n"
-            text += "🔍 Sample Results:\n"
+            text += "🔍 Results:\n"
             for result in results.prefix(5) {
                 text += "• \(result.originalValue) → \(result.token)\n"
             }
@@ -231,7 +216,7 @@ enum TokenDisplayItem: Identifiable {
         case .fileImported(let fileName, let totalValues, let validValues, let invalidValues, let dataType, let sampleValues):
             let successRate = Int((Float(validValues) / Float(totalValues)) * 100)
             let errorRate = Int((Float(invalidValues) / Float(totalValues)) * 100)
-            
+
             var text = "📂 File Import Summary\n\n"
             text += "📄 File: \(fileName)\n"
             text += "🎯 Target Type: \(dataType.displayName)\n"
@@ -249,7 +234,7 @@ enum TokenDisplayItem: Identifiable {
             }
             text += "\n\n💡 Ready for batch tokenization!"
             return text
-            
+
         case .error(let title, let message):
             var text = "❌ Error Details\n\n"
             text += "🏷️ Type: \(title)\n"
@@ -275,8 +260,8 @@ enum TokenDisplayItem: Identifiable {
             return Color.green.opacity(0.2)
         case .singleDetokenize:
             return Color.blue.opacity(0.2)
-        case .batchTokenize(_, _, _, let isImported, _):
-            return isImported ? Color.green.opacity(0.2) : Color.purple.opacity(0.2)
+        case .batchTokenize:
+            return Color.purple.opacity(0.2)
         case .batchDetokenize:
             return Color.teal.opacity(0.2)
         case .fileImported:
@@ -391,27 +376,3 @@ struct SampleDataProvider {
     }
 }
 
-// MARK: - SDK Result Types (from SDK - included here for sample app completeness)
-
-enum BatchDetokenizeResult<T> {
-    case success(BatchDetokenizeData<T>)
-    case failure(Error)
-}
-
-struct BatchDetokenizeData<T> {
-    let results: [BatchDetokenItem<T>]
-    let summary: BatchDetokenizeSummary
-}
-
-struct BatchDetokenItem<T> {
-    let token: String
-    let value: T?
-    let exists: Bool
-    let dataType: String?
-}
-
-struct BatchDetokenizeSummary {
-    let processedCount: Int
-    let foundCount: Int
-    let notFoundCount: Int
-}
