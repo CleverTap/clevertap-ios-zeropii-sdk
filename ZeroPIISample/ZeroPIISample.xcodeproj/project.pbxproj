@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		489008382F349AE40076F105 /* clevertap_ios_vault_sdk.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489008352F349AD80076F105 /* clevertap_ios_vault_sdk.framework */; };
-		489008392F349AE40076F105 /* clevertap_ios_vault_sdk.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 489008352F349AD80076F105 /* clevertap_ios_vault_sdk.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		489008382F349AE40076F105 /* clevertap_ios_zeropii_sdk.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489008352F349AD80076F105 /* clevertap_ios_zeropii_sdk.framework */; };
+		489008392F349AE40076F105 /* clevertap_ios_zeropii_sdk.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 489008352F349AD80076F105 /* clevertap_ios_zeropii_sdk.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,10 +28,10 @@
 		};
 		489008342F349AD80076F105 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 489007F02F349AD80076F105 /* clevertap-ios-vault-sdk.xcodeproj */;
+			containerPortal = 489007F02F349AD80076F105 /* clevertap-ios-zeropii-sdk.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 4869AA012DF1760100AE1044;
-			remoteInfo = "clevertap-ios-vault-sdk";
+			remoteInfo = "clevertap-ios-zeropii-sdk";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -42,7 +42,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				489008392F349AE40076F105 /* clevertap_ios_vault_sdk.framework in Embed Frameworks */,
+				489008392F349AE40076F105 /* clevertap_ios_zeropii_sdk.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -53,7 +53,7 @@
 		489005FD2F3475700076F105 /* ZeroPIISample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZeroPIISample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4890060A2F3475720076F105 /* ZeroPIISampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZeroPIISampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		489006142F3475720076F105 /* ZeroPIISampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZeroPIISampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		489007F02F349AD80076F105 /* clevertap-ios-vault-sdk.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "clevertap-ios-vault-sdk.xcodeproj"; path = "../clevertap-ios-vault-sdk/clevertap-ios-vault-sdk.xcodeproj"; sourceTree = SOURCE_ROOT; };
+		489007F02F349AD80076F105 /* clevertap-ios-zeropii-sdk.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "clevertap-ios-zeropii-sdk.xcodeproj"; path = "../clevertap-ios-vault-sdk/clevertap-ios-zeropii-sdk.xcodeproj"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -79,7 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				489008382F349AE40076F105 /* clevertap_ios_vault_sdk.framework in Frameworks */,
+				489008382F349AE40076F105 /* clevertap_ios_zeropii_sdk.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,7 +103,7 @@
 		489005F42F3475700076F105 = {
 			isa = PBXGroup;
 			children = (
-				489007F02F349AD80076F105 /* clevertap-ios-vault-sdk.xcodeproj */,
+				489007F02F349AD80076F105 /* clevertap-ios-zeropii-sdk.xcodeproj */,
 				489005FF2F3475700076F105 /* ZeroPIISample */,
 				4890060D2F3475720076F105 /* ZeroPIISampleTests */,
 				489006172F3475720076F105 /* ZeroPIISampleUITests */,
@@ -132,7 +132,7 @@
 		489008302F349AD80076F105 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				489008352F349AD80076F105 /* clevertap_ios_vault_sdk.framework */,
+				489008352F349AD80076F105 /* clevertap_ios_zeropii_sdk.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -244,7 +244,7 @@
 			projectReferences = (
 				{
 					ProductGroup = 489008302F349AD80076F105 /* Products */;
-					ProjectRef = 489007F02F349AD80076F105 /* clevertap-ios-vault-sdk.xcodeproj */;
+					ProjectRef = 489007F02F349AD80076F105 /* clevertap-ios-zeropii-sdk.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -257,10 +257,10 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		489008352F349AD80076F105 /* clevertap_ios_vault_sdk.framework */ = {
+		489008352F349AD80076F105 /* clevertap_ios_zeropii_sdk.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			path = clevertap_ios_vault_sdk.framework;
+			path = clevertap_ios_zeropii_sdk.framework;
 			remoteRef = 489008342F349AD80076F105 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};

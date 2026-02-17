@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 import Combine
-import clevertap_ios_vault_sdk
+import clevertap_ios_zeropii_sdk
 
 // MARK: - View Model
 class ZeroPIIViewModel: ObservableObject {
@@ -59,7 +59,7 @@ class ZeroPIIViewModel: ObservableObject {
         }
         
         addResult(.loading("Tokenizing \(inputText) as \(selectedDataType.displayName)..."))
-        let zeroPIISDK = VaultSDK.getInstance()
+        let zeroPIISDK = ZeroPiiSDK.getInstance()
         
         switch selectedDataType {
         case .string:
@@ -102,7 +102,7 @@ class ZeroPIIViewModel: ObservableObject {
         }
         
         addResult(.loading("Detokenizing \(inputText) as \(selectedDataType.displayName)..."))
-        let zeroPIISDK = VaultSDK.getInstance()
+        let zeroPIISDK = ZeroPiiSDK.getInstance()
         switch selectedDataType {
         case .string:
             zeroPIISDK.detokenizeString(inputText) { [weak self] result in
@@ -185,7 +185,7 @@ class ZeroPIIViewModel: ObservableObject {
     }
 
     private func performBatchTokenize(_ data: [Any]) {
-        let zeroPIISDK = VaultSDK.getInstance()
+        let zeroPIISDK = ZeroPiiSDK.getInstance()
         switch selectedDataType {
         case .string:
             zeroPIISDK.batchTokenizeStringValues(data as! [String]) { [weak self] result in
@@ -215,7 +215,7 @@ class ZeroPIIViewModel: ObservableObject {
     }
 
     private func performBatchDetokenize(_ tokens: [String]) {
-        let zeroPIISDK = VaultSDK.getInstance()
+        let zeroPIISDK = ZeroPiiSDK.getInstance()
         switch selectedDataType {
         case .string:
             zeroPIISDK.batchDetokenizeStringValues(tokens) { [weak self] result in
@@ -334,7 +334,7 @@ class ZeroPIIViewModel: ObservableObject {
 
     // MARK: - Utility
     func clearCache() {
-        VaultSDK.getInstance().clearCache()
+        ZeroPiiSDK.getInstance().clearCache()
         addResult(.cacheCleared)
     }
     

@@ -7,7 +7,7 @@
 
 import SwiftUI
 internal import UniformTypeIdentifiers
-import clevertap_ios_vault_sdk
+import clevertap_ios_zeropii_sdk
 
 // MARK: - Sample Token Provider
 
@@ -66,7 +66,7 @@ class SampleTokenProvider: NSObject, AccessTokenProvider {
 @main
 struct ZeroPIISampleApp: App {
     init() {
-        VaultSDK.initialize(
+        ZeroPiiSDK.initialize(
             tokenProvider: SampleTokenProvider(),
             apiUrl: "https://vault.mangaforyou.com/ct-vault/",
             logLevel: .debug

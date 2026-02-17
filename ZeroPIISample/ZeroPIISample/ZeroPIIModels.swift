@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-import clevertap_ios_vault_sdk
+import clevertap_ios_zeropii_sdk
 
 // MARK: - Data Types
 enum DataType: String, CaseIterable {
