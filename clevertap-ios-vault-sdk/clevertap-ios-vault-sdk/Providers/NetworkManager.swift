@@ -26,39 +26,10 @@ class NetworkManager: NetworkProvider {
         sessionConfig.timeoutIntervalForRequest = 15
         sessionConfig.timeoutIntervalForResource = 15 * 2
         sessionConfig.requestCachePolicy = .reloadIgnoringLocalCacheData
-        
-        // Add custom headers
-        for (key, value) in configuration.customHeaders {
-            sessionConfig.httpAdditionalHeaders?[key] = value
-        }
-        
+
         self.session = URLSession(configuration: sessionConfig)
         self.requestBuilder = NetworkRequestBuilder(configuration: configuration, logger: logger)
         self.responseHandler = NetworkResponseHandler(logger: logger)
-    }
-    
-    func getAccessToken(clientId: String, clientSecret: String) async throws -> Result<AuthTokenResponse, VaultError> {
-        let operation = "getAccessToken"
-        
-        do {
-            let request = try requestBuilder.buildAuthRequest(clientId: clientId, clientSecret: clientSecret)
-
-            let result = await performRequest(request: request, operation: operation) { data, response in
-                return self.responseHandler.handleAuthResponse(data: data, response: response)
-            }
-            
-            switch result {
-            case .success(let authResponse):
-                return .success(authResponse)
-            case .failure(let error):
-                logger.debug("Failed to get auth response", file: #file, function: #function, line: #line)
-                return .failure(error)
-            }
-            
-        } catch {
-            logger.debug("Failed to build auth request", file: #file, function: #function, line: #line)
-            return .failure(.authRequestError)
-        }
     }
     
     func tokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, VaultError> {

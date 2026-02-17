@@ -19,29 +19,7 @@ class NetworkRequestBuilder {
     func updateConfiguration(_ configuration: NetworkConfiguration) {
         self.configuration = configuration
     }
-    
-    func buildAuthRequest(clientId: String, clientSecret: String) throws -> URLRequest {
-        guard let url = URL(string: configuration.authBaseURL + Constants.oauthTokenEndpoint) else {
-            logger.debug("Invalid auth URL: \(configuration.authBaseURL)", file: #file, function: #function, line: #line)
-            throw VaultError.invalidBaseURL
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        
-        for (key, value) in configuration.customHeaders {
-            request.setValue(value, forHTTPHeaderField: key)
-        }
-        
-        let bodyString = "grant_type=\(Constants.oauthGrantType)&client_id=\(clientId)&client_secret=\(clientSecret)"
-        request.httpBody = bodyString.data(using: .utf8)
-        
-        logger.debug("Built auth request for URL: \(url.absoluteString)", file: #file, function: #function, line: #line)
-        
-        return request
-    }
-    
+
     func buildRequest<T: Codable>(
         endpoint: String,
         body: T,
@@ -58,11 +36,7 @@ class NetworkRequestBuilder {
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("true", forHTTPHeaderField: "Encrypted")
-        
-        for (key, value) in configuration.customHeaders {
-            request.setValue(value, forHTTPHeaderField: key)
-        }
-        
+
         do {
             let encoder = JSONEncoder()
             encoder.dateEncodingStrategy = .iso8601

@@ -9,14 +9,68 @@ import SwiftUI
 internal import UniformTypeIdentifiers
 import clevertap_ios_vault_sdk
 
+// MARK: - Sample Token Provider
+
+/// Sample implementation of AccessTokenProvider that fetches a bearer token
+/// using OAuth2 client credentials flow, mirroring the SDK's previous built-in auth.
+class SampleTokenProvider: NSObject, AccessTokenProvider {
+
+    private let authUrl = "https://auth-test.clevertap.net/auth/realms/master/protocol/openid-connect/token"
+    private let clientId = "navin-client"
+    private let clientSecret = "83EpGODDbeyepKaGRy1Srg4c4YVEFQG8"
+
+    func fetchToken(completion: @escaping (AccessTokenInfo?, Error?) -> Void) {
+        guard let url = URL(string: authUrl) else {
+            completion(nil, NSError(domain: "SampleTokenProvider", code: -1,
+                                    userInfo: [NSLocalizedDescriptionKey: "Invalid auth URL"]))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+
+        let body = "grant_type=client_credentials&client_id=\(clientId)&client_secret=\(clientSecret)"
+        request.httpBody = body.data(using: .utf8)
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+
+            guard let data = data else {
+                completion(nil, NSError(domain: "SampleTokenProvider", code: -1,
+                                        userInfo: [NSLocalizedDescriptionKey: "No data received"]))
+                return
+            }
+
+            do {
+                guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let accessToken = json["access_token"] as? String,
+                      let expiresIn = json["expires_in"] as? Int else {
+                    completion(nil, NSError(domain: "SampleTokenProvider", code: -1,
+                                            userInfo: [NSLocalizedDescriptionKey: "Invalid auth response"]))
+                    return
+                }
+
+                let tokenInfo = AccessTokenInfo(token: accessToken, expiresInSeconds: expiresIn)
+                completion(tokenInfo, nil)
+            } catch {
+                completion(nil, error)
+            }
+        }.resume()
+    }
+}
+
 @main
 struct ZeroPIISampleApp: App {
     init() {
-        VaultSDK.initialize(clientId: "navin-client",
-                            clientSecret: "83EpGODDbeyepKaGRy1Srg4c4YVEFQG8",
-                            apiUrl: "https://vault.mangaforyou.com/ct-vault/",
-                            authUrl: "https://auth-test.clevertap.net/auth/realms/master/",
-                            logLevel: .debug)
+        VaultSDK.initialize(
+            tokenProvider: SampleTokenProvider(),
+            apiUrl: "https://vault.mangaforyou.com/ct-vault/",
+            logLevel: .debug
+        )
     }
     
     var body: some Scene {

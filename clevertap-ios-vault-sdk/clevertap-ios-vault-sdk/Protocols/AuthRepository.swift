@@ -15,14 +15,14 @@ protocol AuthRepository {
     /// - Returns: A valid access token as a `String`.
     ///
     /// - Note: This method may perform asynchronous network operations and should be called accordingly.
-    func getAccessToken() async throws -> Result<String, VaultError>
-    
-    /// Requests a new access token from the authentication server.
+    func getAccessToken() async -> Result<String, VaultError>
+
+    /// Requests a new access token from the token provider.
     ///
     /// - Returns: A newly issued access token as a `String`.
     ///
-    /// - Note: This method performs a network request to refresh the token.
-    func refreshAccessToken() async throws -> Result<String, VaultError>
+    /// - Note: This method delegates to the app-provided token provider.
+    func refreshAccessToken() async -> Result<String, VaultError>
     
     /// Checks if the current token is valid.
     ///

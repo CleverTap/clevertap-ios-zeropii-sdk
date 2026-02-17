@@ -8,7 +8,6 @@
 import Foundation
 
 public enum NetworkOperationType: String, CaseIterable {
-    case authentication = "authentication"
     case tokenize = "tokenize"
     case detokenize = "detokenize"
     case batchTokenize = "batchTokenize"

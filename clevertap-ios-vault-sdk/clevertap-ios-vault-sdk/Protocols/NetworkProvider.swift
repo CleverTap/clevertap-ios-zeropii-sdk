@@ -9,17 +9,7 @@ import Foundation
 
 /// Protocol defining network operations for communicating with the Vault API
 protocol NetworkProvider {
-    
-    // MARK: - Authentication Operations
-    
-    /// Requests an access token using OAuth2 client credentials flow
-    /// - Parameters:
-    ///   - clientId: OAuth2 client identifier
-    ///   - clientSecret: OAuth2 client secret
-    /// - Returns: Result containing AuthTokenResponse on success or VaultError on failure
-    /// - Note: This method handles the complete OAuth2 flow including proper header formatting
-    func getAccessToken(clientId: String, clientSecret: String) async throws -> Result<AuthTokenResponse, VaultError>
-    
+
     // MARK: - Single Value Operations
     
     /// Tokenizes a single sensitive value using plain text transmission

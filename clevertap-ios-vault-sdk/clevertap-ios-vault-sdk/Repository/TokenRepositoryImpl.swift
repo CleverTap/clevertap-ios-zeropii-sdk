@@ -11,17 +11,17 @@ actor TokenRepositoryImpl: TokenRepository {
     
     // MARK: - Dependencies
     private let networkProvider: NetworkProvider
-    private let authRepository: AuthRepositoryImpl
+    private let authRepository: AuthRepository
     private let cacheProvider: CacheProvider
     private let encryptionManager: EncryptionManager
     private let logger: VaultLogger
     private let initialRetryDelayMs: Int = 1000
     private let maxBatchSizeTokenize: Int = 1000
     private let maxBatchSizeDetokenize: Int = 10000
-    
+
     // MARK: - Initialization
     init(networkProvider: NetworkProvider,
-        authRepository: AuthRepositoryImpl,
+        authRepository: AuthRepository,
         cacheProvider: CacheProvider,
         encryptionManager: EncryptionManager,
         logger: VaultLogger = VaultLogger.shared) {

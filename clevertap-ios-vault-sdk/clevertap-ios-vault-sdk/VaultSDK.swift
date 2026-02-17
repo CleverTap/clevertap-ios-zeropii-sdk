@@ -12,57 +12,51 @@ import Foundation
 @objc public class VaultSDK: NSObject {
     
     // MARK: - Private Properties
-    
-    private let clientId: String
-    private let clientSecret: String
+
+    private let tokenProvider: AccessTokenProvider
     private let apiUrl: String
-    private let authUrl: String
     private let logLevel: VaultLogLevel
-    
+
     internal var sdkQueue: DispatchQueue
     internal var tokenRepository: TokenRepository!
-    internal var authRepository: AuthRepositoryImpl!
+    internal var authRepository: AuthRepository!
     private var encryptionManager: EncryptionManager!
     private var tokenCacheManager: TokenCacheManager!
     private var logger: VaultLogger!
-    
+
     // MARK: - Singleton
-    
+
     @objc public static var shared: VaultSDK {
         return getInstance()
     }
-    
+
     private static var _instance: VaultSDK?
-    
+
     // MARK: - Initialization
-    
+
     private init(
-        clientId: String,
-        clientSecret: String,
+        tokenProvider: AccessTokenProvider,
         apiUrl: String,
-        authUrl: String,
         logLevel: VaultLogLevel
     ) {
-        self.clientId = clientId
-        self.clientSecret = clientSecret
+        self.tokenProvider = tokenProvider
         self.apiUrl = apiUrl
-        self.authUrl = authUrl
         self.logLevel = logLevel
         self.sdkQueue = DispatchQueue(label: "com.clevertap.vault.sdk", qos: .utility)
-        
+
         super.init()
         initialize()
     }
-    
+
     private func initialize() {
         logger = VaultLogger.shared
         logger.logLevel = logLevel
         logger.debug("Initializing VaultSDK", file: #file, function: #function, line: #line)
-        
+
         // Create network provider
-        let networkConfig = NetworkConfiguration(tokenizationURL: apiUrl, authURL: authUrl)
+        let networkConfig = NetworkConfiguration(tokenizationBaseURL: apiUrl)
         let networkProvider = NetworkManager(configuration: networkConfig, logger: logger)
-        
+
         // Setup encryption manager if enabled
         encryptionManager = EncryptionManager(enabled: true, logger: logger)
 
@@ -72,15 +66,13 @@ import Foundation
 
         // Initialize token cache with preference-backed persistence
         tokenCacheManager = TokenCacheManager(enabled: true, preferenceManager: preferenceManager)
-        
+
         // Create repositories
         authRepository = AuthRepositoryImpl(
-            networkProvider: networkProvider,
-            clientId: clientId,
-            clientSecret: clientSecret,
+            tokenProvider: tokenProvider,
             logger: logger
         )
-        
+
         tokenRepository = TokenRepositoryImpl(
             networkProvider: networkProvider,
             authRepository: authRepository,
@@ -88,28 +80,32 @@ import Foundation
             encryptionManager: encryptionManager,
             logger: logger
         )
-        
+
         TypeConverterRegistry.initialize()
         logger.debug("VaultSDK initialization complete", file: #file, function: #function, line: #line)
     }
-    
+
     // MARK: - Public Static Initialization
-    
+
+    /// Initializes the VaultSDK with an app-provided token provider.
+    ///
+    /// - Parameters:
+    ///   - tokenProvider: An implementation of ``AccessTokenProvider`` that supplies bearer tokens.
+    ///   - apiUrl: The base URL for the tokenization API.
+    ///   - logLevel: The desired log verbosity (default: `.off`).
+    /// - Returns: The initialized ``VaultSDK`` singleton instance.
+    @discardableResult
     @objc public static func initialize(
-        clientId: String,
-        clientSecret: String,
+        tokenProvider: AccessTokenProvider,
         apiUrl: String,
-        authUrl: String,
         logLevel: VaultLogLevel = .off
     ) -> VaultSDK {
         if _instance == nil {
             objc_sync_enter(self)
             if _instance == nil {
                 _instance = VaultSDK(
-                    clientId: clientId,
-                    clientSecret: clientSecret,
+                    tokenProvider: tokenProvider,
                     apiUrl: apiUrl,
-                    authUrl: authUrl,
                     logLevel: logLevel
                 )
             }
@@ -117,7 +113,7 @@ import Foundation
         }
         return _instance!
     }
-    
+
     /// Gets the VaultSDK instance.
     /// - Returns: The VaultSDK instance
     /// - Throws: Fatal error if not initialized

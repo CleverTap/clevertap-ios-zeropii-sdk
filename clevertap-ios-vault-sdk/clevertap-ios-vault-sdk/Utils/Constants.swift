@@ -8,12 +8,8 @@
 import Foundation
 
 struct Constants {
-    static let oauthTokenEndpoint: String = "protocol/openid-connect/token"
-    static let oauthGrantType: String = "client_credentials"
     static let tokenizeEndpoint: String = "api/tokenization/getToken"
-    static let detokenizeEndpoint: String = "" // TODO
     static let batchTokenizeEndpoint: String = "api/tokenization/tokens/batch"
-    static let batchDetokenizeEndpoint: String = "" // TODO
 }
 
 /// String or number value

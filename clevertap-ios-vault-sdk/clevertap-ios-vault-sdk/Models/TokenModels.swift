@@ -7,23 +7,6 @@
 
 import Foundation
 
-/// Authentication token response model returned from auth API.
-struct AuthTokenResponse: Codable {
-    let accessToken: String
-    let expiresIn: Int
-    let refreshExpiresIn: Int
-    let tokenType: String
-    let scope: String
-    
-    enum CodingKeys: String, CodingKey {
-        case accessToken   = "access_token"
-        case expiresIn     = "expires_in"
-        case refreshExpiresIn = "refresh_expires_in"
-        case tokenType     = "token_type"
-        case scope
-    }
-}
-
 /// Request model for tokenizing a single value.
 struct TokenizeRequest: Codable {
     let value: String
