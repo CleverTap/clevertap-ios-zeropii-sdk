@@ -38,25 +38,24 @@ class NetworkResponseHandler {
                 }
                 return .failure(.jsonParsingError)
             }
-          // TODO
-//        case 400:
-//            logger.error("Bad request for authentication", file: #file, function: #function, line: #line)
-//            return .failure(.badRequest)
-//            
-//        case 401:
-//            logger.error("Authentication failed - invalid credentials", file: #file, function: #function, line: #line)
-//            return .failure(.authenticationFailed)
-//            
-//        case 429:
-//            logger.warning("Rate limit exceeded during authentication", file: #file, function: #function, line: #line)
-//            return .failure(.rateLimitExceeded)
-//            
-//        case 500...599:
-//            logger.error("Server error during authentication: \(httpResponse.statusCode)", file: #file, function: #function, line: #line)
-//            return .failure(.serverError)
-            
+        case 400:
+            logger.error("400 Bad Request", file: #file, function: #function, line: #line)
+            return .failure(.badRequest)
+
+        case 401:
+            logger.error("401 Unauthorized - authentication failed", file: #file, function: #function, line: #line)
+            return .failure(.authenticationFailed)
+
+        case 429:
+            logger.warning("Server error \(httpResponse.statusCode) - rate limit exceeded", file: #file, function: #function, line: #line)
+            return .failure(.rateLimitExceeded)
+
+        case 500, 502, 503, 504:
+            logger.error("Server error \(httpResponse.statusCode)", file: #file, function: #function, line: #line)
+            return .failure(.serverError)
+
         default:
-            logger.error("Unexpected status code during authentication: \(httpResponse.statusCode)", file: #file, function: #function, line: #line)
+            logger.error("Unexpected status code \(httpResponse.statusCode)", file: #file, function: #function, line: #line)
             return .failure(.serverError)
         }
     }
@@ -90,38 +89,36 @@ class NetworkResponseHandler {
                 }
                 return .failure(.jsonParsingError)
             }
-          // TODO
-//        case 400:
-//            logger.error("Bad request", file: #file, function: #function, line: #line)
-//            return .failure(.badRequest)
-//            
-//        case 401:
-//            logger.warning("Unauthorized - token may be expired", file: #file, function: #function, line: #line)
-//            return .failure(.unauthorized)
-//            
-//        case 403:
-//            logger.error("Forbidden", file: #file, function: #function, line: #line)
-//            return .failure(.forbidden)
-//            
-//        case 404:
-//            logger.error("Not found", file: #file, function: #function, line: #line)
-//            return .failure(.notFound)
-//            
-//        case 405:
-//            logger.error("Method not allowed", file: #file, function: #function, line: #line)
-//            return .failure(.methodNotAllowed)
-//            
-//        case 429:
-//            logger.warning("Rate limit exceeded", file: #file, function: #function, line: #line)
-//            return .failure(.rateLimitExceeded)
-//            
-//        case 500...599:
-//            let errorCode = VaultError.fromHTTPStatusCode(httpResponse.statusCode)
-//            logger.error("Server error: \(httpResponse.statusCode)", file: #file, function: #function, line: #line)
-//            return .failure(errorCode)
-            
+        case 400:
+            logger.error("400 Bad Request", file: #file, function: #function, line: #line)
+            return .failure(.badRequest)
+
+        case 401:
+            logger.error("401 Unauthorized - token may be expired", file: #file, function: #function, line: #line)
+            return .failure(.unauthorized)
+
+        case 403:
+            logger.error("403 Forbidden", file: #file, function: #function, line: #line)
+            return .failure(.forbidden)
+
+        case 404:
+            logger.error("404 Not Found", file: #file, function: #function, line: #line)
+            return .failure(.notFound)
+
+        case 405:
+            logger.error("405 Method Not Allowed", file: #file, function: #function, line: #line)
+            return .failure(.methodNotAllowed)
+
+        case 429:
+            logger.warning("Server error \(httpResponse.statusCode) - rate limit exceeded", file: #file, function: #function, line: #line)
+            return .failure(.rateLimitExceeded)
+
+        case 500, 502, 503, 504:
+            logger.error("Server error \(httpResponse.statusCode)", file: #file, function: #function, line: #line)
+            return .failure(.serverError)
+
         default:
-            logger.error("Unexpected status code: \(httpResponse.statusCode)", file: #file, function: #function, line: #line)
+            logger.error("Unexpected status code \(httpResponse.statusCode)", file: #file, function: #function, line: #line)
             return .failure(.serverError)
         }
     }

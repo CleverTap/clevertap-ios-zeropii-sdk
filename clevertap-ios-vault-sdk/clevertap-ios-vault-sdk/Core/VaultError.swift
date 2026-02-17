@@ -26,7 +26,12 @@ enum VaultError: Int, Error {
     case serverError = 1013
     case authRequestError = 1014
     case buildRequestError = 1015
-    
+    case badRequest = 1016
+    case rateLimitExceeded = 1017
+    case forbidden = 1018
+    case notFound = 1019
+    case methodNotAllowed = 1020
+
     // MARK: - Localized Error Description
     public var errorDescription: String? {
         switch self {
@@ -64,6 +69,16 @@ enum VaultError: Int, Error {
             return "Failed to build auth request"
         case .buildRequestError:
             return "Failed to build request"
+        case .badRequest:
+            return "Bad request"
+        case .rateLimitExceeded:
+            return "Rate limit exceeded"
+        case .forbidden:
+            return "Forbidden"
+        case .notFound:
+            return "Not found"
+        case .methodNotAllowed:
+            return "Method not allowed"
         }
     }
 }
