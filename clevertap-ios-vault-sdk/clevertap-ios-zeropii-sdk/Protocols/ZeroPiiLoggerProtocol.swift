@@ -7,58 +7,32 @@
 
 import Foundation
 
+/// Higher raw value = more verbose.
 @objc public enum ZeroPiiLogLevel: Int {
-    case off = -1
-    case debug = 0
-    case info = 1
-    case warning = 2
-    case error = 3
-    
-    var description: String {
-        switch self {
-            case .off: return "OFF"
-            case .debug: return "DEBUG"
-            case .info: return "INFO"
-            case .warning: return "WARNING"
-            case .error: return "ERROR"
-        }
-    }
+    case off     = 0   // No logging
+    case error   = 1   // Only errors
+    case info    = 2   // Errors + Info + Warning
+    case debug   = 3   // Errors + Info + Warning + Debug
+    case verbose = 4   // All logs including verbose
 }
 
 /// Protocol defining logging operations for the ZeroPii SDK
 protocol ZeroPiiLoggerProtocol {
     /// Current log level
     var logLevel: ZeroPiiLogLevel { get set }
-    
+
+    /// Logs a verbose message (most detailed)
+    func verbose(_ message: String, file: String, line: Int)
+
     /// Logs a debug message (for development and troubleshooting)
-    /// - Parameters:
-    ///   - message: The message to log
-    ///   - file: Source file where log was called
-    ///   - function: Function where log was called
-    ///   - line: Line number where log was called
-    func debug(_ message: String, file: String, function: String, line: Int)
-    
+    func debug(_ message: String, file: String, line: Int)
+
     /// Logs an informational message (general information)
-    /// - Parameters:
-    ///   - message: The message to log
-    ///   - file: Source file where log was called
-    ///   - function: Function where log was called
-    ///   - line: Line number where log was called
-    func info(_ message: String, file: String, function: String, line: Int)
-    
+    func info(_ message: String, file: String, line: Int)
+
     /// Logs a warning message (potential issues)
-    /// - Parameters:
-    ///   - message: The message to log
-    ///   - file: Source file where log was called
-    ///   - function: Function where log was called
-    ///   - line: Line number where log was called
-    func warning(_ message: String, file: String, function: String, line: Int)
-    
+    func warning(_ message: String, file: String, line: Int)
+
     /// Logs an error message (serious problems)
-    /// - Parameters:
-    ///   - message: The message to log
-    ///   - file: Source file where log was called
-    ///   - function: Function where log was called
-    ///   - line: Line number where log was called
-    func error(_ message: String, file: String, function: String, line: Int)
+    func error(_ message: String, file: String, line: Int)
 }

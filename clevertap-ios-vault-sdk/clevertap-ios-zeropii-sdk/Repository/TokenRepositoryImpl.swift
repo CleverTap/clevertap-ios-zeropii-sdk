@@ -32,21 +32,21 @@ actor TokenRepositoryImpl: TokenRepository {
         self.encryptionManager = encryptionManager
         self.logger = logger
         
-        logger.debug("TokenRepository initialized", file: #file, function: #function, line: #line)
+        logger.debug("TokenRepository initialized", file: #file, line: #line)
     }
     
     // MARK: - TokenRepository Protocol Implementation
     
     public func tokenize(_ value: String) async -> TokenResult {
         guard !value.isEmpty else {
-            logger.warning("Empty value provided for tokenization", file: #file, function: #function, line: #line)
+            logger.warning("Empty value provided for tokenization", file: #file, line: #line)
             return .error(message: "Empty value passed")
         }
         
         // Check cache first if enabled
         if cacheProvider.isEnabled() {
             if let tokenDetails = cacheProvider.getToken(for: value) {
-                logger.debug("Token found in cache", file: #file, function: #function, line: #line)
+                logger.debug("Token found in cache", file: #file, line: #line)
                 return .success(token: tokenDetails.token, exists: true, newlyCreated: false, dataType: tokenDetails.dataType)
             }
         }
@@ -67,39 +67,39 @@ actor TokenRepositoryImpl: TokenRepository {
     
     public func detokenize(_ token: String) async -> DetokenResult {
         guard !token.isEmpty else {
-            logger.warning("Empty token provided for detokenization", file: #file, function: #function, line: #line)
+            logger.warning("Empty token provided for detokenization", file: #file, line: #line)
             return .error(message: "Empty token passed")
         }
 
         // Local-only lookup from cache (backed by encrypted preferences)
         if cacheProvider.isEnabled() {
             if let valueDetails = cacheProvider.getValue(for: token) {
-                logger.debug("Value found in local store", file: #file, function: #function, line: #line)
+                logger.debug("Value found in local store", file: #file, line: #line)
                 return .success(value: valueDetails.value, exists: true, dataType: valueDetails.dataType)
             }
         }
 
-        logger.debug("Token not found in local store", file: #file, function: #function, line: #line)
+        logger.debug("Token not found in local store", file: #file, line: #line)
         return .error(message: "Token not found in local store")
     }
     
     public func batchTokenize(_ values: [String]) async -> BatchTokenResult {
         guard !values.isEmpty else {
-            logger.warning("Batch tokenize request contains no values", file: #file, function: #function, line: #line)
+            logger.warning("Batch tokenize request contains no values", file: #file, line: #line)
             return .error(message: "Empty values passed")
         }
         
         guard values.count <= maxBatchSizeTokenize else {
-            logger.error("Batch size \(values.count) exceeds maximum \(maxBatchSizeTokenize)", file: #file, function: #function, line: #line)
+            logger.error("Batch size \(values.count) exceeds maximum \(maxBatchSizeTokenize)", file: #file, line: #line)
             return .error(message: "Batch size exceeds maximum limit")
         }
         
         var (cachedResults, uncachedValues) = separateCachedValues(values)
-        logger.debug("Batch tokenize: \(cachedResults.count) cached, \(uncachedValues.count) uncached", file: #file, function: #function, line: #line)
+        logger.debug("Batch tokenize: \(cachedResults.count) cached, \(uncachedValues.count) uncached", file: #file, line: #line)
         
         // If all values are cached, return immediately
         if uncachedValues.isEmpty {
-            logger.debug("All tokens found in cache", file: #file, function: #function, line: #line)
+            logger.debug("All tokens found in cache", file: #file, line: #line)
             return .success(results: cachedResults, summary: BatchTokenizeSummary(processedCount: values.count, existingCount: values.count, newlyCreatedCount: 0))
         }
         
@@ -122,12 +122,12 @@ actor TokenRepositoryImpl: TokenRepository {
     
     public func batchDetokenize(_ tokens: [String]) async -> BatchDetokenResult {
         guard !tokens.isEmpty else {
-            logger.warning("Batch detokenize request contains no tokens", file: #file, function: #function, line: #line)
+            logger.warning("Batch detokenize request contains no tokens", file: #file, line: #line)
             return .error(message: "Empty tokens passed")
         }
 
         guard tokens.count <= maxBatchSizeDetokenize else {
-            logger.error("Batch size \(tokens.count) exceeds maximum \(maxBatchSizeDetokenize)", file: #file, function: #function, line: #line)
+            logger.error("Batch size \(tokens.count) exceeds maximum \(maxBatchSizeDetokenize)", file: #file, line: #line)
             return .error(message: "Batch size exceeds maximum limit")
         }
 
@@ -146,7 +146,7 @@ actor TokenRepositoryImpl: TokenRepository {
             }
         }
 
-        logger.debug("Batch detokenize local lookup: \(foundCount) found, \(notFoundCount) not found", file: #file, function: #function, line: #line)
+        logger.debug("Batch detokenize local lookup: \(foundCount) found, \(notFoundCount) not found", file: #file, line: #line)
         return .success(results: results, summary: BatchDetokenizeSummary(processedCount: tokens.count, foundCount: foundCount, notFoundCount: notFoundCount))
     }
     
@@ -155,14 +155,14 @@ actor TokenRepositoryImpl: TokenRepository {
     private func performTokenization(value: String) async -> Result<TokenizeResponse, ZeroPiiError> {
         let tokenResult = await authRepository.getAccessToken()
         guard case .success(let accessToken) = tokenResult else {
-            logger.error("Failed to get access token for tokenization", file: #file, function: #function, line: #line)
+            logger.error("Failed to get access token for tokenization", file: #file, line: #line)
             return .failure(.authenticationFailed)
         }
         
         let request = TokenizeRequest(value: value)
         guard let encryptedRequest = encryptionManager.createEncryptedRequest(request) else {
             // TODO: Check for encrypted request failed case
-            logger.error("Failed to get access token for tokenization", file: #file, function: #function, line: #line)
+            logger.error("Failed to get access token for tokenization", file: #file, line: #line)
             return .failure(.tokenisationFalied)
         }
         do {
@@ -181,18 +181,18 @@ actor TokenRepositoryImpl: TokenRepository {
                             cacheProvider.putValue(token: decodedObject.token.stringValue, value: value, dataType: decodedObject.dataType)
                         }
                         
-                        logger.debug("Tokenization successful", file: #file, function: #function, line: #line)
+                        logger.debug("Tokenization successful", file: #file, line: #line)
                         return .success(decodedObject)
                     } catch (let error) {
-                        logger.error("Failed to parse decrypted response: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+                        logger.error("Failed to parse decrypted response: \(error.localizedDescription)", file: #file, line: #line)
                         return .failure(.tokenisationFalied)
                     }
                 case .failure(message: let message):
-                    logger.error("Failed to parse tokenization response: \(message)", file: #file, function: #function, line: #line)
+                    logger.error("Failed to parse tokenization response: \(message)", file: #file, line: #line)
                     return .failure(.tokenisationFalied)
                 }
             case .failure(_):
-                logger.error("Tokenisation failed", file: #file, function: #function, line: #line)
+                logger.error("Tokenisation failed", file: #file, line: #line)
                 return .failure(.invalidTokenisationResponse)
             }
         } catch {
@@ -203,14 +203,14 @@ actor TokenRepositoryImpl: TokenRepository {
     private func performBatchTokenization(values: [String]) async -> Result<BatchTokenizeResponse, ZeroPiiError> {
         let tokenResult = await authRepository.getAccessToken()
         guard case .success(let accessToken) = tokenResult else {
-            logger.error("Failed to get access token for batch tokenization", file: #file, function: #function, line: #line)
+            logger.error("Failed to get access token for batch tokenization", file: #file, line: #line)
             return .failure(.authenticationFailed)
         }
         
         let request = BatchTokenizeRequest(values: values)
         guard let encryptedRequest = encryptionManager.createEncryptedRequest(request) else {
             // TODO: Check for encrypted request failed case
-            logger.error("Failed to get access token for tokenization", file: #file, function: #function, line: #line)
+            logger.error("Failed to get access token for tokenization", file: #file, line: #line)
             return .failure(.tokenisationFalied)
         }
         do {
@@ -233,18 +233,18 @@ actor TokenRepositoryImpl: TokenRepository {
                             }
                         }
                         
-                        logger.debug("Batch Tokenization successful", file: #file, function: #function, line: #line)
+                        logger.debug("Batch Tokenization successful", file: #file, line: #line)
                         return .success(decodedObject)
                     } catch (let error) {
-                        logger.error("Failed to parse decrypted response: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+                        logger.error("Failed to parse decrypted response: \(error.localizedDescription)", file: #file, line: #line)
                         return .failure(.batchTokenisationFalied)
                     }
                 case .failure(message: let message):
-                    logger.error("Failed to parse batch tokenization response: \(message)", file: #file, function: #function, line: #line)
+                    logger.error("Failed to parse batch tokenization response: \(message)", file: #file, line: #line)
                     return .failure(.batchTokenisationFalied)
                 }
             case .failure(_):
-                logger.error("Batch Tokenization failed", file: #file, function: #function, line: #line)
+                logger.error("Batch Tokenization failed", file: #file, line: #line)
                 return .failure(.invalidBatchTokenisationResponse)
             }
         } catch {
@@ -286,30 +286,30 @@ actor TokenRepositoryImpl: TokenRepository {
             switch result {
             case .success:
                 if attempt > 0 {
-                    logger.info("Operation \(operation) succeeded after \(attempt + 1) attempts", file: #file, function: #function, line: #line)
+                    logger.info("Operation \(operation) succeeded after \(attempt + 1) attempts", file: #file, line: #line)
                 }
                 return result
                 
             case .failure(let error):
                 lastError = error
                 if attempt == maxAttempts - 1 {
-                    logger.error("Operation \(operation) failed after \(attempt + 1) attempts: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+                    logger.error("Operation \(operation) failed after \(attempt + 1) attempts: \(error.localizedDescription)", file: #file, line: #line)
                     break
                 }
                 
                 // Handle token refresh for 401 errors
                 if error == .unauthorized {
-                    logger.debug("Attempting token refresh for unauthorized 401 error", file: #file, function: #function, line: #line)
+                    logger.debug("Attempting token refresh for unauthorized 401 error", file: #file, line: #line)
 
                     let refreshResult = await authRepository.refreshAccessToken()
                     if case .failure(let refreshError) = refreshResult {
-                        logger.error("Token refresh failed: \(refreshError.localizedDescription)", file: #file, function: #function, line: #line)
+                        logger.error("Token refresh failed: \(refreshError.localizedDescription)", file: #file, line: #line)
                         return .failure(refreshError)
                     }
                 }
                 
                 let delayMs = initialRetryDelayMs * (1 << attempt)
-                logger.debug("Retrying operation \(operation) in \(delayMs)s (attempt \(attempt + 1)/\(maxAttempts))", file: #file, function: #function, line: #line)
+                logger.debug("Retrying operation \(operation) in \(delayMs)s (attempt \(attempt + 1)/\(maxAttempts))", file: #file, line: #line)
                 
                 try? await Task.sleep(nanoseconds: UInt64(delayMs) * 1_000_000)
             }

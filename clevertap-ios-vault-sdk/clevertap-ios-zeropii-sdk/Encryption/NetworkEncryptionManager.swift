@@ -26,7 +26,7 @@ public class NetworkEncryptionManager {
             }
             
             let newKey = SymmetricKey(size: .bits256)
-            logger.debug("Generated new session key.", file: #file, function: #function, line: #line)
+            logger.debug("Generated new session key.", file: #file, line: #line)
             sessionKey = newKey
             return newKey
         }
@@ -53,12 +53,12 @@ public class NetworkEncryptionManager {
             }
             catch {
                 let errorMessage = "Encryption in transit error: \(error.localizedDescription)"
-                logger.error(errorMessage, file: #file, function: #function, line: #line)
+                logger.error(errorMessage, file: #file, line: #line)
                 return EncryptionResult.failure(message: errorMessage)
             }
         } else {
             let failureMessage = "Encryption in transit is only available from iOS 13 and later."
-            logger.debug(failureMessage, file: #file, function: #function, line: #line)
+            logger.debug(failureMessage, file: #file, line: #line)
             return EncryptionResult.failure(message: failureMessage)
         }
     }
@@ -70,11 +70,11 @@ public class NetworkEncryptionManager {
                   let encryptedData = Data(base64Encoded: encryptedPayload)
             else {
                 let failureMessage = "Decryption failed, incorrect nonce or encrypted data."
-                logger.debug(failureMessage, file: #file, function: #function, line: #line)
+                logger.debug(failureMessage, file: #file, line: #line)
                 return DecryptionResult.failure(message: failureMessage)
             }
             do {
-                logger.debug("Encrypted Response: \(encryptedPayload)", file: #file, function: #function, line: #line)
+                logger.debug("Encrypted Response: \(encryptedPayload)", file: #file, line: #line)
                 let sealedBox = try AES.GCM.SealedBox(nonce: AES.GCM.Nonce(data: nonceData),
                                                       ciphertext: encryptedData.dropLast(16), // Excluding the tag
                                                       tag: encryptedData.suffix(16)) // Last 16 bytes are the authentication tag
@@ -83,12 +83,12 @@ public class NetworkEncryptionManager {
                 return DecryptionResult.success(data: decryptedData)
             } catch {
                 let errorMessage = "Decryption in transit error: \(error.localizedDescription)"
-                logger.error(errorMessage, file: #file, function: #function, line: #line)
+                logger.error(errorMessage, file: #file, line: #line)
                 return DecryptionResult.failure(message: errorMessage)
             }
         } else {
             let failureMessage = "Decryption in transit is only available from iOS 13 and later."
-            logger.debug(failureMessage, file: #file, function: #function, line: #line)
+            logger.debug(failureMessage, file: #file, line: #line)
             return DecryptionResult.failure(message: failureMessage)
         }
     }

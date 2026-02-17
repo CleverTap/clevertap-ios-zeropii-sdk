@@ -83,15 +83,15 @@ class NetworkManager: NetworkProvider {
             
             switch result {
             case .success:
-                logger.info("Operation \(operation) succeeded", file: #file, function: #function, line: #line)
+                logger.info("Operation \(operation) succeeded", file: #file, line: #line)
                 return result
                 
             case .failure(let error):
-                logger.debug("Operation \(operation) failed: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+                logger.debug("Operation \(operation) failed: \(error.localizedDescription)", file: #file, line: #line)
             }
             
         } catch {
-            logger.debug("Network operation \(operation) failed with exception: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+            logger.debug("Network operation \(operation) failed with exception: \(error.localizedDescription)", file: #file, line: #line)
         }
         
         return .failure(.networkError)
@@ -119,16 +119,16 @@ class NetworkManager: NetworkProvider {
             
             switch result {
             case .success(let response):
-                logger.info("Operation \(operationName) succeeded", file: #file, function: #function, line: #line)
+                logger.info("Operation \(operationName) succeeded", file: #file, line: #line)
                 return .success(response)
                 
             case .failure(let error):
-                logger.debug("Operation \(operationName) failed: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+                logger.debug("Operation \(operationName) failed: \(error.localizedDescription)", file: #file, line: #line)
                 return .failure(error)
             }
             
         } catch {
-            logger.debug("Failed to build request", file: #file, function: #function, line: #line)
+            logger.debug("Failed to build request", file: #file, line: #line)
             return .failure(.buildRequestError)
         }
     }

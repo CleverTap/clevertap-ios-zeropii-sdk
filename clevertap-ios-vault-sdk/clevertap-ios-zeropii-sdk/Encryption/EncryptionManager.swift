@@ -54,7 +54,7 @@ public class EncryptionManager {
                 let combinedData = sealedBox.ciphertext + sealedBox.tag
                 return (encryptedPayload: combinedData.base64EncodedString(), iv: Data(nonce).base64EncodedString())
             } catch {
-                logger.error("At-rest encryption error: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+                logger.error("At-rest encryption error: \(error.localizedDescription)", file: #file, line: #line)
                 return nil
             }
         }
@@ -67,7 +67,7 @@ public class EncryptionManager {
         if #available(iOS 13.0, tvOS 13.0, *) {
             guard let encryptedData = Data(base64Encoded: encryptedPayload),
                   let ivData = Data(base64Encoded: iv) else {
-                logger.error("At-rest decryption failed: invalid base64 input", file: #file, function: #function, line: #line)
+                logger.error("At-rest decryption failed: invalid base64 input", file: #file, line: #line)
                 return nil
             }
             do {
@@ -79,7 +79,7 @@ public class EncryptionManager {
                 )
                 return try AES.GCM.open(sealedBox, using: key)
             } catch {
-                logger.error("At-rest decryption error: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+                logger.error("At-rest decryption error: \(error.localizedDescription)", file: #file, line: #line)
                 return nil
             }
         }
@@ -96,7 +96,7 @@ public class EncryptionManager {
             } else {
                 dataToEncrypt = try JSONEncoder().encode(request)
             }
-            logger.debug("Request before encryption: \(dataToEncrypt)", file: #file, function: #function, line: #line)
+            logger.debug("Request before encryption: \(dataToEncrypt)", file: #file, line: #line)
             
             // Perform encryption
             let encryptionResult = encrypt(data: dataToEncrypt)
@@ -109,12 +109,12 @@ public class EncryptionManager {
                     itv: iv
                 )
             default:
-                logger.error("Encryption failed: \(encryptionResult)", file: #file, function: #function, line: #line)
+                logger.error("Encryption failed: \(encryptionResult)", file: #file, line: #line)
                 return nil
             }
         } catch {
             let errorMessage = "Encryption error: \(error.localizedDescription)"
-            logger.error(errorMessage, file: #file, function: #function, line: #line)
+            logger.error(errorMessage, file: #file, line: #line)
             return nil
         }
     }

@@ -40,14 +40,14 @@ class ZeroPiiPreferenceManager {
 
     private func loadOrGenerateEncryptionKey() -> SymmetricKey {
         if let keyData = keychainManager.getData(forKey: ZeroPiiPreferenceManager.encryptionKeyKeychainKey) {
-            logger.debug("Loaded preference encryption key from Keychain", file: #file, function: #function, line: #line)
+            logger.debug("Loaded preference encryption key from Keychain", file: #file, line: #line)
             return SymmetricKey(data: keyData)
         }
 
         let newKey = SymmetricKey(size: .bits256)
         let keyData = newKey.withUnsafeBytes { Data($0) }
         keychainManager.setData(keyData, forKey: ZeroPiiPreferenceManager.encryptionKeyKeychainKey)
-        logger.debug("Generated and stored new preference encryption key", file: #file, function: #function, line: #line)
+        logger.debug("Generated and stored new preference encryption key", file: #file, line: #line)
         return newKey
     }
 
@@ -59,7 +59,7 @@ class ZeroPiiPreferenceManager {
     func saveTokenToValueMap(_ map: [String: (value: String, dataType: String)]) {
         queue.async(flags: .barrier) {
             guard let key = self.encryptionKey else {
-                self.logger.error("No encryption key available for saving token-to-value map", file: #file, function: #function, line: #line)
+                self.logger.error("No encryption key available for saving token-to-value map", file: #file, line: #line)
                 return
             }
 
@@ -68,7 +68,7 @@ class ZeroPiiPreferenceManager {
                 // Encrypt individual value
                 guard let encryptedValue = self.encryptValue(tuple.value, using: key),
                       let encryptedDataType = self.encryptValue(tuple.dataType, using: key) else {
-                    self.logger.error("Failed to encrypt individual value for token", file: #file, function: #function, line: #line)
+                    self.logger.error("Failed to encrypt individual value for token", file: #file, line: #line)
                     continue
                 }
                 serializable[token] = [
@@ -88,7 +88,7 @@ class ZeroPiiPreferenceManager {
     func saveValueToTokenMap(_ map: [String: (token: String, dataType: String)]) {
         queue.async(flags: .barrier) {
             guard let key = self.encryptionKey else {
-                self.logger.error("No encryption key available for saving value-to-token map", file: #file, function: #function, line: #line)
+                self.logger.error("No encryption key available for saving value-to-token map", file: #file, line: #line)
                 return
             }
 
@@ -96,12 +96,12 @@ class ZeroPiiPreferenceManager {
             for (value, tuple) in map {
                 // Encrypt the sensitive value used as key
                 guard let encryptedKey = self.encryptValue(value, using: key) else {
-                    self.logger.error("Failed to encrypt map key for value-to-token map", file: #file, function: #function, line: #line)
+                    self.logger.error("Failed to encrypt map key for value-to-token map", file: #file, line: #line)
                     continue
                 }
                 // Token stays as-is; encrypt dataType
                 guard let encryptedDataType = self.encryptValue(tuple.dataType, using: key) else {
-                    self.logger.error("Failed to encrypt dataType for value-to-token map", file: #file, function: #function, line: #line)
+                    self.logger.error("Failed to encrypt dataType for value-to-token map", file: #file, line: #line)
                     continue
                 }
                 // Use encrypted key as the map key to protect PII
@@ -128,7 +128,7 @@ class ZeroPiiPreferenceManager {
     func lookupValue(for token: String) -> (value: String, dataType: String)? {
         return queue.sync {
             guard let key = encryptionKey else {
-                logger.error("No encryption key available for lookup", file: #file, function: #function, line: #line)
+                logger.error("No encryption key available for lookup", file: #file, line: #line)
                 return nil
             }
 
@@ -142,7 +142,7 @@ class ZeroPiiPreferenceManager {
 
             // Step 2: Find the token key (tokens are stored as plaintext keys)
             guard let entry = serializable[token] else {
-                logger.debug("Token not found in persisted map", file: #file, function: #function, line: #line)
+                logger.debug("Token not found in persisted map", file: #file, line: #line)
                 return nil
             }
 
@@ -151,13 +151,13 @@ class ZeroPiiPreferenceManager {
                   let evIV = entry["eiv"],
                   let edtPayload = entry["edt"],
                   let edtIV = entry["edtiv"] else {
-                logger.error("Malformed entry in token-to-value map", file: #file, function: #function, line: #line)
+                logger.error("Malformed entry in token-to-value map", file: #file, line: #line)
                 return nil
             }
 
             guard let decryptedValue = decryptValue(payload: evPayload, iv: evIV, using: key),
                   let decryptedDataType = decryptValue(payload: edtPayload, iv: edtIV, using: key) else {
-                logger.error("Failed to decrypt individual value for token", file: #file, function: #function, line: #line)
+                logger.error("Failed to decrypt individual value for token", file: #file, line: #line)
                 return nil
             }
 
@@ -172,7 +172,7 @@ class ZeroPiiPreferenceManager {
     func lookupToken(for value: String) -> (token: String, dataType: String)? {
         return queue.sync {
             guard let key = encryptionKey else {
-                logger.error("No encryption key available for lookup", file: #file, function: #function, line: #line)
+                logger.error("No encryption key available for lookup", file: #file, line: #line)
                 return nil
             }
 
@@ -206,7 +206,7 @@ class ZeroPiiPreferenceManager {
                 }
             }
 
-            logger.debug("Value not found in persisted value-to-token map", file: #file, function: #function, line: #line)
+            logger.debug("Value not found in persisted value-to-token map", file: #file, line: #line)
             return nil
         }
     }
@@ -219,7 +219,7 @@ class ZeroPiiPreferenceManager {
             self.defaults.removeObject(forKey: ZeroPiiPreferenceManager.tokenToValueIVKey)
             self.defaults.removeObject(forKey: ZeroPiiPreferenceManager.valueToTokenMapKey)
             self.defaults.removeObject(forKey: ZeroPiiPreferenceManager.valueToTokenIVKey)
-            self.logger.debug("Cleared preference maps", file: #file, function: #function, line: #line)
+            self.logger.debug("Cleared preference maps", file: #file, line: #line)
         }
     }
 
@@ -244,7 +244,7 @@ class ZeroPiiPreferenceManager {
 
     private func encryptAndPersist(_ serializable: [String: [String: String]], mapKey: String, ivKey: String) {
         guard let key = encryptionKey else {
-            logger.error("No encryption key available for preference persistence", file: #file, function: #function, line: #line)
+            logger.error("No encryption key available for preference persistence", file: #file, line: #line)
             return
         }
 
@@ -252,21 +252,21 @@ class ZeroPiiPreferenceManager {
             let jsonData = try JSONSerialization.data(withJSONObject: serializable, options: [])
 
             guard let encrypted = encryptionManager.encryptData(jsonData, using: key) else {
-                logger.error("Failed to encrypt map for key: \(mapKey)", file: #file, function: #function, line: #line)
+                logger.error("Failed to encrypt map for key: \(mapKey)", file: #file, line: #line)
                 return
             }
 
             defaults.set(encrypted.encryptedPayload, forKey: mapKey)
             defaults.set(encrypted.iv, forKey: ivKey)
-            logger.debug("Persisted encrypted map for key: \(mapKey)", file: #file, function: #function, line: #line)
+            logger.debug("Persisted encrypted map for key: \(mapKey)", file: #file, line: #line)
         } catch {
-            logger.error("Failed to serialize map for key \(mapKey): \(error.localizedDescription)", file: #file, function: #function, line: #line)
+            logger.error("Failed to serialize map for key \(mapKey): \(error.localizedDescription)", file: #file, line: #line)
         }
     }
 
     private func loadAndDecryptMap<T>(mapKey: String, ivKey: String) -> T? where T: Any {
         guard let key = encryptionKey else {
-            logger.error("No encryption key available for preference loading", file: #file, function: #function, line: #line)
+            logger.error("No encryption key available for preference loading", file: #file, line: #line)
             return nil
         }
 
@@ -276,7 +276,7 @@ class ZeroPiiPreferenceManager {
         }
 
         guard let decryptedData = encryptionManager.decryptData(encryptedPayload: encryptedPayload, iv: iv, using: key) else {
-            logger.error("Failed to decrypt preference map for key: \(mapKey)", file: #file, function: #function, line: #line)
+            logger.error("Failed to decrypt preference map for key: \(mapKey)", file: #file, line: #line)
             return nil
         }
 
@@ -284,7 +284,7 @@ class ZeroPiiPreferenceManager {
             let deserialized = try JSONSerialization.jsonObject(with: decryptedData, options: [])
             return deserialized as? T
         } catch {
-            logger.error("Failed to deserialize map for key \(mapKey): \(error.localizedDescription)", file: #file, function: #function, line: #line)
+            logger.error("Failed to deserialize map for key \(mapKey): \(error.localizedDescription)", file: #file, line: #line)
             return nil
         }
     }

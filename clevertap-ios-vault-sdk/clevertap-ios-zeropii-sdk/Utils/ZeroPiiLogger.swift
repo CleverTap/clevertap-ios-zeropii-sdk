@@ -9,45 +9,74 @@ import Foundation
 import os.log
 
 @objc public class ZeroPiiLogger: NSObject, ZeroPiiLoggerProtocol {
-    @objc public var logLevel: ZeroPiiLogLevel = .warning
-    private var osLog = OSLog(subsystem: "CleverTap", category: "ZeroPiiSDK")
-    
+
+    private static let tag = "CT-ZeroPiiSDK"
+    private static let maxLogLength = 4000
+
+    @objc public var logLevel: ZeroPiiLogLevel = .off
+    private let osLog = OSLog(subsystem: "CleverTap", category: tag)
+
     @objc public static let shared = ZeroPiiLogger()
     private override init() {}
-    
-    func debug(_ message: String, file: String, function: String, line: Int) {
-        log(message, level: .debug, file: file, function: function, line: line)
+
+    // MARK: - Public Logging Methods
+
+    func verbose(_ message: String, file: String = #file, line: Int = #line) {
+        guard logLevel.rawValue >= ZeroPiiLogLevel.verbose.rawValue else { return }
+        log(message, level: .verbose, file: file, line: line)
     }
-    
-    func info(_ message: String, file: String, function: String, line: Int) {
-        log(message, level: .info, file: file, function: function, line: line)
+
+    func debug(_ message: String, file: String = #file, line: Int = #line) {
+        guard logLevel.rawValue >= ZeroPiiLogLevel.debug.rawValue else { return }
+        log(message, level: .debug, file: file, line: line)
     }
-    
-    func warning(_ message: String, file: String, function: String, line: Int) {
-        log(message, level: .warning, file: file, function: function, line: line)
+
+    func info(_ message: String, file: String = #file, line: Int = #line) {
+        guard logLevel.rawValue >= ZeroPiiLogLevel.info.rawValue else { return }
+        log(message, level: .info, file: file, line: line)
     }
-    
-    func error(_ message: String, file: String, function: String, line: Int) {
-        log(message, level: .error, file: file, function: function, line: line)
+
+    func warning(_ message: String, file: String = #file, line: Int = #line) {
+        guard logLevel.rawValue >= ZeroPiiLogLevel.info.rawValue else { return }
+        log(message, level: .info, file: file, line: line, overrideType: .default)
     }
-    
+
+    func error(_ message: String, file: String = #file, line: Int = #line) {
+        guard logLevel.rawValue >= ZeroPiiLogLevel.error.rawValue else { return }
+        log(message, level: .error, file: file, line: line)
+    }
+
     // MARK: - Private Methods
-        
-    private func log(_ message: String, level: ZeroPiiLogLevel, file: String, function: String, line: Int) {
+
+    private func log(_ message: String, level: ZeroPiiLogLevel, file: String, line: Int, overrideType: OSLogType? = nil) {
         let fileName = (file as NSString).lastPathComponent
-        let logMessage = "\(fileName):\(line) \(function) - \(message)"
-        
+        let logMessage = "[\(ZeroPiiLogger.tag)] \(fileName):\(line) - \(message)"
+        let logType = overrideType ?? osLogType(for: level)
+
+        if logMessage.count > ZeroPiiLogger.maxLogLength {
+            logSplit(logMessage, type: logType)
+        } else {
+            os_log("%{public}@", log: osLog, type: logType, logMessage)
+        }
+    }
+
+    private func logSplit(_ message: String, type: OSLogType) {
+        var remaining = message
+        while !remaining.isEmpty {
+            let end = remaining.index(remaining.startIndex, offsetBy: min(ZeroPiiLogger.maxLogLength, remaining.count))
+            let chunk = String(remaining[remaining.startIndex..<end])
+            os_log("%{public}@", log: osLog, type: type, chunk)
+            remaining = String(remaining[end...])
+        }
+    }
+
+    private func osLogType(for level: ZeroPiiLogLevel) -> OSLogType {
         switch level {
-            case .off:
-                break
-            case .debug:
-                os_log(.debug, log: osLog, "%{public}@", logMessage)
-            case .info:
-                os_log(.info, log: osLog, "%{public}@", logMessage)
-            case .warning:
-                os_log(.default, log: osLog, "%{public}@", logMessage)
-            case .error:
-                os_log(.error, log: osLog, "%{public}@", logMessage)
+        case .off:     return .default
+        case .error:   return .error
+        case .info:    return .info
+        case .debug:   return .debug
+        case .verbose: return .debug
         }
     }
 }

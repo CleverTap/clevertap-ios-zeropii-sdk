@@ -51,7 +51,7 @@ import Foundation
     private func initialize() {
         logger = ZeroPiiLogger.shared
         logger.logLevel = logLevel
-        logger.debug("Initializing ZeroPiiSDK", file: #file, function: #function, line: #line)
+        logger.debug("Initializing ZeroPiiSDK", file: #file, line: #line)
 
         // Create network provider
         let networkConfig = NetworkConfiguration(tokenizationBaseURL: apiUrl)
@@ -82,7 +82,7 @@ import Foundation
         )
 
         TypeConverterRegistry.initialize()
-        logger.debug("ZeroPiiSDK initialization complete", file: #file, function: #function, line: #line)
+        logger.debug("ZeroPiiSDK initialization complete", file: #file, line: #line)
     }
 
     // MARK: - Public Static Initialization
@@ -326,7 +326,7 @@ import Foundation
 
     /// Clears the token cache
     @objc public func clearCache() {
-        logger.debug("Clearing token cache", file: #file, function: #function, line: #line)
+        logger.debug("Clearing token cache", file: #file, line: #line)
         tokenCacheManager.clear()
     }
     
@@ -343,7 +343,7 @@ import Foundation
             
             Task { @MainActor in
                 let typeName = String(describing: type)
-                self.logger.debug("Tokenizing \(typeName) value", file: #file, function: #function, line: #line)
+                self.logger.debug("Tokenizing \(typeName) value", file: #file, line: #line)
                 
                 guard let converter = TypeConverterRegistry.getConverter(for: type) else {
                     let tokenizeResult = TokenizeResult(result: .error(message: "Unsupported type: \(typeName)"))
@@ -359,7 +359,7 @@ import Foundation
                 
                 // Convert repository result to public result
                 let tokenizeResult = TokenizeResult(result: repoResult)
-                self.logger.debug("Tokenization result: \(typeName) value: \(repoResult)", file: #file, function: #function, line: #line)
+                self.logger.debug("Tokenization result: \(typeName) value: \(repoResult)", file: #file, line: #line)
                 
                 callback(tokenizeResult)
             }
@@ -377,7 +377,7 @@ import Foundation
 
             Task { @MainActor in
                 let typeName = String(describing: type)
-                self.logger.debug("Detokenizing for \(typeName) type", file: #file, function: #function, line: #line)
+                self.logger.debug("Detokenizing for \(typeName) type", file: #file, line: #line)
 
                 // Call repository (local-only lookup from encrypted preferences)
                 let repoResult = await self.tokenRepository.detokenize(token)
@@ -394,7 +394,7 @@ import Foundation
                         }
                     }
                     let result = DetokenizeResult(result: .success(value: value, exists: exists, dataType: dataType))
-                    self.logger.debug("Detokenization result: \(typeName): \(repoResult)", file: #file, function: #function, line: #line)
+                    self.logger.debug("Detokenization result: \(typeName): \(repoResult)", file: #file, line: #line)
                     callback(result)
 
                 case .error(let message):
@@ -423,7 +423,7 @@ import Foundation
                 }
                 
                 let typeName = String(describing: type)
-                self.logger.debug("Batch tokenizing \(values.count) \(typeName) values", file: #file, function: #function, line: #line)
+                self.logger.debug("Batch tokenizing \(values.count) \(typeName) values", file: #file, line: #line)
                 
                 guard let converter = TypeConverterRegistry.getConverter(for: type) else {
                     let result = BatchTokenResult.error(message: "Unsupported type: \(typeName)")
@@ -439,7 +439,7 @@ import Foundation
                 let repoResult = await self.tokenRepository.batchTokenize(stringValues)
                 
                 // Convert repository result to public result
-                self.logger.debug("Batch tokenization result: \(typeName) values: \(repoResult)", file: #file, function: #function, line: #line)
+                self.logger.debug("Batch tokenization result: \(typeName) values: \(repoResult)", file: #file, line: #line)
                 
                 let batchTokenizeResult = BatchTokenizeResult(result: repoResult)
                 callback(batchTokenizeResult)
@@ -465,7 +465,7 @@ import Foundation
                 }
 
                 let typeName = String(describing: type)
-                self.logger.debug("Batch detokenizing \(tokens.count) tokens for \(typeName) type", file: #file, function: #function, line: #line)
+                self.logger.debug("Batch detokenizing \(tokens.count) tokens for \(typeName) type", file: #file, line: #line)
 
                 guard let converter = TypeConverterRegistry.getConverter(for: type) else {
                     let result = BatchDetokenResult.error(message: "Unsupported type: \(typeName)")
@@ -495,7 +495,7 @@ import Foundation
                     }
 
                     let validatedResult = BatchDetokenResult.success(results: validatedResults, summary: summary)
-                    self.logger.debug("Batch detokenization result: \(typeName) tokens: \(repoResult)", file: #file, function: #function, line: #line)
+                    self.logger.debug("Batch detokenization result: \(typeName) tokens: \(repoResult)", file: #file, line: #line)
                     let batchDetokenizeResult = BatchDetokenizeResult(result: validatedResult)
                     callback(batchDetokenizeResult)
 

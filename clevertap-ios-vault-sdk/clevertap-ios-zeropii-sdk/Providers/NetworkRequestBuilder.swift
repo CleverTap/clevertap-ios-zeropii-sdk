@@ -27,7 +27,7 @@ class NetworkRequestBuilder {
     ) throws -> URLRequest {
         
         guard let url = URL(string: configuration.tokenizationBaseURL + endpoint) else {
-            logger.error("Invalid tokenization URL: \(configuration.tokenizationBaseURL + endpoint)", file: #file, function: #function, line: #line)
+            logger.error("Invalid tokenization URL: \(configuration.tokenizationBaseURL + endpoint)", file: #file, line: #line)
             throw ZeroPiiError.invalidBaseURL
         }
         
@@ -43,10 +43,10 @@ class NetworkRequestBuilder {
             let bodyData = try encoder.encode(body)
             request.httpBody = bodyData
             
-            logger.debug("Built request for URL: \(url.absoluteString), body size: \(bodyData.count) bytes", file: #file, function: #function, line: #line)
+            logger.debug("Built request for URL: \(url.absoluteString), body size: \(bodyData.count) bytes", file: #file, line: #line)
             
         } catch {
-            logger.error("Failed to encode request body: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+            logger.error("Failed to encode request body: \(error.localizedDescription)", file: #file, line: #line)
             throw ZeroPiiError.jsonParsingError
         }
         

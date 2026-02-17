@@ -30,11 +30,11 @@ class AuthRepositoryImpl: AuthRepository {
 
     func getAccessToken() async -> Result<String, ZeroPiiError> {
         if isTokenValid(), let token = currentAccessToken {
-            logger.info("Using existing auth token", file: #file, function: #function, line: #line)
+            logger.info("Using existing auth token", file: #file, line: #line)
             return .success(token)
         }
 
-        logger.info("Requesting new auth token", file: #file, function: #function, line: #line)
+        logger.info("Requesting new auth token", file: #file, line: #line)
         return await refreshAccessToken()
     }
 
@@ -63,20 +63,20 @@ class AuthRepositoryImpl: AuthRepository {
                 }
 
                 if let error = error {
-                    self.logger.error("Token provider returned error: \(error.localizedDescription)", file: #file, function: #function, line: #line)
+                    self.logger.error("Token provider returned error: \(error.localizedDescription)", file: #file, line: #line)
                     continuation.resume(returning: .failure(.authenticationFailed))
                     return
                 }
 
                 guard let tokenInfo = tokenInfo else {
-                    self.logger.error("Token provider returned nil token info", file: #file, function: #function, line: #line)
+                    self.logger.error("Token provider returned nil token info", file: #file, line: #line)
                     continuation.resume(returning: .failure(.authenticationFailed))
                     return
                 }
 
                 self.currentAccessToken = tokenInfo.token
                 self.tokenExpiryDate = Date().addingTimeInterval(TimeInterval(tokenInfo.expiresInSeconds))
-                self.logger.debug("Auth token refreshed, expires in \(tokenInfo.expiresInSeconds) seconds", file: #file, function: #function, line: #line)
+                self.logger.debug("Auth token refreshed, expires in \(tokenInfo.expiresInSeconds) seconds", file: #file, line: #line)
 
                 continuation.resume(returning: .success(tokenInfo.token))
             }
