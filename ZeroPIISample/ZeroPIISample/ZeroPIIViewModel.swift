@@ -27,7 +27,7 @@ class ZeroPIIViewModel: ObservableObject {
     var inputPlaceholder: String {
         switch selectedDataType {
         case .string:
-            return "Enter string value/Token (e.g., john@example.com)"
+            return "Enter string value (e.g., john@example.com)"
         case .int:
             return "Enter integer value (e.g., 123456)"
         case .long:
@@ -95,42 +95,6 @@ class ZeroPIIViewModel: ObservableObject {
         }
     }
     
-    func detokenizeSingleValue() {
-        guard !inputText.isEmpty else {
-            showErrorAlert("Please enter a token to detokenize")
-            return
-        }
-        
-        addResult(.loading("Detokenizing \(inputText) as \(selectedDataType.displayName)..."))
-        let zeroPIISDK = ZeroPiiSDK.getInstance()
-        switch selectedDataType {
-        case .string:
-            zeroPIISDK.detokenizeString(inputText) { [weak self] result in
-                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-            }
-        case .int:
-            zeroPIISDK.detokenizeInt(inputText) { [weak self] result in
-                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-            }
-        case .long:
-            zeroPIISDK.detokenizeLong(inputText) { [weak self] result in
-                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-            }
-        case .float:
-            zeroPIISDK.detokenizeFloat(inputText) { [weak self] result in
-                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-            }
-        case .double:
-            zeroPIISDK.detokenizeDouble(inputText) { [weak self] result in
-                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-            }
-        case .boolean:
-            zeroPIISDK.detokenizeBool(inputText) { [weak self] result in
-                self?.handleDetokenizeResult(token: self?.inputText ?? "", result: result)
-            }
-        }
-    }
-    
     // MARK: - Batch Input Management
     func addBatchInputField() {
         batchInputValues.append("")
@@ -167,23 +131,6 @@ class ZeroPIIViewModel: ObservableObject {
         }
     }
 
-    func batchDetokenize() {
-        if !importedData.isEmpty {
-            let tokens = importedData.map { String(describing: $0) }
-            addResult(.loading("Batch detokenizing \(tokens.count) imported \(selectedDataType.displayName) tokens from \(importedFileName ?? "file")..."))
-            performBatchDetokenize(tokens)
-        } else {
-            let nonEmptyTokens = batchInputValues.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
-            guard !nonEmptyTokens.isEmpty else {
-                showErrorAlert("Please add at least one token to batch detokenize")
-                return
-            }
-
-            addResult(.loading("Batch detokenizing \(nonEmptyTokens.count) \(selectedDataType.displayName) tokens..."))
-            performBatchDetokenize(nonEmptyTokens)
-        }
-    }
-
     private func performBatchTokenize(_ data: [Any]) {
         let zeroPIISDK = ZeroPiiSDK.getInstance()
         switch selectedDataType {
@@ -214,36 +161,6 @@ class ZeroPIIViewModel: ObservableObject {
         }
     }
 
-    private func performBatchDetokenize(_ tokens: [String]) {
-        let zeroPIISDK = ZeroPiiSDK.getInstance()
-        switch selectedDataType {
-        case .string:
-            zeroPIISDK.batchDetokenizeStringValues(tokens) { [weak self] result in
-                self?.handleBatchDetokenizeResult(result)
-            }
-        case .int:
-            zeroPIISDK.batchDetokenizeIntValues(tokens) { [weak self] result in
-                self?.handleBatchDetokenizeResult(result)
-            }
-        case .long:
-            zeroPIISDK.batchDetokenizeLongValues(tokens) { [weak self] result in
-                self?.handleBatchDetokenizeResult(result)
-            }
-        case .float:
-            zeroPIISDK.batchDetokenizeFloatValues(tokens) { [weak self] result in
-                self?.handleBatchDetokenizeResult(result)
-            }
-        case .double:
-            zeroPIISDK.batchDetokenizeDoubleValues(tokens) { [weak self] result in
-                self?.handleBatchDetokenizeResult(result)
-            }
-        case .boolean:
-            zeroPIISDK.batchDetokenizeBoolValues(tokens) { [weak self] result in
-                self?.handleBatchDetokenizeResult(result)
-            }
-        }
-    }
-    
     // MARK: - File Import
     func handleFileImport(_ result: Result<[URL], Error>) {
         switch result {
@@ -362,28 +279,6 @@ class ZeroPIIViewModel: ObservableObject {
         ))
     }
     
-    private func handleDetokenizeResult(token: String, result: DetokenizeResult) {
-        self.removeLastLoadingItem()
-
-        if !result.isSuccess {
-            self.addResult(.error("\(self.selectedDataType.displayName) Detokenize Error", result.errorMessage ?? "Failed to detokenize \(self.selectedDataType.displayName) value"))
-            return
-        }
-
-        guard let value = result.value else {
-            self.addResult(.error("\(self.selectedDataType.displayName) Detokenize Error", "Failed to detokenize \(self.selectedDataType.displayName) value"))
-            return
-        }
-
-        self.addResult(.singleDetokenize(
-            token: token,
-            originalValue: value,
-            exists: result.exists,
-            dataType: result.dataType ?? "unknown",
-            outputDataType: self.selectedDataType
-        ))
-    }
-    
     private func handleBatchTokenizeResult(_ result: BatchTokenizeResult) {
         DispatchQueue.main.async {
             self.removeLastLoadingItem()
@@ -395,22 +290,6 @@ class ZeroPIIViewModel: ObservableObject {
                 ))
             } else {
                 self.addResult(.error("\(self.selectedDataType.displayName) Batch Tokenize Error", "Batch tokenization failed. Check the console for more details."))
-            }
-        }
-    }
-    
-    private func handleBatchDetokenizeResult(_ result: BatchDetokenizeResult) {
-        DispatchQueue.main.async {
-            self.removeLastLoadingItem()
-
-            if result.isSuccess {
-                self.addResult(.batchDetokenize(
-                    results: result.results,
-                    summary: result.summary ?? BatchDetokenizeSummary(processedCount: 0, foundCount: 0, notFoundCount: 0),
-                    outputDataType: self.selectedDataType
-                ))
-            } else {
-                self.addResult(.error("\(self.selectedDataType.displayName) Batch Detokenize Error", result.errorMessage ?? "Batch detokenization failed. Check the console for more details."))
             }
         }
     }
@@ -436,44 +315,6 @@ class ZeroPIIViewModel: ObservableObject {
                 return false
             }
             return nil
-        }
-    }
-    
-    private func extractAvailableTokens() -> [String] {
-        var tokens: [String] = []
-        
-        for result in results {
-            switch result {
-            case .singleTokenize(_, let token, _, _, let dataType, _):
-                if isDataTypeCompatible(serverType: dataType) {
-                    tokens.append(token)
-                }
-            case .batchTokenize(let items, _, _):
-                tokens.append(contentsOf: items.filter { isDataTypeCompatible(serverType: $0.dataType) }.map { $0.token })
-            default:
-                break
-            }
-        }
-        
-        return Array(Set(tokens)) // Remove duplicates
-    }
-    
-    private func isDataTypeCompatible(serverType: String?) -> Bool {
-        guard let serverType = serverType?.lowercased() else { return false }
-        
-        switch selectedDataType {
-        case .string:
-            return ["string", "text"].contains(serverType)
-        case .int:
-            return ["number", "integer", "int"].contains(serverType)
-        case .long:
-            return ["number", "long", "bigint"].contains(serverType)
-        case .float:
-            return ["number", "float", "decimal"].contains(serverType)
-        case .double:
-            return ["number", "double", "decimal"].contains(serverType)
-        case .boolean:
-            return ["boolean", "bool", "string"].contains(serverType)
         }
     }
     

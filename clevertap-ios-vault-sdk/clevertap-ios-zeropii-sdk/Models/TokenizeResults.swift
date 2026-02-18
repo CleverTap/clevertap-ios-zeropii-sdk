@@ -37,33 +37,6 @@ import Foundation
     }
 }
 
-@objc public class DetokenizeResult: NSObject {
-    @objc public let isSuccess: Bool
-    @objc public let value: String?
-    @objc public let exists: Bool
-    @objc public let dataType: String?
-    @objc public let errorMessage: String?
-
-    internal init(result: DetokenResult) {
-        switch result {
-        case .success(let value, let exists, let dataType):
-            self.isSuccess = true
-            self.value = value
-            self.exists = exists
-            self.dataType = dataType
-            self.errorMessage = nil
-
-        case .error(let message):
-            self.isSuccess = false
-            self.value = nil
-            self.exists = false
-            self.dataType = nil
-            self.errorMessage = message
-        }
-        super.init()
-    }
-}
-
 @objc public class BatchTokenizeResult: NSObject {
     @objc public let isSuccess: Bool
     @objc public let results: [BatchTokenItem]
@@ -88,26 +61,3 @@ import Foundation
     }
 }
 
-@objc public class BatchDetokenizeResult: NSObject {
-    @objc public let isSuccess: Bool
-    @objc public let results: [BatchDetokenItem]
-    @objc public let summary: BatchDetokenizeSummary?
-    @objc public let errorMessage: String?
-
-    internal init(result: BatchDetokenResult) {
-        switch result {
-        case .success(let results, let summary):
-            self.isSuccess = true
-            self.results = results
-            self.summary = summary
-            self.errorMessage = nil
-
-        case .error(let message):
-            self.isSuccess = false
-            self.results = []
-            self.summary = nil
-            self.errorMessage = message
-        }
-        super.init()
-    }
-}

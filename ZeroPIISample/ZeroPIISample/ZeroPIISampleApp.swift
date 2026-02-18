@@ -334,17 +334,6 @@ struct ActionButtonsView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-                
-                Button {
-                    viewModel.detokenizeSingleValue()
-                } label: {
-                    Label("Detokenize", systemImage: "lock.open")
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Color.orange)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
             } else {
                 // Batch operation buttons
                 Button {
@@ -354,17 +343,6 @@ struct ActionButtonsView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
                         .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                
-                Button {
-                    viewModel.batchDetokenize()
-                } label: {
-                    Label("Batch Detokenize", systemImage: "lock.open.fill")
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Color.orange)
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }

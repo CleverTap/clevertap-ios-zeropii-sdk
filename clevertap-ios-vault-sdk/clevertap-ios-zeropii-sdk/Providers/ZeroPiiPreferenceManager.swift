@@ -11,8 +11,6 @@ import CryptoKit
 class ZeroPiiPreferenceManager {
 
     // MARK: - Constants
-    private static let tokenToValueMapKey = "zeropii_token_to_value_map"
-    private static let tokenToValueIVKey = "zeropii_token_to_value_iv"
     private static let valueToTokenMapKey = "zeropii_value_to_token_map"
     private static let valueToTokenIVKey = "zeropii_value_to_token_iv"
     private static let encryptionKeyKeychainKey = "zeropii_preference_encryption_key"
@@ -53,35 +51,6 @@ class ZeroPiiPreferenceManager {
 
     // MARK: - Save Methods
 
-    /// Saves the token-to-value map with double-layer encryption:
-    /// 1. Each value (sensitive data + dataType) is individually encrypted
-    /// 2. The entire map is encrypted before persisting to UserDefaults
-    func saveTokenToValueMap(_ map: [String: (value: String, dataType: String)]) {
-        queue.async(flags: .barrier) {
-            guard let key = self.encryptionKey else {
-                self.logger.error("No encryption key available for saving token-to-value map", file: #file, line: #line)
-                return
-            }
-
-            var serializable = [String: [String: String]]()
-            for (token, tuple) in map {
-                // Encrypt individual value
-                guard let encryptedValue = self.encryptValue(tuple.value, using: key),
-                      let encryptedDataType = self.encryptValue(tuple.dataType, using: key) else {
-                    self.logger.error("Failed to encrypt individual value for token", file: #file, line: #line)
-                    continue
-                }
-                serializable[token] = [
-                    "ev": encryptedValue.payload,
-                    "eiv": encryptedValue.iv,
-                    "edt": encryptedDataType.payload,
-                    "edtiv": encryptedDataType.iv
-                ]
-            }
-            self.encryptAndPersist(serializable, mapKey: ZeroPiiPreferenceManager.tokenToValueMapKey, ivKey: ZeroPiiPreferenceManager.tokenToValueIVKey)
-        }
-    }
-
     /// Saves the value-to-token map with double-layer encryption:
     /// 1. Each value (sensitive original value used as key) is individually encrypted
     /// 2. The entire map is encrypted before persisting to UserDefaults
@@ -119,51 +88,6 @@ class ZeroPiiPreferenceManager {
     }
 
     // MARK: - Lookup Methods (Read from preferences, no in-memory cache)
-
-    /// Looks up a token in the persisted token-to-value map:
-    /// 1. Decrypts the whole map from UserDefaults
-    /// 2. Finds the token key
-    /// 3. Decrypts the individual value and dataType
-    /// Returns the decrypted value and dataType, or nil if not found
-    func lookupValue(for token: String) -> (value: String, dataType: String)? {
-        return queue.sync {
-            guard let key = encryptionKey else {
-                logger.error("No encryption key available for lookup", file: #file, line: #line)
-                return nil
-            }
-
-            // Step 1: Decrypt the whole map from preferences
-            guard let serializable: [String: [String: String]] = loadAndDecryptMap(
-                mapKey: ZeroPiiPreferenceManager.tokenToValueMapKey,
-                ivKey: ZeroPiiPreferenceManager.tokenToValueIVKey
-            ) else {
-                return nil
-            }
-
-            // Step 2: Find the token key (tokens are stored as plaintext keys)
-            guard let entry = serializable[token] else {
-                logger.debug("Token not found in persisted map", file: #file, line: #line)
-                return nil
-            }
-
-            // Step 3: Decrypt individual value and dataType
-            guard let evPayload = entry["ev"],
-                  let evIV = entry["eiv"],
-                  let edtPayload = entry["edt"],
-                  let edtIV = entry["edtiv"] else {
-                logger.error("Malformed entry in token-to-value map", file: #file, line: #line)
-                return nil
-            }
-
-            guard let decryptedValue = decryptValue(payload: evPayload, iv: evIV, using: key),
-                  let decryptedDataType = decryptValue(payload: edtPayload, iv: edtIV, using: key) else {
-                logger.error("Failed to decrypt individual value for token", file: #file, line: #line)
-                return nil
-            }
-
-            return (value: decryptedValue, dataType: decryptedDataType)
-        }
-    }
 
     /// Looks up a value in the persisted value-to-token map:
     /// 1. Decrypts the whole map from UserDefaults
@@ -215,8 +139,6 @@ class ZeroPiiPreferenceManager {
 
     func clear() {
         queue.async(flags: .barrier) {
-            self.defaults.removeObject(forKey: ZeroPiiPreferenceManager.tokenToValueMapKey)
-            self.defaults.removeObject(forKey: ZeroPiiPreferenceManager.tokenToValueIVKey)
             self.defaults.removeObject(forKey: ZeroPiiPreferenceManager.valueToTokenMapKey)
             self.defaults.removeObject(forKey: ZeroPiiPreferenceManager.valueToTokenIVKey)
             self.logger.debug("Cleared preference maps", file: #file, line: #line)

@@ -17,20 +17,10 @@ protocol TokenRepository {
     /// - Returns: The tokenization result
     func tokenize(_ value: String) async -> TokenResult
     
-    /// Retrieves the original value for a given token
-    /// - Parameter token: The token to detokenize
-    /// - Returns: The detokenization result
-    func detokenize(_ token: String) async -> DetokenResult
-    
     // MARK: - Batch Operations
-    
+
     /// Tokenizes multiple sensitive values in a single operation
     /// - Parameter values: Array of sensitive values to tokenize
     /// - Returns: The batch tokenization result
     func batchTokenize(_ values: [String]) async -> BatchTokenResult
-    
-    /// Retrieves original values for multiple tokens in a single operation
-    /// - Parameter tokens: Array of tokens to detokenize
-    /// - Returns: The batch detokenization result
-    func batchDetokenize(_ tokens: [String]) async -> BatchDetokenResult
 }

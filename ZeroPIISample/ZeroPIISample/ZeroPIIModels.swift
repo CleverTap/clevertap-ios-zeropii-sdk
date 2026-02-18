@@ -58,9 +58,7 @@ enum OperationType: String, CaseIterable {
 enum TokenDisplayItem: Identifiable {
     case loading(String)
     case singleTokenize(originalValue: String, token: String, exists: Bool, newlyCreated: Bool, dataType: String, inputDataType: DataType)
-    case singleDetokenize(token: String, originalValue: String, exists: Bool, dataType: String, outputDataType: DataType)
     case batchTokenize(results: [BatchTokenItem], summary: BatchTokenizeSummary, inputDataType: DataType)
-    case batchDetokenize(results: [BatchDetokenItem], summary: BatchDetokenizeSummary, outputDataType: DataType)
     case fileImported(fileName: String, totalValues: Int, validValues: Int, invalidValues: Int, dataType: DataType, sampleValues: [String])
     case error(String, String)
     case cacheCleared
@@ -79,12 +77,8 @@ enum TokenDisplayItem: Identifiable {
             return "⏳ Loading"
         case .singleTokenize(_, _, _, _, _, let inputType):
             return "\(inputType.icon) Single Tokenize (\(inputType.displayName))"
-        case .singleDetokenize(_, _, _, _, let outputType):
-            return "\(outputType.icon) Single Detokenize (\(outputType.displayName))"
         case .batchTokenize(_, _, let inputType):
             return "\(inputType.icon) Batch Tokenize (\(inputType.displayName))"
-        case .batchDetokenize(_, _, let outputType):
-            return "\(outputType.icon) Batch Detokenize (\(outputType.displayName))"
         case .fileImported:
             return "📂 File Imported"
         case .error(let title, _):
@@ -108,15 +102,6 @@ enum TokenDisplayItem: Identifiable {
             Input Type: \(inputType.displayName)
             """
             
-        case .singleDetokenize(let token, let originalValue, let exists, let dataType, let outputType):
-            return """
-            Token: \(token)
-            Value: \(originalValue)
-            Exists: \(exists)
-            Data Type: \(dataType)
-            Output Type: \(outputType.displayName)
-            """
-            
         case .batchTokenize(let results, let summary, let inputType):
             var text = "Summary:\n"
             text += "• Processed: \(summary.processedCount)\n"
@@ -126,21 +111,6 @@ enum TokenDisplayItem: Identifiable {
             text += "\nResults:\n"
             for result in results {
                 text += "• \(result.originalValue) → \(result.token)\n"
-            }
-            return text
-            
-        case .batchDetokenize(let results, let summary, let outputType):
-            var text = "Summary:\n"
-            text += "• Processed: \(summary.processedCount)\n"
-            text += "• Found: \(summary.foundCount)\n"
-            text += "• Not Found: \(summary.notFoundCount)\n"
-            text += "• Output Type: \(outputType.displayName)\n\n"
-            text += "Results:\n"
-            for result in results.prefix(3) {
-                text += "• \(result.token) → \(result.value ?? "null")\n"
-            }
-            if results.count > 3 {
-                text += "... and \(results.count - 3) more"
             }
             return text
             
@@ -193,26 +163,6 @@ enum TokenDisplayItem: Identifiable {
             }
             return text
             
-        case .batchDetokenize(let results, let summary, let outputType):
-            let foundRate = summary.processedCount > 0 ? Int((Float(summary.foundCount) / Float(summary.processedCount)) * 100) : 0
-            
-            var text = "📊 Batch Detokenize Results\n\n"
-            text += "🎯 Data Type: \(outputType.displayName)\n\n"
-            text += "📈 Statistics:\n"
-            text += "• Total Tokens: \(results.count)\n"
-            text += "• Processed: \(summary.processedCount)\n"
-            text += "• Found Values: \(summary.foundCount)\n"
-            text += "• Not Found: \(summary.notFoundCount)\n"
-            text += "• Found Rate: \(foundRate)%\n\n"
-            text += "🔍 Sample Results:\n"
-            for result in results.prefix(5) {
-                text += "• \(result.token) → \(result.value ?? "null")\n"
-            }
-            if results.count > 5 {
-                text += "\n... and \(results.count - 5) more"
-            }
-            return text
-            
         case .fileImported(let fileName, let totalValues, let validValues, let invalidValues, let dataType, let sampleValues):
             let successRate = Int((Float(validValues) / Float(totalValues)) * 100)
             let errorRate = Int((Float(invalidValues) / Float(totalValues)) * 100)
@@ -258,12 +208,8 @@ enum TokenDisplayItem: Identifiable {
             return Color.yellow.opacity(0.2)
         case .singleTokenize:
             return Color.green.opacity(0.2)
-        case .singleDetokenize:
-            return Color.blue.opacity(0.2)
         case .batchTokenize:
             return Color.purple.opacity(0.2)
-        case .batchDetokenize:
-            return Color.teal.opacity(0.2)
         case .fileImported:
             return Color.blue.opacity(0.2)
         case .error:
@@ -275,7 +221,7 @@ enum TokenDisplayItem: Identifiable {
     
     var isExpandable: Bool {
         switch self {
-        case .batchTokenize, .batchDetokenize, .fileImported, .error:
+        case .batchTokenize, .fileImported, .error:
             return true
         default:
             return false

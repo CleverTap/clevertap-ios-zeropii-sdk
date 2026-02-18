@@ -9,9 +9,7 @@ import Foundation
 
 struct Constants {
     static let tokenizeEndpoint: String = "api/tokenization/getToken"
-    static let detokenizeEndpoint: String = "api/tokenization/detokenize"
     static let batchTokenizeEndpoint: String = "api/tokenization/tokens/batch"
-    static let batchDetokenizeEndpoint: String = "api/tokenization/tokens/batch/detokenize"
 }
 
 /// String or number value

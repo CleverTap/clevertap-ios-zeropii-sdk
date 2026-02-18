@@ -15,12 +15,8 @@ enum ZeroPiiError: Int, Error {
     case invalidTokenisationResponse = 1002
     case networkError = 1003
     case refreshTokenError = 1004
-    case detokenisationFalied = 1005
-    case invalidDetokenisationResponse = 1006
     case batchTokenisationFalied = 1007
     case invalidBatchTokenisationResponse = 1008
-    case batchDetokenisationFalied = 1009
-    case invalidBatchDetokenisationResponse = 1010
     case invalidBaseURL = 1011
     case jsonParsingError = 1012
     case serverError = 1013
@@ -47,18 +43,10 @@ enum ZeroPiiError: Int, Error {
             return "Unauthorized error."
         case .refreshTokenError:
             return "Refresh token error."
-        case .detokenisationFalied:
-            return "Detokenisation failed error."
-        case .invalidDetokenisationResponse:
-            return "Invalid detokenization response type."
         case .batchTokenisationFalied:
             return "Batch tokenisation failed error."
         case .invalidBatchTokenisationResponse:
             return "Invalid batch tokenization response type."
-        case .batchDetokenisationFalied:
-            return "Batch detokenisation failed error."
-        case .invalidBatchDetokenisationResponse:
-            return "Invalid batch detokenization response type."
         case .invalidBaseURL:
             return "Invalid Auth base URL"
         case .jsonParsingError:

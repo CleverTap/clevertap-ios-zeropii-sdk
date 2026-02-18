@@ -174,56 +174,6 @@ import Foundation
         performTokenization(value: value, type: Bool.self, callback: callback)
     }
     
-    // MARK: - Detokenization Methods
-
-    /// Detokenizes a token and returns the original String value from local store
-    /// - Parameters:
-    ///   - token: The token to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func detokenizeString(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
-        performDetokenization(token: token, type: String.self, callback: callback)
-    }
-
-    /// Detokenizes a token and returns the original Int value from local store
-    /// - Parameters:
-    ///   - token: The token to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func detokenizeInt(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
-        performDetokenization(token: token, type: Int.self, callback: callback)
-    }
-
-    /// Detokenizes a token and returns the original Int64 (Long) value from local store
-    /// - Parameters:
-    ///   - token: The token to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func detokenizeLong(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
-        performDetokenization(token: token, type: Int64.self, callback: callback)
-    }
-
-    /// Detokenizes a token and returns the original Float value from local store
-    /// - Parameters:
-    ///   - token: The token to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func detokenizeFloat(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
-        performDetokenization(token: token, type: Float.self, callback: callback)
-    }
-
-    /// Detokenizes a token and returns the original Double value from local store
-    /// - Parameters:
-    ///   - token: The token to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func detokenizeDouble(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
-        performDetokenization(token: token, type: Double.self, callback: callback)
-    }
-
-    /// Detokenizes a token and returns the original Boolean value from local store
-    /// - Parameters:
-    ///   - token: The token to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func detokenizeBool(_ token: String, callback: @escaping (DetokenizeResult) -> Void) {
-        performDetokenization(token: token, type: Bool.self, callback: callback)
-    }
-
     // MARK: - Batch Tokenization Methods
         
     /// Tokenizes multiple String values in a single batch operation
@@ -274,56 +224,6 @@ import Foundation
         performBatchTokenization(values: values, type: Bool.self, callback: callback)
     }
    
-    // MARK: - Batch Detokenization Methods
-
-    /// Detokenizes multiple tokens and returns original String values from local store
-    /// - Parameters:
-    ///   - tokens: The list of tokens to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func batchDetokenizeStringValues(_ tokens: [String], callback: @escaping (BatchDetokenizeResult) -> Void) {
-        performBatchDetokenization(tokens: tokens, type: String.self, callback: callback)
-    }
-
-    /// Detokenizes multiple tokens and returns original Int values from local store
-    /// - Parameters:
-    ///   - tokens: The list of tokens to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func batchDetokenizeIntValues(_ tokens: [String], callback: @escaping (BatchDetokenizeResult) -> Void) {
-        performBatchDetokenization(tokens: tokens, type: Int.self, callback: callback)
-    }
-
-    /// Detokenizes multiple tokens and returns original Int64 (Long) values from local store
-    /// - Parameters:
-    ///   - tokens: The list of tokens to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func batchDetokenizeLongValues(_ tokens: [String], callback: @escaping (BatchDetokenizeResult) -> Void) {
-        performBatchDetokenization(tokens: tokens, type: Int64.self, callback: callback)
-    }
-
-    /// Detokenizes multiple tokens and returns original Float values from local store
-    /// - Parameters:
-    ///   - tokens: The list of tokens to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func batchDetokenizeFloatValues(_ tokens: [String], callback: @escaping (BatchDetokenizeResult) -> Void) {
-        performBatchDetokenization(tokens: tokens, type: Float.self, callback: callback)
-    }
-
-    /// Detokenizes multiple tokens and returns original Double values from local store
-    /// - Parameters:
-    ///   - tokens: The list of tokens to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func batchDetokenizeDoubleValues(_ tokens: [String], callback: @escaping (BatchDetokenizeResult) -> Void) {
-        performBatchDetokenization(tokens: tokens, type: Double.self, callback: callback)
-    }
-
-    /// Detokenizes multiple tokens and returns original Boolean values from local store
-    /// - Parameters:
-    ///   - tokens: The list of tokens to detokenize
-    ///   - callback: The callback to receive the result
-    @objc public func batchDetokenizeBoolValues(_ tokens: [String], callback: @escaping (BatchDetokenizeResult) -> Void) {
-        performBatchDetokenization(tokens: tokens, type: Bool.self, callback: callback)
-    }
-
     /// Clears the token cache
     @objc public func clearCache() {
         logger.debug("Clearing token cache", file: #file, line: #line)
@@ -362,45 +262,6 @@ import Foundation
                 self.logger.debug("Tokenization result: \(typeName) value: \(repoResult)", file: #file, line: #line)
                 
                 callback(tokenizeResult)
-            }
-        }
-    }
-
-    /// Internal method to perform detokenization with type validation
-    private func performDetokenization<T>(
-        token: String,
-        type: T.Type,
-        callback: @escaping (DetokenizeResult) -> Void
-    ) {
-        sdkQueue.async { [weak self] in
-            guard let self = self else { return }
-
-            Task { @MainActor in
-                let typeName = String(describing: type)
-                self.logger.debug("Detokenizing for \(typeName) type", file: #file, line: #line)
-
-                // Call repository (local-only lookup from encrypted preferences)
-                let repoResult = await self.tokenRepository.detokenize(token)
-
-                // Validate the returned value can be converted to the expected type
-                switch repoResult {
-                case .success(let value, let exists, let dataType):
-                    if let value = value, let converter = TypeConverterRegistry.getConverter(for: type) {
-                        let converted = converter.fromStringNullable(value)
-                        if converted == nil {
-                            let result = DetokenizeResult(result: .error(message: "Value cannot be converted to \(typeName)"))
-                            callback(result)
-                            return
-                        }
-                    }
-                    let result = DetokenizeResult(result: .success(value: value, exists: exists, dataType: dataType))
-                    self.logger.debug("Detokenization result: \(typeName): \(repoResult)", file: #file, line: #line)
-                    callback(result)
-
-                case .error(let message):
-                    let result = DetokenizeResult(result: .error(message: message))
-                    callback(result)
-                }
             }
         }
     }
@@ -447,64 +308,4 @@ import Foundation
         }
     }
 
-    /// Internal method to perform batch detokenization with type validation and cache lookup
-    private func performBatchDetokenization<T>(
-        tokens: [String],
-        type: T.Type,
-        callback: @escaping (BatchDetokenizeResult) -> Void
-    ) {
-        sdkQueue.async { [weak self] in
-            guard let self = self else { return }
-
-            Task { @MainActor in
-                if tokens.isEmpty {
-                    let result = BatchDetokenResult.error(message: "Batch detokenize request contains no tokens")
-                    let batchDetokenizeResult = BatchDetokenizeResult(result: result)
-                    callback(batchDetokenizeResult)
-                    return
-                }
-
-                let typeName = String(describing: type)
-                self.logger.debug("Batch detokenizing \(tokens.count) tokens for \(typeName) type", file: #file, line: #line)
-
-                guard let converter = TypeConverterRegistry.getConverter(for: type) else {
-                    let result = BatchDetokenResult.error(message: "Unsupported type: \(typeName)")
-                    let batchDetokenizeResult = BatchDetokenizeResult(result: result)
-                    callback(batchDetokenizeResult)
-                    return
-                }
-
-                // Call repository (local-only lookup from encrypted preferences)
-                let repoResult = await self.tokenRepository.batchDetokenize(tokens)
-
-                // Validate returned values can be converted to the expected type
-                switch repoResult {
-                case .success(let results, let summary):
-                    var validatedResults = [BatchDetokenItem]()
-                    for item in results {
-                        if let value = item.value {
-                            let converted = converter.fromStringNullable(value)
-                            if converted == nil {
-                                validatedResults.append(BatchDetokenItem(token: item.token, value: nil, exists: false, dataType: item.dataType))
-                            } else {
-                                validatedResults.append(item)
-                            }
-                        } else {
-                            validatedResults.append(item)
-                        }
-                    }
-
-                    let validatedResult = BatchDetokenResult.success(results: validatedResults, summary: summary)
-                    self.logger.debug("Batch detokenization result: \(typeName) tokens: \(repoResult)", file: #file, line: #line)
-                    let batchDetokenizeResult = BatchDetokenizeResult(result: validatedResult)
-                    callback(batchDetokenizeResult)
-
-                case .error(let message):
-                    let result = BatchDetokenResult.error(message: message)
-                    let batchDetokenizeResult = BatchDetokenizeResult(result: result)
-                    callback(batchDetokenizeResult)
-                }
-            }
-        }
-    }
 }

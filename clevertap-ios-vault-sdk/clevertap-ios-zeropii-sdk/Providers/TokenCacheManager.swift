@@ -12,9 +12,8 @@ class TokenCacheManager: CacheProvider {
     private let queue = DispatchQueue(label: "com.clevertap.ZeroPiiTokenCacheQueue", attributes: .concurrent)
     private let preferenceManager: ZeroPiiPreferenceManager?
 
-    // In-memory maps only used for write-through during tokenization session
-    // These are NOT loaded from preferences on init
-    private var tokenToValueMap = [String: (value: String, dataType: String)]()
+    // In-memory map only used for write-through during tokenization session
+    // This is NOT loaded from preferences on init
     private var valueToTokenMap = [String: (token: String, dataType: String)]()
 
     init(enabled: Bool, preferenceManager: ZeroPiiPreferenceManager? = nil) {
@@ -36,24 +35,6 @@ class TokenCacheManager: CacheProvider {
         return preferenceManager?.lookupToken(for: value)
     }
 
-    func getValue(for token: String) -> (value: String, dataType: String)? {
-        guard enabled else { return nil }
-
-        // Read directly from encrypted preferences (no in-memory cache for detokenization)
-        // This decrypts the whole map, finds the token, then decrypts the individual value
-        return preferenceManager?.lookupValue(for: token)
-    }
-
-    func putValue(token: String, value: String, dataType: String?) {
-        guard enabled else { return }
-
-        queue.async(flags: .barrier) {
-            let actualDataType = dataType ?? "string"
-            self.tokenToValueMap[token] = (value, actualDataType)
-            self.preferenceManager?.saveTokenToValueMap(self.tokenToValueMap)
-        }
-    }
-
     func putToken(value: String, token: String, dataType: String?) {
         guard enabled else { return }
 
@@ -71,14 +52,13 @@ class TokenCacheManager: CacheProvider {
     func size() -> Int {
         guard enabled else { return 0 }
 
-        return queue.sync { tokenToValueMap.count }
+        return queue.sync { valueToTokenMap.count }
     }
 
     func clear() {
         guard enabled else { return }
 
         queue.async(flags: .barrier) {
-            self.tokenToValueMap.removeAll()
             self.valueToTokenMap.removeAll()
             self.preferenceManager?.clear()
         }

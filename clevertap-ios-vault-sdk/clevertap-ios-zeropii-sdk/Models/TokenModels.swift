@@ -20,18 +20,6 @@ struct TokenizeResponse: Codable {
     let dataType: String?
 }
 
-/// Request model for detokenizing a single token.
-struct DetokenizeRequest: Codable {
-    let token: String
-}
-
-/// Response model for detokenizing a single token.
-struct DetokenizeResponse: Codable {
-    let value: String?
-    let exists: Bool
-    let dataType: String?
-}
-
 /// Request model for batch tokenization.
 struct BatchTokenizeRequest: Codable {
     let values: [String]
@@ -41,17 +29,6 @@ struct BatchTokenizeRequest: Codable {
 struct BatchTokenizeResponse: Codable {
     let results: [BatchTokenItem]
     let summary: BatchTokenizeSummary
-}
-
-/// Request model for batch detokenization.
-struct BatchDetokenizeRequest: Codable {
-    let tokens: [String]
-}
-
-/// Response model for batch detokenization.
-struct BatchDetokenizeResponse: Codable {
-    let results: [BatchDetokenItem]
-    let summary: BatchDetokenizeSummary
 }
 
 /// Represents the result for an individual item in a batch tokenization operation.
@@ -119,61 +96,6 @@ struct BatchDetokenizeResponse: Codable {
     
     enum CodingKeys: String, CodingKey {
         case processedCount, existingCount, newlyCreatedCount
-    }
-}
-
-/// Represents the result for an individual item in a batch detokenization operation.
-@objc public class BatchDetokenItem: NSObject, Codable {
-    @objc public let token: String
-    @objc public let value: String?
-    @objc public let exists: Bool
-    @objc public let dataType: String?
-
-    init(token: String, value: String?, exists: Bool, dataType: String?) {
-        self.token = token
-        self.value = value
-        self.exists = exists
-        self.dataType = dataType
-        super.init()
-    }
-
-    required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.token = try container.decode(String.self, forKey: .token)
-        self.value = try container.decodeIfPresent(String.self, forKey: .value)
-        self.exists = try container.decode(Bool.self, forKey: .exists)
-        self.dataType = try container.decodeIfPresent(String.self, forKey: .dataType)
-        super.init()
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case token, value, exists, dataType
-    }
-}
-
-/// Summary statistics for a batch detokenization operation.
-@objc public class BatchDetokenizeSummary: NSObject, Codable {
-    @objc public let processedCount: Int
-    @objc public let foundCount: Int
-    @objc public let notFoundCount: Int
-
-    @objc public init(processedCount: Int, foundCount: Int, notFoundCount: Int) {
-        self.processedCount = processedCount
-        self.foundCount = foundCount
-        self.notFoundCount = notFoundCount
-        super.init()
-    }
-
-    required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.processedCount = try container.decode(Int.self, forKey: .processedCount)
-        self.foundCount = try container.decode(Int.self, forKey: .foundCount)
-        self.notFoundCount = try container.decode(Int.self, forKey: .notFoundCount)
-        super.init()
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case processedCount, foundCount, notFoundCount
     }
 }
 

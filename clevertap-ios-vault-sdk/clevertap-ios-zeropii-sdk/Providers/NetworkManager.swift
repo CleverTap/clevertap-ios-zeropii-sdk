@@ -42,16 +42,6 @@ class NetworkManager: NetworkProvider {
         )
     }
     
-    func detokenize(_ request: DetokenizeRequest, accessToken: String) async throws -> Result<DetokenizeResponse, ZeroPiiError> {
-        return await performOperation(
-            endpoint: Constants.detokenizeEndpoint,
-            request: request,
-            accessToken: accessToken,
-            responseType: DetokenizeResponse.self,
-            operationType: .detokenize
-        )
-    }
-    
     func batchTokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, ZeroPiiError> {
         return await performOperation(
             endpoint: Constants.batchTokenizeEndpoint,
@@ -59,16 +49,6 @@ class NetworkManager: NetworkProvider {
             accessToken: accessToken,
             responseType: EncryptedResponse.self,
             operationType: .batchTokenize
-        )
-    }
-    
-    func batchDetokenize(_ request: BatchDetokenizeRequest, accessToken: String) async throws -> Result<BatchDetokenizeResponse, ZeroPiiError> {
-        return await performOperation(
-            endpoint: Constants.batchDetokenizeEndpoint,
-            request: request,
-            accessToken: accessToken,
-            responseType: BatchDetokenizeResponse.self,
-            operationType: .batchDetokenize
         )
     }
     

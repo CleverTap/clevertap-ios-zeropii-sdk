@@ -17,7 +17,6 @@ actor TokenRepositoryImpl: TokenRepository {
     private let logger: ZeroPiiLogger
     private let initialRetryDelayMs: Int = 1000
     private let maxBatchSizeTokenize: Int = 1000
-    private let maxBatchSizeDetokenize: Int = 10000
 
     // MARK: - Initialization
     init(networkProvider: NetworkProvider,
@@ -63,26 +62,7 @@ actor TokenRepositoryImpl: TokenRepository {
             return .error(message: error.localizedDescription)
         }
     }
-    
-    
-    public func detokenize(_ token: String) async -> DetokenResult {
-        guard !token.isEmpty else {
-            logger.warning("Empty token provided for detokenization", file: #file, line: #line)
-            return .error(message: "Empty token passed")
-        }
 
-        // Local-only lookup from cache (backed by encrypted preferences)
-        if cacheProvider.isEnabled() {
-            if let valueDetails = cacheProvider.getValue(for: token) {
-                logger.debug("Value found in local store", file: #file, line: #line)
-                return .success(value: valueDetails.value, exists: true, dataType: valueDetails.dataType)
-            }
-        }
-
-        logger.debug("Token not found in local store", file: #file, line: #line)
-        return .error(message: "Token not found in local store")
-    }
-    
     public func batchTokenize(_ values: [String]) async -> BatchTokenResult {
         guard !values.isEmpty else {
             logger.warning("Batch tokenize request contains no values", file: #file, line: #line)
@@ -120,36 +100,6 @@ actor TokenRepositoryImpl: TokenRepository {
         }
     }
     
-    public func batchDetokenize(_ tokens: [String]) async -> BatchDetokenResult {
-        guard !tokens.isEmpty else {
-            logger.warning("Batch detokenize request contains no tokens", file: #file, line: #line)
-            return .error(message: "Empty tokens passed")
-        }
-
-        guard tokens.count <= maxBatchSizeDetokenize else {
-            logger.error("Batch size \(tokens.count) exceeds maximum \(maxBatchSizeDetokenize)", file: #file, line: #line)
-            return .error(message: "Batch size exceeds maximum limit")
-        }
-
-        // Local-only lookup from cache (backed by encrypted preferences)
-        var results = [BatchDetokenItem]()
-        var foundCount = 0
-        var notFoundCount = 0
-
-        for token in tokens {
-            if cacheProvider.isEnabled(), let valueDetails = cacheProvider.getValue(for: token) {
-                results.append(BatchDetokenItem(token: token, value: valueDetails.value, exists: true, dataType: valueDetails.dataType))
-                foundCount += 1
-            } else {
-                results.append(BatchDetokenItem(token: token, value: nil, exists: false, dataType: nil))
-                notFoundCount += 1
-            }
-        }
-
-        logger.debug("Batch detokenize local lookup: \(foundCount) found, \(notFoundCount) not found", file: #file, line: #line)
-        return .success(results: results, summary: BatchDetokenizeSummary(processedCount: tokens.count, foundCount: foundCount, notFoundCount: notFoundCount))
-    }
-    
     // MARK: - Private Implementation Methods
     
     private func performTokenization(value: String) async -> Result<TokenizeResponse, ZeroPiiError> {
@@ -178,7 +128,6 @@ actor TokenRepositoryImpl: TokenRepository {
                         // Cache the result if caching is enabled
                         if cacheProvider.isEnabled() {
                             cacheProvider.putToken(value: value, token: decodedObject.token.stringValue, dataType: decodedObject.dataType)
-                            cacheProvider.putValue(token: decodedObject.token.stringValue, value: value, dataType: decodedObject.dataType)
                         }
                         
                         logger.debug("Tokenization successful", file: #file, line: #line)
@@ -228,7 +177,6 @@ actor TokenRepositoryImpl: TokenRepository {
                             for item in decodedObject.results {
                                 if item.exists || item.newlyCreated {
                                     cacheProvider.putToken(value: item.originalValue, token: item.token, dataType: item.dataType)
-                                    cacheProvider.putValue(token: item.token, value: item.originalValue, dataType: item.dataType)
                                 }
                             }
                         }

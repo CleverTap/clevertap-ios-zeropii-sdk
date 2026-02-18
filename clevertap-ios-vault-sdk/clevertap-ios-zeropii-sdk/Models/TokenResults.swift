@@ -27,25 +27,6 @@ enum TokenResult {
 }
 
 
-/// Represents the result of a detokenization process, which can either be a success
-/// containing the original value and metadata, or an error describing what went wrong.
-enum DetokenResult {
-    
-    /// Indicates a successful detokenization operation.
-    ///
-    /// - Parameters:
-    ///   - value: The original value retrieved from the token. This may be `nil` if no value was found.
-    ///   - exists: A Boolean indicating whether the value actually existed for the given token.
-    ///   - dataType: The data type of the original value, such as `"string"` or `"number"`.
-    case success(value: String?, exists: Bool, dataType: String?)
-    
-    /// Indicates that an error occurred during the detokenization process.
-    ///
-    /// - Parameter message: A descriptive error message explaining the failure.
-    case error(message: String)
-}
-
-
 /// Represents the result of a batch tokenization operation, which can either be a success
 /// containing multiple individual tokenization results and a summary, or an error describing the failure.
 enum BatchTokenResult {
@@ -63,19 +44,3 @@ enum BatchTokenResult {
     case error(message: String)
 }
 
-/// Represents the result of a batch detokenization operation, which can either be a success
-/// containing multiple individual detokenization results and a summary, or an error describing the failure.
-enum BatchDetokenResult {
-    
-    /// Indicates a successful batch detokenization.
-    ///
-    /// - Parameters:
-    ///   - results: An array of individual detokenization results for each token in the batch.
-    ///   - summary: A summary object containing statistics and metadata about the batch operation.
-    case success(results: [BatchDetokenItem], summary: BatchDetokenizeSummary)
-    
-    /// Indicates an error occurred during the batch detokenization process.
-    ///
-    /// - Parameter message: A descriptive error message explaining what went wrong.
-    case error(message: String)
-}
