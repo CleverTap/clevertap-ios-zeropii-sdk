@@ -250,11 +250,6 @@ class ZeroPIIViewModel: ObservableObject {
     }
 
     // MARK: - Utility
-    func clearCache() {
-        ZeroPiiSDK.getInstance().clearCache()
-        addResult(.cacheCleared)
-    }
-    
     func clearResults() {
         results.removeAll()
     }

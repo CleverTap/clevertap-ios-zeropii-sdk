@@ -21,11 +21,6 @@ import os.log
 
     // MARK: - Public Logging Methods
 
-    func verbose(_ message: String, file: String = #file, line: Int = #line) {
-        guard logLevel.rawValue >= ZeroPiiLogLevel.verbose.rawValue else { return }
-        log(message, level: .verbose, file: file, line: line)
-    }
-
     func debug(_ message: String, file: String = #file, line: Int = #line) {
         guard logLevel.rawValue >= ZeroPiiLogLevel.debug.rawValue else { return }
         log(message, level: .debug, file: file, line: line)
@@ -76,7 +71,6 @@ import os.log
         case .error:   return .error
         case .info:    return .info
         case .debug:   return .debug
-        case .verbose: return .debug
         }
     }
 }

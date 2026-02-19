@@ -8,11 +8,10 @@
 import Foundation
 
 actor TokenRepositoryImpl: TokenRepository {
-    
+
     // MARK: - Dependencies
     private let networkProvider: NetworkProvider
     private let authRepository: AuthRepository
-    private let cacheProvider: CacheProvider
     private let encryptionManager: EncryptionManager
     private let logger: ZeroPiiLogger
     private let initialRetryDelayMs: Int = 1000
@@ -21,16 +20,14 @@ actor TokenRepositoryImpl: TokenRepository {
     // MARK: - Initialization
     init(networkProvider: NetworkProvider,
         authRepository: AuthRepository,
-        cacheProvider: CacheProvider,
         encryptionManager: EncryptionManager,
         logger: ZeroPiiLogger = ZeroPiiLogger.shared) {
-        
+
         self.networkProvider = networkProvider
         self.authRepository = authRepository
-        self.cacheProvider = cacheProvider
         self.encryptionManager = encryptionManager
         self.logger = logger
-        
+
         logger.debug("TokenRepository initialized", file: #file, line: #line)
     }
     
@@ -41,20 +38,12 @@ actor TokenRepositoryImpl: TokenRepository {
             logger.warning("Empty value provided for tokenization", file: #file, line: #line)
             return .error(message: "Empty value passed")
         }
-        
-        // Check cache first if enabled
-        if cacheProvider.isEnabled() {
-            if let tokenDetails = cacheProvider.getToken(for: value) {
-                logger.debug("Token found in cache", file: #file, line: #line)
-                return .success(token: tokenDetails.token, exists: true, newlyCreated: false, dataType: tokenDetails.dataType)
-            }
-        }
-        
+
         // Perform tokenization with retry logic
         let result = await performWithRetry(operation: "tokenize", maxAttempts: 1) {
             await self.performTokenization(value: value)
         }
-        
+
         switch result {
         case .success(let response):
             return .success(token: response.token.stringValue, exists: response.exists, newlyCreated: response.newlyCreated, dataType: response.dataType)
@@ -68,33 +57,20 @@ actor TokenRepositoryImpl: TokenRepository {
             logger.warning("Batch tokenize request contains no values", file: #file, line: #line)
             return .error(message: "Empty values passed")
         }
-        
+
         guard values.count <= maxBatchSizeTokenize else {
             logger.error("Batch size \(values.count) exceeds maximum \(maxBatchSizeTokenize)", file: #file, line: #line)
             return .error(message: "Batch size exceeds maximum limit")
         }
-        
-        var (cachedResults, uncachedValues) = separateCachedValues(values)
-        logger.debug("Batch tokenize: \(cachedResults.count) cached, \(uncachedValues.count) uncached", file: #file, line: #line)
-        
-        // If all values are cached, return immediately
-        if uncachedValues.isEmpty {
-            logger.debug("All tokens found in cache", file: #file, line: #line)
-            return .success(results: cachedResults, summary: BatchTokenizeSummary(processedCount: values.count, existingCount: values.count, newlyCreatedCount: 0))
-        }
-        
-        // Process uncached values
+
         let result = await performWithRetry(operation: "batchTokenize", maxAttempts: 1) {
-            await self.performBatchTokenization(values: uncachedValues)
+            await self.performBatchTokenization(values: values)
         }
-        
+
         switch result {
         case .success(let response):
-            cachedResults.append(contentsOf: response.results)
-            return .success(results: cachedResults,
-                            summary: BatchTokenizeSummary(processedCount: cachedResults.count,
-                                                          existingCount: cachedResults.count { $0.exists },
-                                                          newlyCreatedCount: cachedResults.count { $0.newlyCreated }))
+            return .success(results: response.results,
+                            summary: response.summary)
         case .failure(let error):
             return .error(message: error.localizedDescription)
         }
@@ -125,11 +101,6 @@ actor TokenRepositoryImpl: TokenRepository {
                 case .success(let jsonData):
                     do {
                         let decodedObject = try JSONDecoder().decode(TokenizeResponse.self, from: jsonData)
-                        // Cache the result if caching is enabled
-                        if cacheProvider.isEnabled() {
-                            cacheProvider.putToken(value: value, token: decodedObject.token.stringValue, dataType: decodedObject.dataType)
-                        }
-                        
                         logger.debug("Tokenization successful", file: #file, line: #line)
                         return .success(decodedObject)
                     } catch (let error) {
@@ -172,15 +143,6 @@ actor TokenRepositoryImpl: TokenRepository {
                 case .success(let jsonData):
                     do {
                         let decodedObject = try JSONDecoder().decode(BatchTokenizeResponse.self, from: jsonData)
-                        // Cache the result if caching is enabled
-                        if cacheProvider.isEnabled() {
-                            for item in decodedObject.results {
-                                if item.exists || item.newlyCreated {
-                                    cacheProvider.putToken(value: item.originalValue, token: item.token, dataType: item.dataType)
-                                }
-                            }
-                        }
-                        
                         logger.debug("Batch Tokenization successful", file: #file, line: #line)
                         return .success(decodedObject)
                     } catch (let error) {
@@ -198,25 +160,6 @@ actor TokenRepositoryImpl: TokenRepository {
         } catch {
             return .failure(.batchTokenisationFalied)
         }
-    }
-    
-    private func separateCachedValues(_ values: [String]) -> ([BatchTokenItem], [String]) {
-        if !cacheProvider.isEnabled() {
-            return ([], values)
-        }
-        
-        var cachedResults: [BatchTokenItem] = []
-        var uncachedValues: [String] = []
-        
-        for (_, value) in values.enumerated() {
-            if let tokenDetails = cacheProvider.getToken(for: value) {
-                cachedResults.append(BatchTokenItem(originalValue: value, token: tokenDetails.token, exists: true, newlyCreated: false, dataType: tokenDetails.dataType))
-            } else {
-                uncachedValues.append(value)
-            }
-        }
-        
-        return (cachedResults, uncachedValues)
     }
     
     // MARK: - Retry Logic

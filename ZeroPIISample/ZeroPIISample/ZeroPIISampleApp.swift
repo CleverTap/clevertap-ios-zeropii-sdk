@@ -140,14 +140,10 @@ struct StatusHeaderView: View {
                 Label("Encryption: ON", systemImage: "lock.fill")
                     .font(.caption)
                     .foregroundColor(.green)
-                
+
                 Spacer()
-                
-                Label("Cache: ON", systemImage: "externaldrive.fill")
-                    .font(.caption)
-                    .foregroundColor(.blue)
             }
-            
+
             Text("SDK Status: Ready")
                 .font(.caption2)
                 .foregroundColor(.secondary)
@@ -357,17 +353,6 @@ struct UtilityButtonsView: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            Button {
-                viewModel.clearCache()
-            } label: {
-                Label("Clear Cache", systemImage: "trash")
-                    .font(.caption)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(8)
-            }
-            
             Button {
                 viewModel.clearResults()
             } label: {

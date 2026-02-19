@@ -8,16 +8,12 @@
 import Foundation
 
 class NetworkRequestBuilder {
-    private var configuration: NetworkConfiguration
+    private let configuration: NetworkConfiguration
     private let logger: ZeroPiiLoggerProtocol
     
     init(configuration: NetworkConfiguration, logger: ZeroPiiLoggerProtocol) {
         self.configuration = configuration
         self.logger = logger
-    }
-    
-    func updateConfiguration(_ configuration: NetworkConfiguration) {
-        self.configuration = configuration
     }
 
     func buildRequest<T: Codable>(

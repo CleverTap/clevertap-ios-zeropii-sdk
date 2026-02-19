@@ -21,7 +21,6 @@ import Foundation
     internal var tokenRepository: TokenRepository!
     internal var authRepository: AuthRepository!
     private var encryptionManager: EncryptionManager!
-    private var tokenCacheManager: TokenCacheManager!
     private var logger: ZeroPiiLogger!
 
     // MARK: - Singleton
@@ -57,15 +56,8 @@ import Foundation
         let networkConfig = NetworkConfiguration(tokenizationBaseURL: apiUrl)
         let networkProvider = NetworkManager(configuration: networkConfig, logger: logger)
 
-        // Setup encryption manager if enabled
+        // Setup encryption manager
         encryptionManager = EncryptionManager(enabled: true, logger: logger)
-
-        // Initialize preference manager for encrypted persistence
-        let keychainManager = KeychainManager()
-        let preferenceManager = ZeroPiiPreferenceManager(keychainManager: keychainManager, encryptionManager: encryptionManager, logger: logger)
-
-        // Initialize token cache with preference-backed persistence
-        tokenCacheManager = TokenCacheManager(enabled: true, preferenceManager: preferenceManager)
 
         // Create repositories
         authRepository = AuthRepositoryImpl(
@@ -76,7 +68,6 @@ import Foundation
         tokenRepository = TokenRepositoryImpl(
             networkProvider: networkProvider,
             authRepository: authRepository,
-            cacheProvider: tokenCacheManager,
             encryptionManager: encryptionManager,
             logger: logger
         )
@@ -224,12 +215,6 @@ import Foundation
         performBatchTokenization(values: values, type: Bool.self, callback: callback)
     }
    
-    /// Clears the token cache
-    @objc public func clearCache() {
-        logger.debug("Clearing token cache", file: #file, line: #line)
-        tokenCacheManager.clear()
-    }
-    
     // MARK: - Private Methods
     
     /// Internal method to perform tokenization with type conversion

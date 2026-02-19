@@ -13,16 +13,12 @@ import Foundation
     case error   = 1   // Only errors
     case info    = 2   // Errors + Info + Warning
     case debug   = 3   // Errors + Info + Warning + Debug
-    case verbose = 4   // All logs including verbose
 }
 
 /// Protocol defining logging operations for the ZeroPii SDK
 protocol ZeroPiiLoggerProtocol {
     /// Current log level
     var logLevel: ZeroPiiLogLevel { get set }
-
-    /// Logs a verbose message (most detailed)
-    func verbose(_ message: String, file: String, line: Int)
 
     /// Logs a debug message (for development and troubleshooting)
     func debug(_ message: String, file: String, line: Int)

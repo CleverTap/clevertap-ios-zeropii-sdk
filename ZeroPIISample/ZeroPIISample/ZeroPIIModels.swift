@@ -61,7 +61,6 @@ enum TokenDisplayItem: Identifiable {
     case batchTokenize(results: [BatchTokenItem], summary: BatchTokenizeSummary, inputDataType: DataType)
     case fileImported(fileName: String, totalValues: Int, validValues: Int, invalidValues: Int, dataType: DataType, sampleValues: [String])
     case error(String, String)
-    case cacheCleared
     
     var id: String {
         UUID().uuidString
@@ -83,8 +82,6 @@ enum TokenDisplayItem: Identifiable {
             return "📂 File Imported"
         case .error(let title, _):
             return "❌ \(title)"
-        case .cacheCleared:
-            return "🗑️ Cache Cleared"
         }
     }
     
@@ -135,9 +132,6 @@ enum TokenDisplayItem: Identifiable {
 
         case .error(_, let message):
             return message
-
-        case .cacheCleared:
-            return "Token cache has been cleared successfully"
         }
     }
     
@@ -214,8 +208,6 @@ enum TokenDisplayItem: Identifiable {
             return Color.blue.opacity(0.2)
         case .error:
             return Color.red.opacity(0.2)
-        case .cacheCleared:
-            return Color.orange.opacity(0.2)
         }
     }
     

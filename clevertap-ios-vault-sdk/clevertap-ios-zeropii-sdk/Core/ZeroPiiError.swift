@@ -14,13 +14,11 @@ enum ZeroPiiError: Int, Error {
     case tokenisationFalied = 1001
     case invalidTokenisationResponse = 1002
     case networkError = 1003
-    case refreshTokenError = 1004
     case batchTokenisationFalied = 1007
     case invalidBatchTokenisationResponse = 1008
     case invalidBaseURL = 1011
     case jsonParsingError = 1012
     case serverError = 1013
-    case authRequestError = 1014
     case buildRequestError = 1015
     case badRequest = 1016
     case rateLimitExceeded = 1017
@@ -41,8 +39,6 @@ enum ZeroPiiError: Int, Error {
             return "Network error."
         case .unauthorized:
             return "Unauthorized error."
-        case .refreshTokenError:
-            return "Refresh token error."
         case .batchTokenisationFalied:
             return "Batch tokenisation failed error."
         case .invalidBatchTokenisationResponse:
@@ -53,8 +49,6 @@ enum ZeroPiiError: Int, Error {
             return "Failed to parse JSON"
         case .serverError:
             return "Server error"
-        case .authRequestError:
-            return "Failed to build auth request"
         case .buildRequestError:
             return "Failed to build request"
         case .badRequest:
