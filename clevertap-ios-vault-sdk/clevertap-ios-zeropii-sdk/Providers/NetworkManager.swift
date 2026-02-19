@@ -38,17 +38,41 @@ class NetworkManager: NetworkProvider {
             request: request,
             accessToken: accessToken,
             responseType: EncryptedResponse.self,
-            operationType: .tokenize
+            operationType: .tokenize,
+            encrypted: true
         )
     }
-    
+
+    func tokenizePlain(_ request: TokenizeRequest, accessToken: String) async throws -> Result<TokenizeResponse, ZeroPiiError> {
+        return await performOperation(
+            endpoint: Constants.tokenizeEndpoint,
+            request: request,
+            accessToken: accessToken,
+            responseType: TokenizeResponse.self,
+            operationType: .tokenize,
+            encrypted: false
+        )
+    }
+
     func batchTokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, ZeroPiiError> {
         return await performOperation(
             endpoint: Constants.batchTokenizeEndpoint,
             request: request,
             accessToken: accessToken,
             responseType: EncryptedResponse.self,
-            operationType: .batchTokenize
+            operationType: .batchTokenize,
+            encrypted: true
+        )
+    }
+
+    func batchTokenizePlain(_ request: BatchTokenizeRequest, accessToken: String) async throws -> Result<BatchTokenizeResponse, ZeroPiiError> {
+        return await performOperation(
+            endpoint: Constants.batchTokenizeEndpoint,
+            request: request,
+            accessToken: accessToken,
+            responseType: BatchTokenizeResponse.self,
+            operationType: .batchTokenize,
+            encrypted: false
         )
     }
     
@@ -68,12 +92,13 @@ class NetworkManager: NetworkProvider {
                 
             case .failure(let error):
                 logger.debug("Operation \(operation) failed: \(error.localizedDescription)", file: #file, line: #line)
+                return .failure(error)
             }
-            
+
         } catch {
             logger.debug("Network operation \(operation) failed with exception: \(error.localizedDescription)", file: #file, line: #line)
         }
-        
+
         return .failure(.networkError)
     }
     
@@ -82,29 +107,21 @@ class NetworkManager: NetworkProvider {
         request: TRequest,
         accessToken: String,
         responseType: TResponse.Type,
-        operationType: NetworkOperationType
+        operationType: NetworkOperationType,
+        encrypted: Bool = true
     ) async -> Result<TResponse, ZeroPiiError> {
         let operationName = "\(operationType.rawValue)"
-        
+
         do {
             let urlRequest = try requestBuilder.buildRequest(
                 endpoint: endpoint,
                 body: request,
-                accessToken: accessToken
+                accessToken: accessToken,
+                encrypted: encrypted
             )
             
-            let result = await performRequest(request: urlRequest, operation: operationName) { data, response in
+            return await performRequest(request: urlRequest, operation: operationName) { data, response in
                 return self.responseHandler.handleResponse(data: data, response: response, responseType: responseType)
-            }
-            
-            switch result {
-            case .success(let response):
-                logger.info("Operation \(operationName) succeeded", file: #file, line: #line)
-                return .success(response)
-                
-            case .failure(let error):
-                logger.debug("Operation \(operationName) failed: \(error.localizedDescription)", file: #file, line: #line)
-                return .failure(error)
             }
             
         } catch {

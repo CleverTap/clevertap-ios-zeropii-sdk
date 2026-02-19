@@ -19,19 +19,22 @@ class NetworkRequestBuilder {
     func buildRequest<T: Codable>(
         endpoint: String,
         body: T,
-        accessToken: String
+        accessToken: String,
+        encrypted: Bool = true
     ) throws -> URLRequest {
-        
+
         guard let url = URL(string: configuration.tokenizationBaseURL + endpoint) else {
             logger.error("Invalid tokenization URL: \(configuration.tokenizationBaseURL + endpoint)", file: #file, line: #line)
             throw ZeroPiiError.invalidBaseURL
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("true", forHTTPHeaderField: "Encrypted")
+        if encrypted {
+            request.setValue("true", forHTTPHeaderField: "Encrypted")
+        }
 
         do {
             let encoder = JSONEncoder()

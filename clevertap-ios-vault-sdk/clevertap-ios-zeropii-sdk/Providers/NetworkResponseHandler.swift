@@ -63,6 +63,10 @@ class NetworkResponseHandler {
             logger.error("405 Method Not Allowed", file: #file, line: #line)
             return .failure(.methodNotAllowed)
 
+        case 419:
+            logger.warning("419 Backend decryption failure, falling back to non-encrypted requests", file: #file, line: #line)
+            return .failure(.decryptionFailed)
+
         case 429:
             logger.warning("Server error \(httpResponse.statusCode) - rate limit exceeded", file: #file, line: #line)
             return .failure(.rateLimitExceeded)

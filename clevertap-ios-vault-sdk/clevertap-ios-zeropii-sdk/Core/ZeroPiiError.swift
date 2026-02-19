@@ -10,6 +10,7 @@ import Foundation
 enum ZeroPiiError: Int, Error {
     
     case unauthorized = 401
+    case decryptionFailed = 419
     case authenticationFailed = 1000
     case tokenisationFalied = 1001
     case invalidTokenisationResponse = 1002
@@ -39,6 +40,8 @@ enum ZeroPiiError: Int, Error {
             return "Network error."
         case .unauthorized:
             return "Unauthorized error."
+        case .decryptionFailed:
+            return "Backend decryption failure."
         case .batchTokenisationFalied:
             return "Batch tokenisation failed error."
         case .invalidBatchTokenisationResponse:
