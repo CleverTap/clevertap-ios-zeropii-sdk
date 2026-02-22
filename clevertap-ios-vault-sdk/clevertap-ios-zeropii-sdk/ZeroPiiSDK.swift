@@ -80,6 +80,23 @@ import Foundation
 
     /// Initializes the ZeroPiiSDK with an app-provided token provider.
     ///
+    /// This convenience overload uses the default log level (`.off`) and is intended for
+    /// Objective-C callers, which cannot use Swift default parameter values.
+    ///
+    /// - Parameters:
+    ///   - tokenProvider: An implementation of `AccessTokenProvider` that supplies bearer tokens.
+    ///   - apiUrl: The base URL for the tokenization API.
+    /// - Returns: The initialized `ZeroPiiSDK` singleton instance.
+    @discardableResult
+    @objc public static func initialize(
+        tokenProvider: AccessTokenProvider,
+        apiUrl: String
+    ) -> ZeroPiiSDK {
+        return initialize(tokenProvider: tokenProvider, apiUrl: apiUrl, logLevel: .off)
+    }
+
+    /// Initializes the ZeroPiiSDK with an app-provided token provider.
+    ///
     /// - Parameters:
     ///   - tokenProvider: An implementation of ``AccessTokenProvider`` that supplies bearer tokens.
     ///   - apiUrl: The base URL for the tokenization API.
