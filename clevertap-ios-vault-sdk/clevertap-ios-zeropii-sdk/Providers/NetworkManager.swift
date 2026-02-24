@@ -8,17 +8,17 @@
 import Foundation
 
 class NetworkManager: NetworkProvider {
-    
+
     private let session: URLSession
     private let logger: ZeroPiiLoggerProtocol
     private var networkConfiguration: NetworkConfiguration
     private let requestBuilder: NetworkRequestBuilder
     private let responseHandler: NetworkResponseHandler
-    
+
     public var configuration: NetworkConfiguration {
         return networkConfiguration
     }
-    
+
     public init(configuration: NetworkConfiguration, logger: ZeroPiiLoggerProtocol = ZeroPiiLogger.shared) {
         self.networkConfiguration = configuration
         self.logger = logger
@@ -31,8 +31,8 @@ class NetworkManager: NetworkProvider {
         self.requestBuilder = NetworkRequestBuilder(configuration: configuration, logger: logger)
         self.responseHandler = NetworkResponseHandler(logger: logger)
     }
-    
-    func tokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, ZeroPiiError> {
+
+    func tokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, ZeroPiiNetworkFailure> {
         return await performOperation(
             endpoint: Constants.tokenizeEndpoint,
             request: request,
@@ -43,7 +43,7 @@ class NetworkManager: NetworkProvider {
         )
     }
 
-    func tokenizePlain(_ request: TokenizeRequest, accessToken: String) async throws -> Result<TokenizeResponse, ZeroPiiError> {
+    func tokenizePlain(_ request: TokenizeRequest, accessToken: String) async throws -> Result<TokenizeResponse, ZeroPiiNetworkFailure> {
         return await performOperation(
             endpoint: Constants.tokenizeEndpoint,
             request: request,
@@ -54,7 +54,7 @@ class NetworkManager: NetworkProvider {
         )
     }
 
-    func batchTokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, ZeroPiiError> {
+    func batchTokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, ZeroPiiNetworkFailure> {
         return await performOperation(
             endpoint: Constants.batchTokenizeEndpoint,
             request: request,
@@ -65,7 +65,7 @@ class NetworkManager: NetworkProvider {
         )
     }
 
-    func batchTokenizePlain(_ request: BatchTokenizeRequest, accessToken: String) async throws -> Result<BatchTokenizeResponse, ZeroPiiError> {
+    func batchTokenizePlain(_ request: BatchTokenizeRequest, accessToken: String) async throws -> Result<BatchTokenizeResponse, ZeroPiiNetworkFailure> {
         return await performOperation(
             endpoint: Constants.batchTokenizeEndpoint,
             request: request,
@@ -75,33 +75,35 @@ class NetworkManager: NetworkProvider {
             encrypted: false
         )
     }
-    
+
     private func performRequest<T>(
         request: URLRequest,
         operation: String,
-        handler: @escaping (Data, URLResponse) -> Result<T, ZeroPiiError>
-    ) async -> Result<T, ZeroPiiError> {
+        handler: @escaping (Data, URLResponse) -> (Result<T, ZeroPiiError>, Int?)
+    ) async -> Result<T, ZeroPiiNetworkFailure> {
         do {
             let (data, response) = try await session.data(for: request)
-            let result = handler(data, response)
-            
-            switch result {
+            let (result, httpStatusCode) = handler(data, response)
+
+            let mapped = result.mapError { ZeroPiiNetworkFailure(error: $0, httpStatusCode: httpStatusCode) }
+
+            switch mapped {
             case .success:
                 logger.info("Operation \(operation) succeeded", file: #file, line: #line)
-                return result
-                
-            case .failure(let error):
-                logger.debug("Operation \(operation) failed: \(error.localizedDescription)", file: #file, line: #line)
-                return .failure(error)
+
+            case .failure(let failure):
+                logger.debug("Operation \(operation) failed with status \(failure.httpStatusCode.map(String.init) ?? "n/a"): \(failure.error.localizedDescription)", file: #file, line: #line)
             }
+
+            return mapped
 
         } catch {
             logger.debug("Network operation \(operation) failed with exception: \(error.localizedDescription)", file: #file, line: #line)
         }
 
-        return .failure(.networkError)
+        return .failure(ZeroPiiNetworkFailure(error: .networkError, httpStatusCode: nil))
     }
-    
+
     private func performOperation<TRequest: Codable, TResponse: Codable>(
         endpoint: String,
         request: TRequest,
@@ -109,7 +111,7 @@ class NetworkManager: NetworkProvider {
         responseType: TResponse.Type,
         operationType: NetworkOperationType,
         encrypted: Bool = true
-    ) async -> Result<TResponse, ZeroPiiError> {
+    ) async -> Result<TResponse, ZeroPiiNetworkFailure> {
         let operationName = "\(operationType.rawValue)"
 
         do {
@@ -119,14 +121,14 @@ class NetworkManager: NetworkProvider {
                 accessToken: accessToken,
                 encrypted: encrypted
             )
-            
+
             return await performRequest(request: urlRequest, operation: operationName) { data, response in
                 return self.responseHandler.handleResponse(data: data, response: response, responseType: responseType)
             }
-            
+
         } catch {
             logger.debug("Failed to build request", file: #file, line: #line)
-            return .failure(.buildRequestError)
+            return .failure(ZeroPiiNetworkFailure(error: .buildRequestError, httpStatusCode: nil))
         }
     }
 }

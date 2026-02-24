@@ -53,38 +53,41 @@ final class NetworkResponseHandlerTests: XCTestCase {
         let data = makeValidJSON()
         let response = makeHTTPResponse(statusCode: 200)
 
-        let result = handler.handleResponse(data: data, response: response, responseType: TestResponse.self)
+        let (result, statusCode) = handler.handleResponse(data: data, response: response, responseType: TestResponse.self)
 
         if case .success(let decoded) = result {
             XCTAssertEqual(decoded.message, "hello")
         } else {
             XCTFail("Expected success, got \(result)")
         }
+        XCTAssertNil(statusCode)
     }
 
     func testHandleResponse_200_invalidJSON_returnsJsonParsingError() {
         let data = makeInvalidJSON()
         let response = makeHTTPResponse(statusCode: 200)
 
-        let result = handler.handleResponse(data: data, response: response, responseType: TestResponse.self)
+        let (result, statusCode) = handler.handleResponse(data: data, response: response, responseType: TestResponse.self)
 
         XCTAssertEqual(result, .failure(.jsonParsingError))
+        XCTAssertNil(statusCode)
     }
 
     func testHandleResponse_200_emptyData_returnsJsonParsingError() {
         let data = Data()
         let response = makeHTTPResponse(statusCode: 200)
 
-        let result = handler.handleResponse(data: data, response: response, responseType: TestResponse.self)
+        let (result, statusCode) = handler.handleResponse(data: data, response: response, responseType: TestResponse.self)
 
         XCTAssertEqual(result, .failure(.jsonParsingError))
+        XCTAssertNil(statusCode)
     }
 
     func testHandleResponse_200_decodesTokenizeResponse() {
         let data = makeTokenizeResponseJSON()
         let response = makeHTTPResponse(statusCode: 200)
 
-        let result = handler.handleResponse(data: data, response: response, responseType: TokenizeResponse.self)
+        let (result, _) = handler.handleResponse(data: data, response: response, responseType: TokenizeResponse.self)
 
         if case .success(let tokenizeResponse) = result {
             XCTAssertEqual(tokenizeResponse.token.stringValue, "TOK123")
@@ -99,113 +102,125 @@ final class NetworkResponseHandlerTests: XCTestCase {
     // MARK: - 4xx Status Codes
 
     func testHandleResponse_400_returnsBadRequest() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 400),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.badRequest))
+        XCTAssertEqual(statusCode, 400)
     }
 
     func testHandleResponse_401_returnsUnauthorized() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 401),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.unauthorized))
+        XCTAssertEqual(statusCode, 401)
     }
 
     func testHandleResponse_403_returnsForbidden() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 403),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.forbidden))
+        XCTAssertEqual(statusCode, 403)
     }
 
     func testHandleResponse_404_returnsNotFound() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 404),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.notFound))
+        XCTAssertEqual(statusCode, 404)
     }
 
     func testHandleResponse_405_returnsMethodNotAllowed() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 405),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.methodNotAllowed))
+        XCTAssertEqual(statusCode, 405)
     }
 
     func testHandleResponse_419_returnsDecryptionFailed() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 419),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.decryptionFailed))
+        XCTAssertEqual(statusCode, 419)
     }
 
     func testHandleResponse_429_returnsRateLimitExceeded() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 429),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.rateLimitExceeded))
+        XCTAssertEqual(statusCode, 429)
     }
 
     // MARK: - 5xx Status Codes
 
     func testHandleResponse_500_returnsServerError() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 500),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.serverError))
+        XCTAssertEqual(statusCode, 500)
     }
 
     func testHandleResponse_502_returnsServerError() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 502),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.serverError))
+        XCTAssertEqual(statusCode, 502)
     }
 
     func testHandleResponse_503_returnsServerError() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 503),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.serverError))
+        XCTAssertEqual(statusCode, 503)
     }
 
     func testHandleResponse_504_returnsServerError() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 504),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.serverError))
+        XCTAssertEqual(statusCode, 504)
     }
 
     func testHandleResponse_unknownStatusCode_returnsServerError() {
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeInvalidJSON(),
             response: makeHTTPResponse(statusCode: 418),
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.serverError))
+        XCTAssertEqual(statusCode, 418)
     }
 
     // MARK: - Non-HTTP Response
@@ -217,12 +232,13 @@ final class NetworkResponseHandlerTests: XCTestCase {
             expectedContentLength: 0,
             textEncodingName: nil
         )
-        let result = handler.handleResponse(
+        let (result, statusCode) = handler.handleResponse(
             data: makeValidJSON(),
             response: nonHTTPResponse,
             responseType: TestResponse.self
         )
         XCTAssertEqual(result, .failure(.networkError))
+        XCTAssertNil(statusCode)
     }
 
     // MARK: - Encrypted Response
@@ -232,7 +248,7 @@ final class NetworkResponseHandlerTests: XCTestCase {
         let data = json.data(using: .utf8)!
         let response = makeHTTPResponse(statusCode: 200)
 
-        let result = handler.handleResponse(data: data, response: response, responseType: EncryptedResponse.self)
+        let (result, _) = handler.handleResponse(data: data, response: response, responseType: EncryptedResponse.self)
 
         if case .success(let encResponse) = result {
             XCTAssertEqual(encResponse.itp, "encryptedPayload")
@@ -242,4 +258,3 @@ final class NetworkResponseHandlerTests: XCTestCase {
         }
     }
 }
-

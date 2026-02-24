@@ -8,9 +8,15 @@
 import Foundation
 
 enum ZeroPiiError: Int, Error {
-    
+
+    case badRequest = 400
     case unauthorized = 401
+    case forbidden = 403
+    case notFound = 404
+    case methodNotAllowed = 405
     case decryptionFailed = 419
+    case rateLimitExceeded = 429
+    case serverError = 500
     case authenticationFailed = 1000
     case tokenisationFalied = 1001
     case invalidTokenisationResponse = 1002
@@ -19,17 +25,27 @@ enum ZeroPiiError: Int, Error {
     case invalidBatchTokenisationResponse = 1008
     case invalidBaseURL = 1011
     case jsonParsingError = 1012
-    case serverError = 1013
     case buildRequestError = 1015
-    case badRequest = 1016
-    case rateLimitExceeded = 1017
-    case forbidden = 1018
-    case notFound = 1019
-    case methodNotAllowed = 1020
 
     // MARK: - Localized Error Description
     public var errorDescription: String? {
         switch self {
+        case .badRequest:
+            return "Bad request"
+        case .unauthorized:
+            return "Unauthorized error."
+        case .forbidden:
+            return "Forbidden"
+        case .notFound:
+            return "Not found"
+        case .methodNotAllowed:
+            return "Method not allowed"
+        case .decryptionFailed:
+            return "Backend decryption failure."
+        case .rateLimitExceeded:
+            return "Rate limit exceeded"
+        case .serverError:
+            return "Server error"
         case .authenticationFailed:
             return "Authentication failed error."
         case .tokenisationFalied:
@@ -38,10 +54,6 @@ enum ZeroPiiError: Int, Error {
             return "Invalid tokenization response type."
         case .networkError:
             return "Network error."
-        case .unauthorized:
-            return "Unauthorized error."
-        case .decryptionFailed:
-            return "Backend decryption failure."
         case .batchTokenisationFalied:
             return "Batch tokenisation failed error."
         case .invalidBatchTokenisationResponse:
@@ -50,20 +62,17 @@ enum ZeroPiiError: Int, Error {
             return "Invalid Auth base URL"
         case .jsonParsingError:
             return "Failed to parse JSON"
-        case .serverError:
-            return "Server error"
         case .buildRequestError:
             return "Failed to build request"
-        case .badRequest:
-            return "Bad request"
-        case .rateLimitExceeded:
-            return "Rate limit exceeded"
-        case .forbidden:
-            return "Forbidden"
-        case .notFound:
-            return "Not found"
-        case .methodNotAllowed:
-            return "Method not allowed"
         }
     }
+}
+
+/// Pairs a `ZeroPiiError` with the exact HTTP status code returned by the server.
+/// `httpStatusCode` is the raw value from `HTTPURLResponse.statusCode` — it is `nil`
+/// only for SDK-level errors (network failures, auth errors, build errors) that were
+/// never received as an HTTP response.
+struct ZeroPiiNetworkFailure: Error {
+    let error: ZeroPiiError
+    let httpStatusCode: Int?
 }

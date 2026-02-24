@@ -117,7 +117,7 @@ final class TokenRepositoryImplTests: XCTestCase {
 
     func testTokenize_encryptionDisabled_plainFails_returnsError() async {
         let mockProvider = MockNetworkProvider()
-        mockProvider.tokenizePlainResult = .failure(.networkError)
+        mockProvider.tokenizePlainResult = .failure(ZeroPiiNetworkFailure(error: .networkError, httpStatusCode: nil))
 
         let encManager = EncryptionManager(enabled: false, logger: ZeroPiiLogger.shared)
         let repo = TokenRepositoryImpl(
@@ -140,7 +140,7 @@ final class TokenRepositoryImplTests: XCTestCase {
 
     func testTokenize_receives419_fallsBackToPlain() async {
         let mockProvider = MockNetworkProvider()
-        mockProvider.tokenizeResult = .failure(.decryptionFailed)
+        mockProvider.tokenizeResult = .failure(ZeroPiiNetworkFailure(error: .decryptionFailed, httpStatusCode: 419))
         mockProvider.tokenizePlainResult = .success(makeTokenizeResponse(token: "FALLBACK_TOKEN"))
 
         let encManager = EncryptionManager(enabled: true, logger: ZeroPiiLogger.shared)
@@ -171,7 +171,7 @@ final class TokenRepositoryImplTests: XCTestCase {
         guard #available(iOS 13.0, tvOS 13.0, *) else { return }
 
         let mockProvider = MockNetworkProvider()
-        mockProvider.tokenizeResult = .failure(.decryptionFailed)
+        mockProvider.tokenizeResult = .failure(ZeroPiiNetworkFailure(error: .decryptionFailed, httpStatusCode: 419))
         mockProvider.tokenizePlainResult = .success(makeTokenizeResponse(token: "TOKEN"))
 
         let encManager = EncryptionManager(enabled: true, logger: ZeroPiiLogger.shared)
@@ -201,7 +201,7 @@ final class TokenRepositoryImplTests: XCTestCase {
         guard #available(iOS 13.0, tvOS 13.0, *) else { return }
 
         let mockProvider = MockNetworkProvider()
-        mockProvider.tokenizeResult = .failure(.networkError)
+        mockProvider.tokenizeResult = .failure(ZeroPiiNetworkFailure(error: .networkError, httpStatusCode: nil))
 
         let encManager = EncryptionManager(enabled: true, logger: ZeroPiiLogger.shared)
         let repo = TokenRepositoryImpl(
@@ -225,7 +225,7 @@ final class TokenRepositoryImplTests: XCTestCase {
         guard #available(iOS 13.0, tvOS 13.0, *) else { return }
 
         let mockProvider = MockNetworkProvider()
-        mockProvider.tokenizeResult = .failure(.serverError)
+        mockProvider.tokenizeResult = .failure(ZeroPiiNetworkFailure(error: .serverError, httpStatusCode: 500))
 
         let encManager = EncryptionManager(enabled: true, logger: ZeroPiiLogger.shared)
         let repo = TokenRepositoryImpl(
@@ -365,7 +365,7 @@ final class TokenRepositoryImplTests: XCTestCase {
 
         // Should proceed (not fail with size error)
         XCTAssertEqual(mockProvider.batchTokenizePlainCallCount, 1)
-        if case .error(let message) = result {
+        if case .error(let message, _) = result {
             XCTAssertFalse(message.contains("maximum"), "Should not be a size error")
         }
     }
@@ -426,7 +426,7 @@ final class TokenRepositoryImplTests: XCTestCase {
         guard #available(iOS 13.0, tvOS 13.0, *) else { return }
 
         let mockProvider = MockNetworkProvider()
-        mockProvider.batchTokenizeResult = .failure(.decryptionFailed)
+        mockProvider.batchTokenizeResult = .failure(ZeroPiiNetworkFailure(error: .decryptionFailed, httpStatusCode: 419))
         mockProvider.batchTokenizePlainResult = .success(makeBatchTokenizeResponse(tokens: ["FALLBACK_A"]))
 
         let encManager = EncryptionManager(enabled: true, logger: ZeroPiiLogger.shared)
@@ -453,7 +453,7 @@ final class TokenRepositoryImplTests: XCTestCase {
         guard #available(iOS 13.0, tvOS 13.0, *) else { return }
 
         let mockProvider = MockNetworkProvider()
-        mockProvider.batchTokenizeResult = .failure(.decryptionFailed)
+        mockProvider.batchTokenizeResult = .failure(ZeroPiiNetworkFailure(error: .decryptionFailed, httpStatusCode: 419))
         mockProvider.batchTokenizePlainResult = .success(makeBatchTokenizeResponse(tokens: ["T1"]))
         mockProvider.tokenizePlainResult = .success(makeTokenizeResponse(token: "PLAIN_TOKEN"))
 
@@ -482,7 +482,7 @@ final class TokenRepositoryImplTests: XCTestCase {
         guard #available(iOS 13.0, tvOS 13.0, *) else { return }
 
         let mockProvider = MockNetworkProvider()
-        mockProvider.tokenizeResult = .failure(.decryptionFailed)
+        mockProvider.tokenizeResult = .failure(ZeroPiiNetworkFailure(error: .decryptionFailed, httpStatusCode: 419))
         mockProvider.tokenizePlainResult = .success(makeTokenizeResponse(token: "T1"))
         mockProvider.batchTokenizePlainResult = .success(makeBatchTokenizeResponse(tokens: ["B1"]))
 
@@ -551,7 +551,7 @@ final class TokenRepositoryImplTests: XCTestCase {
         guard #available(iOS 13.0, tvOS 13.0, *) else { return }
 
         let mockProvider = MockNetworkProvider()
-        mockProvider.batchTokenizeResult = .failure(.networkError)
+        mockProvider.batchTokenizeResult = .failure(ZeroPiiNetworkFailure(error: .networkError, httpStatusCode: nil))
 
         let encManager = EncryptionManager(enabled: true, logger: ZeroPiiLogger.shared)
         let repo = TokenRepositoryImpl(

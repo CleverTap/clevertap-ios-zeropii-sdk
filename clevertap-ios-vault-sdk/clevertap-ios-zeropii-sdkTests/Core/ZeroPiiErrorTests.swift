@@ -51,7 +51,7 @@ final class ZeroPiiErrorTests: XCTestCase {
     }
 
     func testServerErrorRawValue() {
-        XCTAssertEqual(ZeroPiiError.serverError.rawValue, 1013)
+        XCTAssertEqual(ZeroPiiError.serverError.rawValue, 500)
     }
 
     func testBuildRequestErrorRawValue() {
@@ -59,23 +59,23 @@ final class ZeroPiiErrorTests: XCTestCase {
     }
 
     func testBadRequestRawValue() {
-        XCTAssertEqual(ZeroPiiError.badRequest.rawValue, 1016)
+        XCTAssertEqual(ZeroPiiError.badRequest.rawValue, 400)
     }
 
     func testRateLimitExceededRawValue() {
-        XCTAssertEqual(ZeroPiiError.rateLimitExceeded.rawValue, 1017)
+        XCTAssertEqual(ZeroPiiError.rateLimitExceeded.rawValue, 429)
     }
 
     func testForbiddenRawValue() {
-        XCTAssertEqual(ZeroPiiError.forbidden.rawValue, 1018)
+        XCTAssertEqual(ZeroPiiError.forbidden.rawValue, 403)
     }
 
     func testNotFoundRawValue() {
-        XCTAssertEqual(ZeroPiiError.notFound.rawValue, 1019)
+        XCTAssertEqual(ZeroPiiError.notFound.rawValue, 404)
     }
 
     func testMethodNotAllowedRawValue() {
-        XCTAssertEqual(ZeroPiiError.methodNotAllowed.rawValue, 1020)
+        XCTAssertEqual(ZeroPiiError.methodNotAllowed.rawValue, 405)
     }
 
     // MARK: - Error Descriptions
@@ -160,14 +160,17 @@ final class ZeroPiiErrorTests: XCTestCase {
     // MARK: - Init from Raw Value
 
     func testInitFromRawValue_knownValues() {
+        XCTAssertEqual(ZeroPiiError(rawValue: 400), .badRequest)
         XCTAssertEqual(ZeroPiiError(rawValue: 401), .unauthorized)
+        XCTAssertEqual(ZeroPiiError(rawValue: 403), .forbidden)
+        XCTAssertEqual(ZeroPiiError(rawValue: 404), .notFound)
+        XCTAssertEqual(ZeroPiiError(rawValue: 405), .methodNotAllowed)
         XCTAssertEqual(ZeroPiiError(rawValue: 419), .decryptionFailed)
+        XCTAssertEqual(ZeroPiiError(rawValue: 429), .rateLimitExceeded)
+        XCTAssertEqual(ZeroPiiError(rawValue: 500), .serverError)
         XCTAssertEqual(ZeroPiiError(rawValue: 1000), .authenticationFailed)
         XCTAssertEqual(ZeroPiiError(rawValue: 1001), .tokenisationFalied)
         XCTAssertEqual(ZeroPiiError(rawValue: 1003), .networkError)
-        XCTAssertEqual(ZeroPiiError(rawValue: 1016), .badRequest)
-        XCTAssertEqual(ZeroPiiError(rawValue: 1017), .rateLimitExceeded)
-        XCTAssertEqual(ZeroPiiError(rawValue: 1020), .methodNotAllowed)
     }
 
     func testInitFromRawValue_unknownValue_returnsNil() {

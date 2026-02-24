@@ -415,12 +415,13 @@ Implement this protocol to bridge your app's authentication system to the SDK.
 
 ```swift
 @objc public class TokenizeResult: NSObject {
-    public let isSuccess: Bool      // true on success
-    public let token: String?       // The generated token (nil on error)
-    public let exists: Bool         // true if this value was already tokenized
-    public let newlyCreated: Bool   // true if a new token was created
-    public let dataType: String?    // "string" or "number" (nil on error)
-    public let errorMessage: String?// Human-readable error (nil on success)
+    public let isSuccess: Bool       // true on success
+    public let token: String?        // The generated token (nil on error)
+    public let exists: Bool          // true if this value was already tokenized
+    public let newlyCreated: Bool    // true if a new token was created
+    public let dataType: String?     // "string" or "number" (nil on error)
+    public let errorMessage: String? // Human-readable error (nil on success)
+    public let httpStatusCode: NSNumber? // HTTP status code on server error, nil for SDK-level errors
 }
 ```
 
@@ -432,6 +433,7 @@ Implement this protocol to bridge your app's authentication system to the SDK.
     public let results: [BatchTokenItem]     // Individual item results (empty on error)
     public let summary: BatchTokenizeSummary?// Aggregate stats (nil on error)
     public let errorMessage: String?         // Human-readable error (nil on success)
+    public let httpStatusCode: NSNumber?     // HTTP status code on server error, nil for SDK-level errors
 }
 ```
 

@@ -22,25 +22,29 @@ enum TokenResult {
     
     /// Represents an error that occurred during tokenization.
     ///
-    /// - Parameter message: A string describing the error that occurred.
-    case error(message: String)
+    /// - Parameters:
+    ///   - message: A string describing the error that occurred.
+    ///   - httpStatusCode: The HTTP status code returned by the server, or `nil` for SDK-level errors.
+    case error(message: String, httpStatusCode: Int? = nil)
 }
 
 
 /// Represents the result of a batch tokenization operation, which can either be a success
 /// containing multiple individual tokenization results and a summary, or an error describing the failure.
 enum BatchTokenResult {
-    
+
     /// Indicates a successful batch tokenization.
     ///
     /// - Parameters:
     ///   - results: An array of individual tokenization results for each item in the batch.
     ///   - summary: A summary object containing statistics and metadata about the batch operation.
     case success(results: [BatchTokenItem], summary: BatchTokenizeSummary)
-    
+
     /// Indicates an error occurred during the batch tokenization process.
     ///
-    /// - Parameter message: A descriptive error message explaining what went wrong.
-    case error(message: String)
+    /// - Parameters:
+    ///   - message: A descriptive error message explaining what went wrong.
+    ///   - httpStatusCode: The HTTP status code returned by the server, or `nil` for SDK-level errors.
+    case error(message: String, httpStatusCode: Int? = nil)
 }
 

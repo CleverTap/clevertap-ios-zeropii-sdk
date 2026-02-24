@@ -50,8 +50,8 @@ actor TokenRepositoryImpl: TokenRepository {
         switch result {
         case .success(let response):
             return .success(token: response.token.stringValue, exists: response.exists, newlyCreated: response.newlyCreated, dataType: response.dataType)
-        case .failure(let error):
-            return .error(message: error.localizedDescription)
+        case .failure(let failure):
+            return .error(message: failure.error.localizedDescription, httpStatusCode: failure.httpStatusCode)
         }
     }
 
@@ -74,18 +74,18 @@ actor TokenRepositoryImpl: TokenRepository {
         case .success(let response):
             return .success(results: response.results,
                             summary: response.summary)
-        case .failure(let error):
-            return .error(message: error.localizedDescription)
+        case .failure(let failure):
+            return .error(message: failure.error.localizedDescription, httpStatusCode: failure.httpStatusCode)
         }
     }
 
     // MARK: - Private Implementation Methods
 
-    private func performTokenization(value: String) async -> Result<TokenizeResponse, ZeroPiiError> {
+    private func performTokenization(value: String) async -> Result<TokenizeResponse, ZeroPiiNetworkFailure> {
         let tokenResult = await authRepository.getAccessToken()
         guard case .success(let accessToken) = tokenResult else {
             logger.error("Failed to get access token for tokenization", file: #file, line: #line)
-            return .failure(.authenticationFailed)
+            return .failure(ZeroPiiNetworkFailure(error: .authenticationFailed, httpStatusCode: nil))
         }
 
         // If encryption was previously disabled due to 419, go straight to plain text
@@ -116,28 +116,28 @@ actor TokenRepositoryImpl: TokenRepository {
                         return .success(decodedObject)
                     } catch (let error) {
                         logger.error("Failed to parse decrypted response: \(error.localizedDescription)", file: #file, line: #line)
-                        return .failure(.tokenisationFalied)
+                        return .failure(ZeroPiiNetworkFailure(error: .tokenisationFalied, httpStatusCode: nil))
                     }
                 case .failure(message: let message):
                     logger.error("Failed to parse tokenization response: \(message)", file: #file, line: #line)
-                    return .failure(.tokenisationFalied)
+                    return .failure(ZeroPiiNetworkFailure(error: .tokenisationFalied, httpStatusCode: nil))
                 }
-            case .failure(let error):
+            case .failure(let failure):
                 // Fallback 2: Backend returned 419 (decryption failure)
-                if error == .decryptionFailed {
+                if failure.error == .decryptionFailed {
                     logger.warning("Received 419 - Backend decryption failure, disabling encryption and falling back to non-encrypted requests", file: #file, line: #line)
                     encryptionDisabledDueToFailure = true
                     return await performPlainTokenization(value: value, accessToken: accessToken)
                 }
                 logger.error("Tokenisation failed", file: #file, line: #line)
-                return .failure(error)
+                return .failure(failure)
             }
         } catch {
-            return .failure(.tokenisationFalied)
+            return .failure(ZeroPiiNetworkFailure(error: .tokenisationFalied, httpStatusCode: nil))
         }
     }
 
-    private func performPlainTokenization(value: String, accessToken: String) async -> Result<TokenizeResponse, ZeroPiiError> {
+    private func performPlainTokenization(value: String, accessToken: String) async -> Result<TokenizeResponse, ZeroPiiNetworkFailure> {
         let request = TokenizeRequest(value: value)
         do {
             let networkResult = try await networkProvider.tokenizePlain(request, accessToken: accessToken)
@@ -146,20 +146,20 @@ actor TokenRepositoryImpl: TokenRepository {
             case .success(let response):
                 logger.debug("Non-encrypted tokenization successful", file: #file, line: #line)
                 return .success(response)
-            case .failure(let error):
+            case .failure(let failure):
                 logger.error("Non-encrypted tokenisation failed", file: #file, line: #line)
-                return .failure(error)
+                return .failure(failure)
             }
         } catch {
-            return .failure(.tokenisationFalied)
+            return .failure(ZeroPiiNetworkFailure(error: .tokenisationFalied, httpStatusCode: nil))
         }
     }
 
-    private func performBatchTokenization(values: [String]) async -> Result<BatchTokenizeResponse, ZeroPiiError> {
+    private func performBatchTokenization(values: [String]) async -> Result<BatchTokenizeResponse, ZeroPiiNetworkFailure> {
         let tokenResult = await authRepository.getAccessToken()
         guard case .success(let accessToken) = tokenResult else {
             logger.error("Failed to get access token for batch tokenization", file: #file, line: #line)
-            return .failure(.authenticationFailed)
+            return .failure(ZeroPiiNetworkFailure(error: .authenticationFailed, httpStatusCode: nil))
         }
 
         // If encryption was previously disabled due to 419, go straight to plain text
@@ -190,28 +190,28 @@ actor TokenRepositoryImpl: TokenRepository {
                         return .success(decodedObject)
                     } catch (let error) {
                         logger.error("Failed to parse decrypted response: \(error.localizedDescription)", file: #file, line: #line)
-                        return .failure(.batchTokenisationFalied)
+                        return .failure(ZeroPiiNetworkFailure(error: .batchTokenisationFalied, httpStatusCode: nil))
                     }
                 case .failure(message: let message):
                     logger.error("Failed to parse batch tokenization response: \(message)", file: #file, line: #line)
-                    return .failure(.batchTokenisationFalied)
+                    return .failure(ZeroPiiNetworkFailure(error: .batchTokenisationFalied, httpStatusCode: nil))
                 }
-            case .failure(let error):
+            case .failure(let failure):
                 // Fallback 2: Backend returned 419 (decryption failure)
-                if error == .decryptionFailed {
+                if failure.error == .decryptionFailed {
                     logger.warning("Received 419 - Backend decryption failure, disabling encryption and falling back to non-encrypted requests", file: #file, line: #line)
                     encryptionDisabledDueToFailure = true
                     return await performPlainBatchTokenization(values: values, accessToken: accessToken)
                 }
                 logger.error("Batch Tokenization failed", file: #file, line: #line)
-                return .failure(error)
+                return .failure(failure)
             }
         } catch {
-            return .failure(.batchTokenisationFalied)
+            return .failure(ZeroPiiNetworkFailure(error: .batchTokenisationFalied, httpStatusCode: nil))
         }
     }
 
-    private func performPlainBatchTokenization(values: [String], accessToken: String) async -> Result<BatchTokenizeResponse, ZeroPiiError> {
+    private func performPlainBatchTokenization(values: [String], accessToken: String) async -> Result<BatchTokenizeResponse, ZeroPiiNetworkFailure> {
         let request = BatchTokenizeRequest(values: values)
         do {
             let networkResult = try await networkProvider.batchTokenizePlain(request, accessToken: accessToken)
@@ -220,12 +220,12 @@ actor TokenRepositoryImpl: TokenRepository {
             case .success(let response):
                 logger.debug("Non-encrypted batch tokenization successful", file: #file, line: #line)
                 return .success(response)
-            case .failure(let error):
+            case .failure(let failure):
                 logger.error("Non-encrypted batch tokenisation failed", file: #file, line: #line)
-                return .failure(error)
+                return .failure(failure)
             }
         } catch {
-            return .failure(.batchTokenisationFalied)
+            return .failure(ZeroPiiNetworkFailure(error: .batchTokenisationFalied, httpStatusCode: nil))
         }
     }
 
@@ -234,9 +234,9 @@ actor TokenRepositoryImpl: TokenRepository {
     private func performWithRetry<T>(
         operation: String,
         maxAttempts: Int,
-        block: () async -> Result<T, ZeroPiiError>
-    ) async -> Result<T, ZeroPiiError> {
-        var lastError: ZeroPiiError = .networkError
+        block: () async -> Result<T, ZeroPiiNetworkFailure>
+    ) async -> Result<T, ZeroPiiNetworkFailure> {
+        var lastFailure: ZeroPiiNetworkFailure = ZeroPiiNetworkFailure(error: .networkError, httpStatusCode: nil)
 
         for attempt in 0..<maxAttempts {
             let result = await block()
@@ -248,21 +248,21 @@ actor TokenRepositoryImpl: TokenRepository {
                 }
                 return result
 
-            case .failure(let error):
-                lastError = error
+            case .failure(let failure):
+                lastFailure = failure
                 if attempt == maxAttempts - 1 {
-                    logger.error("Operation \(operation) failed after \(attempt + 1) attempts: \(error.localizedDescription)", file: #file, line: #line)
+                    logger.error("Operation \(operation) failed after \(attempt + 1) attempts: \(failure.error.localizedDescription)", file: #file, line: #line)
                     break
                 }
 
                 // Handle token refresh for 401 errors
-                if error == .unauthorized {
+                if failure.error == .unauthorized {
                     logger.debug("Attempting token refresh for unauthorized 401 error", file: #file, line: #line)
 
                     let refreshResult = await authRepository.refreshAccessToken()
                     if case .failure(let refreshError) = refreshResult {
                         logger.error("Token refresh failed: \(refreshError.localizedDescription)", file: #file, line: #line)
-                        return .failure(refreshError)
+                        return .failure(ZeroPiiNetworkFailure(error: refreshError, httpStatusCode: nil))
                     }
                 }
 
@@ -273,6 +273,6 @@ actor TokenRepositoryImpl: TokenRepository {
             }
         }
 
-        return .failure(lastError)
+        return .failure(lastFailure)
     }
 }

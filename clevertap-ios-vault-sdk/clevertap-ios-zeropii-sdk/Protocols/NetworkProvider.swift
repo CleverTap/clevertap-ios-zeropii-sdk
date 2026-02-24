@@ -11,20 +11,20 @@ import Foundation
 protocol NetworkProvider {
 
     // MARK: - Single Value Operations
-    
+
     /// Tokenizes a single sensitive value using encrypted request
     /// - Parameters:
     ///   - request: EncryptedRequest containing the encrypted payload
     ///   - accessToken: Valid OAuth2 access token for authentication
-    /// - Returns: Result containing EncryptedResponse or ZeroPiiError on failure
-    func tokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, ZeroPiiError>
+    /// - Returns: Result containing EncryptedResponse or ZeroPiiNetworkFailure on failure
+    func tokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, ZeroPiiNetworkFailure>
 
     /// Tokenizes a single sensitive value without encryption in transit
     /// - Parameters:
     ///   - request: TokenizeRequest containing the sensitive value
     ///   - accessToken: Valid OAuth2 access token for authentication
-    /// - Returns: Result containing TokenizeResponse with the token or ZeroPiiError on failure
-    func tokenizePlain(_ request: TokenizeRequest, accessToken: String) async throws -> Result<TokenizeResponse, ZeroPiiError>
+    /// - Returns: Result containing TokenizeResponse with the token or ZeroPiiNetworkFailure on failure
+    func tokenizePlain(_ request: TokenizeRequest, accessToken: String) async throws -> Result<TokenizeResponse, ZeroPiiNetworkFailure>
 
     // MARK: - Batch Operations
 
@@ -32,13 +32,13 @@ protocol NetworkProvider {
     /// - Parameters:
     ///   - request: EncryptedRequest containing the encrypted payload
     ///   - accessToken: Valid OAuth2 access token for authentication
-    /// - Returns: Result containing EncryptedResponse or ZeroPiiError on failure
-    func batchTokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, ZeroPiiError>
+    /// - Returns: Result containing EncryptedResponse or ZeroPiiNetworkFailure on failure
+    func batchTokenize(_ request: EncryptedRequest, accessToken: String) async throws -> Result<EncryptedResponse, ZeroPiiNetworkFailure>
 
     /// Tokenizes multiple sensitive values without encryption in transit
     /// - Parameters:
     ///   - request: BatchTokenizeRequest containing array of sensitive values
     ///   - accessToken: Valid OAuth2 access token for authentication
-    /// - Returns: Result containing BatchTokenizeResponse or ZeroPiiError on failure
-    func batchTokenizePlain(_ request: BatchTokenizeRequest, accessToken: String) async throws -> Result<BatchTokenizeResponse, ZeroPiiError>
+    /// - Returns: Result containing BatchTokenizeResponse or ZeroPiiNetworkFailure on failure
+    func batchTokenizePlain(_ request: BatchTokenizeRequest, accessToken: String) async throws -> Result<BatchTokenizeResponse, ZeroPiiNetworkFailure>
 }
