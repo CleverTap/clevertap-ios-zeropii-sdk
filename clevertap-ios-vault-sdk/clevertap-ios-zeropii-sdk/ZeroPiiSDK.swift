@@ -16,6 +16,7 @@ import Foundation
     private let tokenProvider: AccessTokenProvider
     private let apiUrl: String
     private let logLevel: ZeroPiiLogLevel
+    private let retryPolicy: RetryPolicy
 
     internal var tokenRepository: TokenRepository!
     internal var authRepository: AuthRepository!
@@ -35,11 +36,13 @@ import Foundation
     private init(
         tokenProvider: AccessTokenProvider,
         apiUrl: String,
-        logLevel: ZeroPiiLogLevel
+        logLevel: ZeroPiiLogLevel,
+        retryPolicy: RetryPolicy
     ) {
         self.tokenProvider = tokenProvider
         self.apiUrl = apiUrl
         self.logLevel = logLevel
+        self.retryPolicy = retryPolicy
         super.init()
         initialize()
     }
@@ -66,7 +69,8 @@ import Foundation
             networkProvider: networkProvider,
             authRepository: authRepository,
             encryptionManager: encryptionManager,
-            logger: logger
+            logger: logger,
+            retryPolicy: retryPolicy
         )
 
         TypeConverterRegistry.initialize()
@@ -77,8 +81,8 @@ import Foundation
 
     /// Initializes the ZeroPiiSDK with an app-provided token provider.
     ///
-    /// This convenience overload uses the default log level (`.off`) and is intended for
-    /// Objective-C callers, which cannot use Swift default parameter values.
+    /// Convenience overload for Objective-C callers — uses the default log level (`.off`)
+    /// and the default retry policy.
     ///
     /// - Parameters:
     ///   - tokenProvider: An implementation of `AccessTokenProvider` that supplies bearer tokens.
@@ -89,7 +93,27 @@ import Foundation
         tokenProvider: AccessTokenProvider,
         apiUrl: String
     ) -> ZeroPiiSDK {
-        return initialize(tokenProvider: tokenProvider, apiUrl: apiUrl, logLevel: .off)
+        return initialize(tokenProvider: tokenProvider, apiUrl: apiUrl,
+                          logLevel: .off, retryPolicy: DefaultRetryPolicy())
+    }
+
+    /// Initializes the ZeroPiiSDK with an app-provided token provider.
+    ///
+    /// Convenience overload for Objective-C callers — uses the default retry policy.
+    ///
+    /// - Parameters:
+    ///   - tokenProvider: An implementation of `AccessTokenProvider` that supplies bearer tokens.
+    ///   - apiUrl: The base URL for the tokenization API.
+    ///   - logLevel: The desired log verbosity.
+    /// - Returns: The initialized `ZeroPiiSDK` singleton instance.
+    @discardableResult
+    @objc public static func initialize(
+        tokenProvider: AccessTokenProvider,
+        apiUrl: String,
+        logLevel: ZeroPiiLogLevel
+    ) -> ZeroPiiSDK {
+        return initialize(tokenProvider: tokenProvider, apiUrl: apiUrl,
+                          logLevel: logLevel, retryPolicy: DefaultRetryPolicy())
     }
 
     /// Initializes the ZeroPiiSDK with an app-provided token provider.
@@ -98,12 +122,14 @@ import Foundation
     ///   - tokenProvider: An implementation of ``AccessTokenProvider`` that supplies bearer tokens.
     ///   - apiUrl: The base URL for the tokenization API.
     ///   - logLevel: The desired log verbosity (default: `.off`).
+    ///   - retryPolicy: Controls retry behavior for failed requests (default: ``DefaultRetryPolicy``).
     /// - Returns: The initialized ``ZeroPiiSDK`` singleton instance.
     @discardableResult
     @objc public static func initialize(
         tokenProvider: AccessTokenProvider,
         apiUrl: String,
-        logLevel: ZeroPiiLogLevel = .off
+        logLevel: ZeroPiiLogLevel,
+        retryPolicy: RetryPolicy
     ) -> ZeroPiiSDK {
         if _instance == nil {
             objc_sync_enter(self)
@@ -111,7 +137,8 @@ import Foundation
                 _instance = ZeroPiiSDK(
                     tokenProvider: tokenProvider,
                     apiUrl: apiUrl,
-                    logLevel: logLevel
+                    logLevel: logLevel,
+                    retryPolicy: retryPolicy
                 )
             }
             objc_sync_exit(self)

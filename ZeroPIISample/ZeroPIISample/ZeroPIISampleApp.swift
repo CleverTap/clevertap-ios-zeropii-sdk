@@ -9,6 +9,24 @@ import SwiftUI
 internal import UniformTypeIdentifiers
 import clevertap_ios_zeropii_sdk
 
+// MARK: - Sample Retry Policy
+
+/// Sample implementation of RetryPolicy showing how to customize retry behaviour.
+/// The SDK's built-in DefaultRetryPolicy (maxRetries=1, exponential backoff) is used
+/// when no policy is supplied. Override only when you need different rules.
+class SampleRetryPolicy: NSObject, RetryPolicy {
+
+    func shouldRetry(attempt: Int, httpStatusCode: NSNumber?) -> Bool {
+        guard attempt < 2 else { return false }           // max 2 retries
+        guard let code = httpStatusCode else { return true } // nil = network error → retry
+        return [429, 500, 502, 503, 504].contains(code.intValue)
+    }
+
+    func retryDelayMs(attempt: Int) -> Int {
+        return 1000 * (1 << (attempt + 1))  // 2 000 ms, 4 000 ms, 8 000 ms …
+    }
+}
+
 // MARK: - Sample Token Provider
 
 /// Sample implementation of AccessTokenProvider that fetches a bearer token
@@ -69,7 +87,8 @@ struct ZeroPIISampleApp: App {
         ZeroPiiSDK.initialize(
             tokenProvider: SampleTokenProvider(),
             apiUrl: "https://vault.mangaforyou.com/ct-vault/",
-            logLevel: .debug
+            logLevel: .debug,
+            retryPolicy: SampleRetryPolicy()
         )
     }
     

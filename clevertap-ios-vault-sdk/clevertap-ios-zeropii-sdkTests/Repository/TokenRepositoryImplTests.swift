@@ -52,7 +52,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: mockAuth,
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.tokenize("")
@@ -77,7 +78,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: mockAuth,
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.tokenize("test@email.com")
@@ -101,7 +103,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.tokenize("test@email.com")
@@ -124,7 +127,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.tokenize("test@email.com")
@@ -148,7 +152,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         guard #available(iOS 13.0, tvOS 13.0, *) else {
@@ -179,7 +184,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         // First call triggers 419 and sets the encryptionDisabledDueToFailure flag
@@ -208,7 +214,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.tokenize("test@email.com")
@@ -232,7 +239,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.tokenize("test@email.com")
@@ -264,7 +272,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.tokenize("test@email.com")
@@ -295,7 +304,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(token: "expected-access-token"),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         _ = await repo.tokenize("value@test.com")
@@ -313,7 +323,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.batchTokenize([])
@@ -333,7 +344,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let oversizedBatch = Array(repeating: "value", count: 1001)
@@ -357,7 +369,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let maxBatch = Array(repeating: "value", count: 1000)
@@ -381,7 +394,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: mockAuth,
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.batchTokenize(["a@test.com"])
@@ -404,7 +418,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.batchTokenize(["a@test.com", "b@test.com"])
@@ -434,7 +449,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.batchTokenize(["a@test.com"])
@@ -462,7 +478,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         // Trigger the 419 via batch tokenize
@@ -491,7 +508,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         // Trigger the 419 via single tokenize
@@ -527,7 +545,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.batchTokenize(["a@test.com", "b@test.com"])
@@ -558,7 +577,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         let result = await repo.batchTokenize(["test@email.com"])
@@ -582,7 +602,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         _ = await repo.tokenize("unique@value.com")
@@ -600,7 +621,8 @@ final class TokenRepositoryImplTests: XCTestCase {
             networkProvider: mockProvider,
             authRepository: makeAuthRepo(),
             encryptionManager: encManager,
-            logger: ZeroPiiLogger.shared
+            logger: ZeroPiiLogger.shared,
+            retryPolicy: DefaultRetryPolicy(maxRetries: 0)
         )
 
         _ = await repo.batchTokenize(values)

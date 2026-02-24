@@ -16,6 +16,8 @@ class MockNetworkProvider: NetworkProvider {
 
     // MARK: - Tokenize (Plain)
     var tokenizePlainResult: Result<TokenizeResponse, ZeroPiiNetworkFailure> = .failure(ZeroPiiNetworkFailure(error: .tokenisationFalied, httpStatusCode: nil))
+    /// When non-empty, successive calls dequeue from the front; falls back to `tokenizePlainResult` when empty.
+    var tokenizePlainResultSequence: [Result<TokenizeResponse, ZeroPiiNetworkFailure>] = []
     private(set) var tokenizePlainCallCount = 0
     private(set) var lastTokenizePlainRequest: TokenizeRequest?
 
@@ -26,6 +28,8 @@ class MockNetworkProvider: NetworkProvider {
 
     // MARK: - Batch Tokenize (Plain)
     var batchTokenizePlainResult: Result<BatchTokenizeResponse, ZeroPiiNetworkFailure> = .failure(ZeroPiiNetworkFailure(error: .batchTokenisationFalied, httpStatusCode: nil))
+    /// When non-empty, successive calls dequeue from the front; falls back to `batchTokenizePlainResult` when empty.
+    var batchTokenizePlainResultSequence: [Result<BatchTokenizeResponse, ZeroPiiNetworkFailure>] = []
     private(set) var batchTokenizePlainCallCount = 0
     private(set) var lastBatchTokenizePlainRequest: BatchTokenizeRequest?
 
@@ -39,6 +43,9 @@ class MockNetworkProvider: NetworkProvider {
     func tokenizePlain(_ request: TokenizeRequest, accessToken: String) async throws -> Result<TokenizeResponse, ZeroPiiNetworkFailure> {
         tokenizePlainCallCount += 1
         lastTokenizePlainRequest = request
+        if !tokenizePlainResultSequence.isEmpty {
+            return tokenizePlainResultSequence.removeFirst()
+        }
         return tokenizePlainResult
     }
 
@@ -51,6 +58,9 @@ class MockNetworkProvider: NetworkProvider {
     func batchTokenizePlain(_ request: BatchTokenizeRequest, accessToken: String) async throws -> Result<BatchTokenizeResponse, ZeroPiiNetworkFailure> {
         batchTokenizePlainCallCount += 1
         lastBatchTokenizePlainRequest = request
+        if !batchTokenizePlainResultSequence.isEmpty {
+            return batchTokenizePlainResultSequence.removeFirst()
+        }
         return batchTokenizePlainResult
     }
 
@@ -64,5 +74,7 @@ class MockNetworkProvider: NetworkProvider {
         lastBatchTokenizeRequest = nil
         lastBatchTokenizePlainRequest = nil
         lastTokenizeAccessToken = nil
+        tokenizePlainResultSequence = []
+        batchTokenizePlainResultSequence = []
     }
 }

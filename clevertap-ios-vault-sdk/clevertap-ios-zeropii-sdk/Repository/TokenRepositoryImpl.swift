@@ -14,7 +14,7 @@ actor TokenRepositoryImpl: TokenRepository {
     private let authRepository: AuthRepository
     private let encryptionManager: EncryptionManager
     private let logger: ZeroPiiLogger
-    private let initialRetryDelayMs: Int = 1000
+    private let retryPolicy: RetryPolicy
     private let maxBatchSizeTokenize: Int = 1000
 
     /// Flag to disable encryption for subsequent requests after a 419 backend decryption failure
@@ -22,14 +22,16 @@ actor TokenRepositoryImpl: TokenRepository {
 
     // MARK: - Initialization
     init(networkProvider: NetworkProvider,
-        authRepository: AuthRepository,
-        encryptionManager: EncryptionManager,
-        logger: ZeroPiiLogger = ZeroPiiLogger.shared) {
+         authRepository: AuthRepository,
+         encryptionManager: EncryptionManager,
+         logger: ZeroPiiLogger = ZeroPiiLogger.shared,
+         retryPolicy: RetryPolicy = DefaultRetryPolicy()) {
 
         self.networkProvider = networkProvider
         self.authRepository = authRepository
         self.encryptionManager = encryptionManager
         self.logger = logger
+        self.retryPolicy = retryPolicy
 
         logger.debug("TokenRepository initialized", file: #file, line: #line)
     }
@@ -42,14 +44,14 @@ actor TokenRepositoryImpl: TokenRepository {
             return .error(message: "Empty value passed")
         }
 
-        // Perform tokenization with retry logic
-        let result = await performWithRetry(operation: "tokenize", maxAttempts: 1) {
+        let result = await performWithRetry(operation: "tokenize") {
             await self.performTokenization(value: value)
         }
 
         switch result {
         case .success(let response):
-            return .success(token: response.token.stringValue, exists: response.exists, newlyCreated: response.newlyCreated, dataType: response.dataType)
+            return .success(token: response.token.stringValue, exists: response.exists,
+                            newlyCreated: response.newlyCreated, dataType: response.dataType)
         case .failure(let failure):
             return .error(message: failure.error.localizedDescription, httpStatusCode: failure.httpStatusCode)
         }
@@ -66,14 +68,13 @@ actor TokenRepositoryImpl: TokenRepository {
             return .error(message: "Batch size exceeds maximum limit")
         }
 
-        let result = await performWithRetry(operation: "batchTokenize", maxAttempts: 1) {
+        let result = await performWithRetry(operation: "batchTokenize") {
             await self.performBatchTokenization(values: values)
         }
 
         switch result {
         case .success(let response):
-            return .success(results: response.results,
-                            summary: response.summary)
+            return .success(results: response.results, summary: response.summary)
         case .failure(let failure):
             return .error(message: failure.error.localizedDescription, httpStatusCode: failure.httpStatusCode)
         }
@@ -231,14 +232,21 @@ actor TokenRepositoryImpl: TokenRepository {
 
     // MARK: - Retry Logic
 
+    /// Executes `block` with retry logic driven by the injected `RetryPolicy`.
+    ///
+    /// - 401 Unauthorized is handled internally: the SDK refreshes the token and
+    ///   retries once immediately. This is never passed to `RetryPolicy`.
+    /// - All other failures are passed to `retryPolicy.shouldRetry(attempt:httpStatusCode:)`.
+    ///   If it returns `true`, the SDK waits `retryPolicy.retryDelayMs(attempt:)` milliseconds
+    ///   and tries again.
     private func performWithRetry<T>(
         operation: String,
-        maxAttempts: Int,
         block: () async -> Result<T, ZeroPiiNetworkFailure>
     ) async -> Result<T, ZeroPiiNetworkFailure> {
-        var lastFailure: ZeroPiiNetworkFailure = ZeroPiiNetworkFailure(error: .networkError, httpStatusCode: nil)
+        var attempt = 0
+        var tokenRefreshed = false
 
-        for attempt in 0..<maxAttempts {
+        while true {
             let result = await block()
 
             switch result {
@@ -249,30 +257,37 @@ actor TokenRepositoryImpl: TokenRepository {
                 return result
 
             case .failure(let failure):
-                lastFailure = failure
-                if attempt == maxAttempts - 1 {
-                    logger.error("Operation \(operation) failed after \(attempt + 1) attempts: \(failure.error.localizedDescription)", file: #file, line: #line)
-                    break
-                }
-
-                // Handle token refresh for 401 errors
+                // 401: handled internally — refresh token + immediate retry.
+                // Not delegated to RetryPolicy. Only one refresh per call.
                 if failure.error == .unauthorized {
-                    logger.debug("Attempting token refresh for unauthorized 401 error", file: #file, line: #line)
-
-                    let refreshResult = await authRepository.refreshAccessToken()
-                    if case .failure(let refreshError) = refreshResult {
-                        logger.error("Token refresh failed: \(refreshError.localizedDescription)", file: #file, line: #line)
-                        return .failure(ZeroPiiNetworkFailure(error: refreshError, httpStatusCode: nil))
+                    if !tokenRefreshed {
+                        logger.debug("401 Unauthorized - refreshing token and retrying immediately (no delay)", file: #file, line: #line)
+                        let refreshResult = await authRepository.refreshAccessToken()
+                        if case .failure(let refreshError) = refreshResult {
+                            logger.error("Token refresh failed: \(refreshError.localizedDescription)", file: #file, line: #line)
+                            return .failure(ZeroPiiNetworkFailure(error: refreshError, httpStatusCode: nil))
+                        }
+                        tokenRefreshed = true
+                        continue // retry immediately, no delay, no attempt increment
                     }
+                    // Second 401 after refresh — give up
+                    logger.error("Operation \(operation) failed: 401 persists after token refresh", file: #file, line: #line)
+                    return .failure(failure)
                 }
 
-                let delayMs = initialRetryDelayMs * (1 << attempt)
-                logger.debug("Retrying operation \(operation) in \(delayMs)s (attempt \(attempt + 1)/\(maxAttempts))", file: #file, line: #line)
+                // All other errors: delegate to RetryPolicy
+                let statusCodeNumber = failure.httpStatusCode.map { NSNumber(value: $0) }
+                if retryPolicy.shouldRetry(attempt: attempt, httpStatusCode: statusCodeNumber) {
+                    let delayMs = retryPolicy.retryDelayMs(attempt: attempt)
+                    logger.debug("Retrying operation \(operation) in \(delayMs)ms (attempt \(attempt + 1))", file: #file, line: #line)
+                    try? await Task.sleep(nanoseconds: UInt64(delayMs) * 1_000_000)
+                    attempt += 1
+                    continue
+                }
 
-                try? await Task.sleep(nanoseconds: UInt64(delayMs) * 1_000_000)
+                logger.error("Operation \(operation) failed after \(attempt + 1) attempt(s): \(failure.error.localizedDescription)", file: #file, line: #line)
+                return .failure(failure)
             }
         }
-
-        return .failure(lastFailure)
     }
 }

@@ -10,6 +10,7 @@ CleverTap ZeroPii SDK provides a secure way to tokenize Personally Identifiable 
 - **Batch Operations**: Efficiently process multiple values in a single network call (up to 1,000 values)
 - **Encryption in Transit**: Request and response payloads are encrypted while being transmitted over the network
 - **Bring-Your-Own Auth**: No OAuth credentials in the SDK — your app supplies access tokens via the `AccessTokenProvider` protocol, keeping authentication logic under your control
+- **Automatic Retry**: Transient failures (network errors, 5xx, rate-limits) are retried automatically using a configurable `RetryPolicy` with exponential back-off
 - **ObjC / Swift / SwiftUI Compatible**: All public APIs are annotated with `@objc` and work across Objective-C, Swift, and SwiftUI apps
 
 ## Requirements
@@ -129,16 +130,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
+        // Minimal — default log level (.off) and default retry policy (1 retry, exponential back-off)
         ZeroPiiSDK.initialize(
             tokenProvider: MyTokenProvider(),
             apiUrl: "https://your-api-base-url.com/"
         )
 
-        // Optional: enable logging during development
+        // With debug logging
         ZeroPiiSDK.initialize(
             tokenProvider: MyTokenProvider(),
             apiUrl: "https://your-api-base-url.com/",
             logLevel: .debug
+        )
+
+        // With a custom retry policy
+        ZeroPiiSDK.initialize(
+            tokenProvider: MyTokenProvider(),
+            apiUrl: "https://your-api-base-url.com/",
+            logLevel: .debug,
+            retryPolicy: MyRetryPolicy()
         )
 
         return true
@@ -321,14 +331,15 @@ NSArray<NSString *> *emails = @[@"alice@example.com", @"bob@example.com"];
 
 ### Initialization
 
-#### `initialize(tokenProvider:apiUrl:logLevel:)`
+#### `initialize(tokenProvider:apiUrl:logLevel:retryPolicy:)`
 
 ```swift
 @discardableResult
 public static func initialize(
     tokenProvider: AccessTokenProvider,
     apiUrl: String,
-    logLevel: ZeroPiiLogLevel = .off
+    logLevel: ZeroPiiLogLevel,
+    retryPolicy: RetryPolicy
 ) -> ZeroPiiSDK
 ```
 
@@ -336,7 +347,21 @@ public static func initialize(
 |---|---|
 | `tokenProvider` | Your implementation of `AccessTokenProvider` that supplies bearer tokens |
 | `apiUrl` | Base URL for the tokenization API (include trailing slash) |
-| `logLevel` | Logging verbosity. Default: `.off` |
+| `logLevel` | Logging verbosity |
+| `retryPolicy` | Controls retry behaviour for failed requests |
+
+#### `initialize(tokenProvider:apiUrl:logLevel:)` *(ObjC convenience)*
+
+```swift
+@discardableResult
+public static func initialize(
+    tokenProvider: AccessTokenProvider,
+    apiUrl: String,
+    logLevel: ZeroPiiLogLevel
+) -> ZeroPiiSDK
+```
+
+Convenience overload that uses the default `RetryPolicy` (1 retry, exponential back-off).
 
 #### `initialize(tokenProvider:apiUrl:)` *(ObjC convenience)*
 
@@ -348,7 +373,7 @@ public static func initialize(
 ) -> ZeroPiiSDK
 ```
 
-Convenience overload without `logLevel` for Objective-C callers, which cannot use Swift default parameter values. Equivalent to calling the above with `logLevel: .off`.
+Convenience overload for Objective-C callers that uses `logLevel: .off` and the default `RetryPolicy`.
 
 #### `getInstance()`
 
@@ -458,6 +483,92 @@ Implement this protocol to bridge your app's authentication system to the SDK.
     public let newlyCreatedCount: Int  // New tokens created in this call
 }
 ```
+
+### `RetryPolicy`
+
+```swift
+@objc public protocol RetryPolicy: AnyObject {
+    /// Return `true` to retry the failed request.
+    ///
+    /// - Parameters:
+    ///   - attempt: Zero-based retry counter (0 = first retry after the initial failure).
+    ///   - httpStatusCode: The HTTP status code from the server, or `nil` for network-level
+    ///     errors (no HTTP response received). 401 responses are handled internally by the
+    ///     SDK (token refresh) and are **never** passed to this method.
+    func shouldRetry(attempt: Int, httpStatusCode: NSNumber?) -> Bool
+
+    /// Milliseconds to wait before the next attempt.
+    ///
+    /// - Parameter attempt: Zero-based retry counter, identical to the value passed to
+    ///   `shouldRetry(attempt:httpStatusCode:)` for the same retry.
+    func retryDelayMs(attempt: Int) -> Int
+}
+```
+
+The SDK ships a built-in policy used by default — **1 retry with exponential back-off** (2 s, 4 s, 8 s…). It retries on:
+- `nil` status code — network-level errors (no HTTP response)
+- `429` Too Many Requests
+- `500` Internal Server Error
+- `502` Bad Gateway
+- `503` Service Unavailable
+- `504` Gateway Timeout
+
+To customise retry behaviour, implement the protocol and pass your instance to `initialize`:
+
+**Swift**
+
+```swift
+class MyRetryPolicy: NSObject, RetryPolicy {
+    func shouldRetry(attempt: Int, httpStatusCode: NSNumber?) -> Bool {
+        guard attempt < 3 else { return false }
+        guard let code = httpStatusCode else { return true }  // network error → retry
+        return [429, 500, 502, 503, 504].contains(code.intValue)
+    }
+
+    func retryDelayMs(attempt: Int) -> Int {
+        return 1000 * (1 << (attempt + 1))  // 2 000 ms, 4 000 ms, 8 000 ms …
+    }
+}
+
+ZeroPiiSDK.initialize(
+    tokenProvider: MyTokenProvider(),
+    apiUrl: "https://your-api-base-url.com/",
+    logLevel: .debug,
+    retryPolicy: MyRetryPolicy()
+)
+```
+
+**Objective-C**
+
+```objc
+@interface MyRetryPolicy : NSObject <RetryPolicy>
+@end
+
+@implementation MyRetryPolicy
+
+- (BOOL)shouldRetryWithAttempt:(NSInteger)attempt httpStatusCode:(NSNumber *)httpStatusCode {
+    if (attempt >= 3) return NO;
+    if (!httpStatusCode) return YES;
+    NSArray *retryable = @[@429, @500, @502, @503, @504];
+    return [retryable containsObject:httpStatusCode];
+}
+
+- (NSInteger)retryDelayMsWithAttempt:(NSInteger)attempt {
+    return 1000 * (1 << (attempt + 1));
+}
+
+@end
+
+// Usage:
+[ZeroPiiSDK initializeWithTokenProvider:[MyTokenProvider new]
+                                  apiUrl:@"https://your-api-base-url.com/"
+                                logLevel:ZeroPiiLogLevelDebug
+                             retryPolicy:[MyRetryPolicy new]];
+```
+
+> **Note on 401 Unauthorized:** The SDK handles 401 responses internally — it refreshes the access token via your `AccessTokenProvider` and retries once immediately. This is never delegated to your `RetryPolicy`.
+
+---
 
 ### Log Levels (`ZeroPiiLogLevel`)
 
