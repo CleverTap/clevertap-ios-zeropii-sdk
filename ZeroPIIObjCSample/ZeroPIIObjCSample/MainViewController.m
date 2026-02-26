@@ -8,7 +8,7 @@
 #import "ResultDetailViewController.h"
 #import "SampleDataProvider.h"
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
-#import <clevertap_ios_zeropii_sdk/clevertap_ios_zeropii_sdk-Swift.h>
+@import CleverTapZeroPiiSDK;
 #import <objc/runtime.h>
 
 // MARK: - Constants

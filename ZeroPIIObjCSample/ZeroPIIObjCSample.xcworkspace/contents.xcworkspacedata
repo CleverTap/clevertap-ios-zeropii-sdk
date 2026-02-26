@@ -5,6 +5,6 @@
       location = "group:ZeroPIIObjCSample.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:../clevertap-ios-vault-sdk/clevertap-ios-zeropii-sdk.xcodeproj">
+      location = "group:Pods/Pods.xcodeproj">
    </FileRef>
 </Workspace>

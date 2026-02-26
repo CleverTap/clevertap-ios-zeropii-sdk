@@ -4,7 +4,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <clevertap_ios_zeropii_sdk/clevertap_ios_zeropii_sdk-Swift.h>
+@import CleverTapZeroPiiSDK;
 
 typedef NS_ENUM(NSInteger, ResultItemType) {
     ResultItemTypeLoading,

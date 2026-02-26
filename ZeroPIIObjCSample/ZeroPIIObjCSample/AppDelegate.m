@@ -4,7 +4,7 @@
 //
 
 #import "AppDelegate.h"
-#import <clevertap_ios_zeropii_sdk/clevertap_ios_zeropii_sdk-Swift.h>
+@import CleverTapZeroPiiSDK;
 
 // MARK: - Sample Retry Policy
 
