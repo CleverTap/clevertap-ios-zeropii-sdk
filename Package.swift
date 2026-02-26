@@ -15,7 +15,7 @@ let package = Package(
     targets: [
         .target(
             name: "CleverTapZeroPiiSDK",
-            path: "clevertap-ios-vault-sdk/clevertap-ios-zeropii-sdk",
+            path: "clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk",
             exclude: ["clevertap_ios_zeropii_sdk.h"]
         )
     ]

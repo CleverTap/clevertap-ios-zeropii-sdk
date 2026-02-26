@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '13.0'
   s.swift_versions        = ['5.0']
 
-  s.source_files = 'clevertap-ios-vault-sdk/clevertap-ios-zeropii-sdk/**/*.swift'
+  s.source_files = 'clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk/**/*.swift'
 
   # CryptoKit and Foundation are system frameworks available on iOS 13+; no explicit linkage needed.
   s.frameworks = 'Foundation'

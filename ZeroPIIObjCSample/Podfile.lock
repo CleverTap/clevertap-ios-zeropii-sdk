@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  CleverTapZeroPiiSDK: c7746fbf66b1108c651b155961e108c9eb9fd14c
+  CleverTapZeroPiiSDK: 1dfcec2870fc078499af3892ebb15e0b46ca1ba2
 
 PODFILE CHECKSUM: 2ecc0dece1921bcf384d20b795700b6287fd5af4
 

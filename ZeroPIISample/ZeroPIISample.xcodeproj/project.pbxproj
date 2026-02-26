@@ -53,7 +53,7 @@
 		489005FD2F3475700076F105 /* ZeroPIISample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZeroPIISample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4890060A2F3475720076F105 /* ZeroPIISampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZeroPIISampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		489006142F3475720076F105 /* ZeroPIISampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZeroPIISampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		489007F02F349AD80076F105 /* clevertap-ios-zeropii-sdk.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "clevertap-ios-zeropii-sdk.xcodeproj"; path = "../clevertap-ios-vault-sdk/clevertap-ios-zeropii-sdk.xcodeproj"; sourceTree = SOURCE_ROOT; };
+		489007F02F349AD80076F105 /* clevertap-ios-zeropii-sdk.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "clevertap-ios-zeropii-sdk.xcodeproj"; path = "../clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk.xcodeproj"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */

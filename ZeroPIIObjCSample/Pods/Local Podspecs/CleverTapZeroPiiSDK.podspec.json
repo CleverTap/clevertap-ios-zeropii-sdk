@@ -21,7 +21,7 @@
   "swift_versions": [
     "5.0"
   ],
-  "source_files": "clevertap-ios-vault-sdk/clevertap-ios-zeropii-sdk/**/*.swift",
+  "source_files": "clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk/**/*.swift",
   "frameworks": "Foundation",
   "pod_target_xcconfig": {
     "SWIFT_VERSION": "5.0",
