@@ -592,11 +592,11 @@ All public classes, protocols, and enums are annotated with `@objc` and subclass
 **Import the generated Swift header:**
 
 ```objc
-// CocoaPods
-#import <CleverTapZeroPiiSDK/CleverTapZeroPiiSDK-Swift.h>
-
-// SPM (module-qualified)
+// CocoaPods (use_frameworks!) or SPM — module import (recommended)
 @import CleverTapZeroPiiSDK;
+
+// CocoaPods or manual — explicit header import
+#import <CleverTapZeroPiiSDK/CleverTapZeroPiiSDK-Swift.h>
 ```
 
 **Checking the result in ObjC** — since Swift enums with associated values cannot be used in ObjC, all results are returned as `NSObject` subclasses with boolean flags:
@@ -616,4 +616,9 @@ All public classes, protocols, and enums are annotated with `@objc` and subclass
 
 ## Sample App
 
-A sample application demonstrating SDK integration is included in the `ZeroPIISample/` directory of the repository. Open `ZeroPIISample/ZeroPIISample.xcodeproj` in Xcode to explore it.
+Two sample applications are included in the repository:
+
+- **Swift / SwiftUI** — `ZeroPIISample/ZeroPIISample.xcworkspace`
+- **Objective-C / UIKit** — `ZeroPIIObjCSample/ZeroPIIObjCSample.xcworkspace`
+
+Open the `.xcworkspace` (not the `.xcodeproj`) in Xcode to explore them.
