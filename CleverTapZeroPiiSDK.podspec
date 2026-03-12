@@ -10,10 +10,10 @@ Pod::Spec.new do |s|
     Swift, SwiftUI, and Objective-C apps.
   DESC
 
-  s.homepage         = 'https://github.com/CleverTap/clevertap-ios-vault-sdk'
+  s.homepage         = 'https://github.com/CleverTap/clevertap-ios-zeropii-sdk'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'CleverTap' => 'sdk@clevertap.com' }
-  s.source           = { :git => 'https://github.com/CleverTap/clevertap-ios-vault-sdk.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/CleverTap/clevertap-ios-zeropii-sdk.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '13.0'
   s.swift_versions        = ['5.0']
