@@ -1,0 +1,16 @@
+PODS:
+  - CleverTapZeroPiiSDK (1.0.0)
+
+DEPENDENCIES:
+  - CleverTapZeroPiiSDK (from `../`)
+
+EXTERNAL SOURCES:
+  CleverTapZeroPiiSDK:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  CleverTapZeroPiiSDK: 60f4b9de7299ea8220208ec9447c3e51dae8dac9
+
+PODFILE CHECKSUM: 2ecc0dece1921bcf384d20b795700b6287fd5af4
+
+COCOAPODS: 1.16.2

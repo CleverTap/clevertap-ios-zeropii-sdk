@@ -1,0 +1,787 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		042D1BBCC6037C750ABAD2C3ACF7575E /* CleverTapZeroPiiSDK-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E36E5824BC64AF5DFB3D9C3F1EFC548E /* CleverTapZeroPiiSDK-dummy.m */; };
+		064977BD35E7C6300855246F619851E8 /* TokenizeResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7E3E6C4DF7935E8E4E04708700353 /* TokenizeResults.swift */; };
+		1313E6D466BF430DBF7B008812CA438D /* AuthRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78F6A3CF73ED72EFE6B0D910A80A7D3 /* AuthRepository.swift */; };
+		179A9E486E6DB0FD661FCF5A43BE9FF2 /* Pods-ZeroPIIObjCSample-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = FE6E0B84B1CCB5F2801C9B9C59235F76 /* Pods-ZeroPIIObjCSample-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		29A4E97BC205632EB3CD734C660D9BFF /* ZeroPiiLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0DEDF66C6931EA802AC33DA37C1ED3 /* ZeroPiiLogger.swift */; };
+		2B18A0C2A0EB74ADC924F31526811DAA /* NetworkOperationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB0B11BBCE23CE817B602EC325E7681C /* NetworkOperationType.swift */; };
+		3324F0918AE30A0CC4060EB4EDF39B16 /* AuthRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F27700D3DD62602D6323FFCE41332 /* AuthRepositoryImpl.swift */; };
+		3939EE331E10EDCA00775039874C2E98 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		4BA0B7F4E04751400F08AA5AE5F1B1E1 /* ZeroPiiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157D247B553A953A37AE68538AB7C566 /* ZeroPiiError.swift */; };
+		5564E61C9F371A597E7C4F55EABB95C3 /* TokenResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CF2D99235E8F8D082B53C8A5EA3FED /* TokenResults.swift */; };
+		5B7AC10E03DECA26682641891B69D83B /* NetworkProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE9B8507D1F2BB0F71ED255173D2ED39 /* NetworkProvider.swift */; };
+		6216E6838ABEFA62F29A01F6DFDA151D /* NetworkConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2B39AC377EF88123EA0D54206551EC9 /* NetworkConfiguration.swift */; };
+		6B92BDB9934408F1F6B4594699A58B6E /* EncryptionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2FB99E80C5B1594FC8366BACBB46D2 /* EncryptionResult.swift */; };
+		6EBBEF0FA109F6952DC12188BE7A618B /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DEDE93DF74377CFDB875370C3887BA6 /* NetworkManager.swift */; };
+		71822E92036D896FE7D6ED12FFB0E49F /* NetworkResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3DDA537622203DEBC790CFA9601B0A /* NetworkResponseHandler.swift */; };
+		77A8FB13996539CFFF4675CFA41E3EEE /* TokenRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AB956707E8F245BA48A0243B8ED06D /* TokenRepositoryImpl.swift */; };
+		86F20699BEC5D24F0ECACD22C8F21786 /* TokenRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45113C9CEE9B14759A83CB7093BD32CA /* TokenRepository.swift */; };
+		91ACA0183DE20856A2F49E0A24329BFE /* NetworkEncryptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02FACBA78484F88AD251DD3368E737C9 /* NetworkEncryptionManager.swift */; };
+		9FB3A7E3B0453D438D5531B3C6CBCBAF /* RetryPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F192AC99850691839708A2BDE5800D9 /* RetryPolicy.swift */; };
+		AC383292F7F6832C997CC2C83072B9B4 /* TypeConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0D56ED24FF272E6F87C42C78AEEE1F /* TypeConverter.swift */; };
+		B63F207FBFB393382BAAE35081857F74 /* ZeroPiiLoggerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE724ABF21D3BA8F394EEE8F262400E8 /* ZeroPiiLoggerProtocol.swift */; };
+		B73006D865FD49243E5FA3FEF8AEAA89 /* Pods-ZeroPIIObjCSample-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BDB0947D3805F7A0D7E675E1E50EBCE /* Pods-ZeroPIIObjCSample-dummy.m */; };
+		B7347CDDD6FFF9C335B5300F64FE7644 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		C3B0C449AA8DC784ACC5F3E80A41737D /* TokenModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717A250B26E7C733844DF36CD2A411FC /* TokenModels.swift */; };
+		CA8D7B05FF7E236368239DFA5F37A946 /* EncryptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D51AD2ED79ECC2451E06869C3BE5004B /* EncryptionManager.swift */; };
+		D30D09150ED9963E5CFB3B2F4D6F3FC0 /* CleverTapZeroPiiSDK-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BEEC4770AF294444EC5F9C21F09E7C0 /* CleverTapZeroPiiSDK-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D7AE4FAADE1D13764469722D8DA143DF /* NetworkRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5D7013134D85B4FFF59F7B5D6A2871 /* NetworkRequestBuilder.swift */; };
+		DA4D014968C273D68183FD98EBF9F4A6 /* AccessTokenProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81209F75DFB84E286E248C64FA126834 /* AccessTokenProvider.swift */; };
+		E49331EE1055784AB283A53DD53D6AB2 /* ZeroPiiSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4ACDFFCC078B60083ABA4AF99B401BE /* ZeroPiiSDK.swift */; };
+		FCA8293939F1AD17BAD03B44F626FB25 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FCB9AE2DC580AC09B55C40188B31F3 /* Constants.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4AF5CFE45F9CCFED7F049DF00F1273C0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5E37D4EB86A156CB16119A67014A936E;
+			remoteInfo = CleverTapZeroPiiSDK;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		02FACBA78484F88AD251DD3368E737C9 /* NetworkEncryptionManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkEncryptionManager.swift; sourceTree = "<group>"; };
+		07104925D6DA757B73119112D357442D /* Pods-ZeroPIIObjCSample.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-ZeroPIIObjCSample.modulemap"; sourceTree = "<group>"; };
+		157D247B553A953A37AE68538AB7C566 /* ZeroPiiError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ZeroPiiError.swift; sourceTree = "<group>"; };
+		1BDB0947D3805F7A0D7E675E1E50EBCE /* Pods-ZeroPIIObjCSample-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-ZeroPIIObjCSample-dummy.m"; sourceTree = "<group>"; };
+		1BEEC4770AF294444EC5F9C21F09E7C0 /* CleverTapZeroPiiSDK-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CleverTapZeroPiiSDK-umbrella.h"; sourceTree = "<group>"; };
+		1E5D7013134D85B4FFF59F7B5D6A2871 /* NetworkRequestBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkRequestBuilder.swift; sourceTree = "<group>"; };
+		21FCB9AE2DC580AC09B55C40188B31F3 /* Constants.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		24AB956707E8F245BA48A0243B8ED06D /* TokenRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TokenRepositoryImpl.swift; sourceTree = "<group>"; };
+		265F31E7670E56621E2F2216D0EE80FF /* CleverTapZeroPiiSDK.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = CleverTapZeroPiiSDK.modulemap; sourceTree = "<group>"; };
+		384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		45113C9CEE9B14759A83CB7093BD32CA /* TokenRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TokenRepository.swift; sourceTree = "<group>"; };
+		49C7E3E6C4DF7935E8E4E04708700353 /* TokenizeResults.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TokenizeResults.swift; sourceTree = "<group>"; };
+		4F192AC99850691839708A2BDE5800D9 /* RetryPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RetryPolicy.swift; sourceTree = "<group>"; };
+		558954074086888DD597A6FBB0574D4F /* CleverTapZeroPiiSDK-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "CleverTapZeroPiiSDK-Info.plist"; sourceTree = "<group>"; };
+		56D5FBE96DEA62AA849765312DD6D6B3 /* CleverTapZeroPiiSDK.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CleverTapZeroPiiSDK.release.xcconfig; sourceTree = "<group>"; };
+		64EE87753F1F1C0BA83E47FE93122677 /* Pods-ZeroPIIObjCSample */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-ZeroPIIObjCSample"; path = Pods_ZeroPIIObjCSample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		679161BB01D668808E86E6FE77B03E76 /* Pods-ZeroPIIObjCSample-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-ZeroPIIObjCSample-acknowledgements.markdown"; sourceTree = "<group>"; };
+		69A3E4D0241C0EBDFD086B861E5CB076 /* Pods-ZeroPIIObjCSample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ZeroPIIObjCSample.release.xcconfig"; sourceTree = "<group>"; };
+		717A250B26E7C733844DF36CD2A411FC /* TokenModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TokenModels.swift; sourceTree = "<group>"; };
+		749F50885831B2E0E9751F9441A22D34 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE; sourceTree = "<group>"; };
+		7E3DDA537622203DEBC790CFA9601B0A /* NetworkResponseHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkResponseHandler.swift; sourceTree = "<group>"; };
+		81209F75DFB84E286E248C64FA126834 /* AccessTokenProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AccessTokenProvider.swift; sourceTree = "<group>"; };
+		8B3D511951318E1E57D76EB1A70B8FE7 /* Pods-ZeroPIIObjCSample-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-ZeroPIIObjCSample-frameworks.sh"; sourceTree = "<group>"; };
+		984CD8830D9B7D054C8290D7A458C73D /* Pods-ZeroPIIObjCSample-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-ZeroPIIObjCSample-Info.plist"; sourceTree = "<group>"; };
+		9A491DA250B652640A23C35C503875F1 /* Pods-ZeroPIIObjCSample-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-ZeroPIIObjCSample-acknowledgements.plist"; sourceTree = "<group>"; };
+		9B0D56ED24FF272E6F87C42C78AEEE1F /* TypeConverter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TypeConverter.swift; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9DEDE93DF74377CFDB875370C3887BA6 /* NetworkManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		B78F6A3CF73ED72EFE6B0D910A80A7D3 /* AuthRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthRepository.swift; sourceTree = "<group>"; };
+		CB0B11BBCE23CE817B602EC325E7681C /* NetworkOperationType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkOperationType.swift; sourceTree = "<group>"; };
+		D1C442E4185B2B479F0185B9755ED40E /* CleverTapZeroPiiSDK */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = CleverTapZeroPiiSDK; path = CleverTapZeroPiiSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D229CFA7883774E245D24E36A3CAFB03 /* CleverTapZeroPiiSDK.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = CleverTapZeroPiiSDK.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		D51AD2ED79ECC2451E06869C3BE5004B /* EncryptionManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EncryptionManager.swift; sourceTree = "<group>"; };
+		D55F27700D3DD62602D6323FFCE41332 /* AuthRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthRepositoryImpl.swift; sourceTree = "<group>"; };
+		D82439FA534427727D4BEB691EB18033 /* Pods-ZeroPIIObjCSample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ZeroPIIObjCSample.debug.xcconfig"; sourceTree = "<group>"; };
+		DE0DEDF66C6931EA802AC33DA37C1ED3 /* ZeroPiiLogger.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ZeroPiiLogger.swift; sourceTree = "<group>"; };
+		E0FAD2623111A9150E355C5E4D1B8CE0 /* CleverTapZeroPiiSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CleverTapZeroPiiSDK.debug.xcconfig; sourceTree = "<group>"; };
+		E36E5824BC64AF5DFB3D9C3F1EFC548E /* CleverTapZeroPiiSDK-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "CleverTapZeroPiiSDK-dummy.m"; sourceTree = "<group>"; };
+		E8CF2D99235E8F8D082B53C8A5EA3FED /* TokenResults.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TokenResults.swift; sourceTree = "<group>"; };
+		EE724ABF21D3BA8F394EEE8F262400E8 /* ZeroPiiLoggerProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ZeroPiiLoggerProtocol.swift; sourceTree = "<group>"; };
+		EE9B8507D1F2BB0F71ED255173D2ED39 /* NetworkProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkProvider.swift; sourceTree = "<group>"; };
+		F2B39AC377EF88123EA0D54206551EC9 /* NetworkConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkConfiguration.swift; sourceTree = "<group>"; };
+		F4ACDFFCC078B60083ABA4AF99B401BE /* ZeroPiiSDK.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ZeroPiiSDK.swift; path = "clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk/ZeroPiiSDK.swift"; sourceTree = "<group>"; };
+		F51497BE9473CCF8F53498989A8265BF /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		FB2FB99E80C5B1594FC8366BACBB46D2 /* EncryptionResult.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EncryptionResult.swift; sourceTree = "<group>"; };
+		FB8D06F6AA2C80ABFF9F52D0808EF1C0 /* CleverTapZeroPiiSDK-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CleverTapZeroPiiSDK-prefix.pch"; sourceTree = "<group>"; };
+		FE6E0B84B1CCB5F2801C9B9C59235F76 /* Pods-ZeroPIIObjCSample-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-ZeroPIIObjCSample-umbrella.h"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0EE59ECB96ED55D1AF9259D2102F9823 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3939EE331E10EDCA00775039874C2E98 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5FED62C0C1D81EB8564373A8394B2191 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B7347CDDD6FFF9C335B5300F64FE7644 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		01D40D7C59E0B31AC9244C9EE0F6169A /* CleverTapZeroPiiSDK */ = {
+			isa = PBXGroup;
+			children = (
+				F4ACDFFCC078B60083ABA4AF99B401BE /* ZeroPiiSDK.swift */,
+				3639A033125B341559B05E19FB51950D /* Core */,
+				D815D8068448D6F8F7E06FC09AAF7EDD /* Encryption */,
+				86CDDB2688BB958275F7C1F044824550 /* Models */,
+				2B2E583F87208F22F1B07DC6BCA4688D /* Pod */,
+				818832B64CEA80BF0A878121A795FB26 /* Protocols */,
+				489E426EA18211E6BD144489A2BA4A67 /* Providers */,
+				D8861C951E60AAF629E7A00A0B282A8E /* Repository */,
+				50915085F11F57EBB1C5D1AEA345FF69 /* Support Files */,
+				A5BA91A260EFE57678FB3443A1C7E77D /* Utils */,
+			);
+			name = CleverTapZeroPiiSDK;
+			path = ../..;
+			sourceTree = "<group>";
+		};
+		0A493F75D6AD8AD8C6D5285E8888ADC5 /* Pods-ZeroPIIObjCSample */ = {
+			isa = PBXGroup;
+			children = (
+				07104925D6DA757B73119112D357442D /* Pods-ZeroPIIObjCSample.modulemap */,
+				679161BB01D668808E86E6FE77B03E76 /* Pods-ZeroPIIObjCSample-acknowledgements.markdown */,
+				9A491DA250B652640A23C35C503875F1 /* Pods-ZeroPIIObjCSample-acknowledgements.plist */,
+				1BDB0947D3805F7A0D7E675E1E50EBCE /* Pods-ZeroPIIObjCSample-dummy.m */,
+				8B3D511951318E1E57D76EB1A70B8FE7 /* Pods-ZeroPIIObjCSample-frameworks.sh */,
+				984CD8830D9B7D054C8290D7A458C73D /* Pods-ZeroPIIObjCSample-Info.plist */,
+				FE6E0B84B1CCB5F2801C9B9C59235F76 /* Pods-ZeroPIIObjCSample-umbrella.h */,
+				D82439FA534427727D4BEB691EB18033 /* Pods-ZeroPIIObjCSample.debug.xcconfig */,
+				69A3E4D0241C0EBDFD086B861E5CB076 /* Pods-ZeroPIIObjCSample.release.xcconfig */,
+			);
+			name = "Pods-ZeroPIIObjCSample";
+			path = "Target Support Files/Pods-ZeroPIIObjCSample";
+			sourceTree = "<group>";
+		};
+		17FFEEB8FAAC3A3C2949CDFDECCFA8C1 /* Development Pods */ = {
+			isa = PBXGroup;
+			children = (
+				01D40D7C59E0B31AC9244C9EE0F6169A /* CleverTapZeroPiiSDK */,
+			);
+			name = "Development Pods";
+			sourceTree = "<group>";
+		};
+		2B2E583F87208F22F1B07DC6BCA4688D /* Pod */ = {
+			isa = PBXGroup;
+			children = (
+				D229CFA7883774E245D24E36A3CAFB03 /* CleverTapZeroPiiSDK.podspec */,
+				749F50885831B2E0E9751F9441A22D34 /* LICENSE */,
+				F51497BE9473CCF8F53498989A8265BF /* README.md */,
+			);
+			name = Pod;
+			sourceTree = "<group>";
+		};
+		3639A033125B341559B05E19FB51950D /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				157D247B553A953A37AE68538AB7C566 /* ZeroPiiError.swift */,
+			);
+			name = Core;
+			path = "clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk/Core";
+			sourceTree = "<group>";
+		};
+		489E426EA18211E6BD144489A2BA4A67 /* Providers */ = {
+			isa = PBXGroup;
+			children = (
+				9DEDE93DF74377CFDB875370C3887BA6 /* NetworkManager.swift */,
+				1E5D7013134D85B4FFF59F7B5D6A2871 /* NetworkRequestBuilder.swift */,
+				7E3DDA537622203DEBC790CFA9601B0A /* NetworkResponseHandler.swift */,
+			);
+			name = Providers;
+			path = "clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk/Providers";
+			sourceTree = "<group>";
+		};
+		50915085F11F57EBB1C5D1AEA345FF69 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				265F31E7670E56621E2F2216D0EE80FF /* CleverTapZeroPiiSDK.modulemap */,
+				E36E5824BC64AF5DFB3D9C3F1EFC548E /* CleverTapZeroPiiSDK-dummy.m */,
+				558954074086888DD597A6FBB0574D4F /* CleverTapZeroPiiSDK-Info.plist */,
+				FB8D06F6AA2C80ABFF9F52D0808EF1C0 /* CleverTapZeroPiiSDK-prefix.pch */,
+				1BEEC4770AF294444EC5F9C21F09E7C0 /* CleverTapZeroPiiSDK-umbrella.h */,
+				E0FAD2623111A9150E355C5E4D1B8CE0 /* CleverTapZeroPiiSDK.debug.xcconfig */,
+				56D5FBE96DEA62AA849765312DD6D6B3 /* CleverTapZeroPiiSDK.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "ZeroPIIObjCSample/Pods/Target Support Files/CleverTapZeroPiiSDK";
+			sourceTree = "<group>";
+		};
+		818832B64CEA80BF0A878121A795FB26 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				81209F75DFB84E286E248C64FA126834 /* AccessTokenProvider.swift */,
+				B78F6A3CF73ED72EFE6B0D910A80A7D3 /* AuthRepository.swift */,
+				EE9B8507D1F2BB0F71ED255173D2ED39 /* NetworkProvider.swift */,
+				4F192AC99850691839708A2BDE5800D9 /* RetryPolicy.swift */,
+				45113C9CEE9B14759A83CB7093BD32CA /* TokenRepository.swift */,
+				EE724ABF21D3BA8F394EEE8F262400E8 /* ZeroPiiLoggerProtocol.swift */,
+			);
+			name = Protocols;
+			path = "clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk/Protocols";
+			sourceTree = "<group>";
+		};
+		86CDDB2688BB958275F7C1F044824550 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F2B39AC377EF88123EA0D54206551EC9 /* NetworkConfiguration.swift */,
+				CB0B11BBCE23CE817B602EC325E7681C /* NetworkOperationType.swift */,
+				49C7E3E6C4DF7935E8E4E04708700353 /* TokenizeResults.swift */,
+				717A250B26E7C733844DF36CD2A411FC /* TokenModels.swift */,
+				E8CF2D99235E8F8D082B53C8A5EA3FED /* TokenResults.swift */,
+			);
+			name = Models;
+			path = "clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk/Models";
+			sourceTree = "<group>";
+		};
+		9FB45F86717D525EA8616BABF828BBD0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D1C442E4185B2B479F0185B9755ED40E /* CleverTapZeroPiiSDK */,
+				64EE87753F1F1C0BA83E47FE93122677 /* Pods-ZeroPIIObjCSample */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A5BA91A260EFE57678FB3443A1C7E77D /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				21FCB9AE2DC580AC09B55C40188B31F3 /* Constants.swift */,
+				9B0D56ED24FF272E6F87C42C78AEEE1F /* TypeConverter.swift */,
+				DE0DEDF66C6931EA802AC33DA37C1ED3 /* ZeroPiiLogger.swift */,
+			);
+			name = Utils;
+			path = "clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk/Utils";
+			sourceTree = "<group>";
+		};
+		CF1408CF629C7361332E53B88F7BD30C = {
+			isa = PBXGroup;
+			children = (
+				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
+				17FFEEB8FAAC3A3C2949CDFDECCFA8C1 /* Development Pods */,
+				D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */,
+				9FB45F86717D525EA8616BABF828BBD0 /* Products */,
+				D50E825B81669F8327508536A577201B /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E4801F62A6B08CD9B5410329F1A18FDE /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D50E825B81669F8327508536A577201B /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				0A493F75D6AD8AD8C6D5285E8888ADC5 /* Pods-ZeroPIIObjCSample */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		D815D8068448D6F8F7E06FC09AAF7EDD /* Encryption */ = {
+			isa = PBXGroup;
+			children = (
+				D51AD2ED79ECC2451E06869C3BE5004B /* EncryptionManager.swift */,
+				FB2FB99E80C5B1594FC8366BACBB46D2 /* EncryptionResult.swift */,
+				02FACBA78484F88AD251DD3368E737C9 /* NetworkEncryptionManager.swift */,
+			);
+			name = Encryption;
+			path = "clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk/Encryption";
+			sourceTree = "<group>";
+		};
+		D8861C951E60AAF629E7A00A0B282A8E /* Repository */ = {
+			isa = PBXGroup;
+			children = (
+				D55F27700D3DD62602D6323FFCE41332 /* AuthRepositoryImpl.swift */,
+				24AB956707E8F245BA48A0243B8ED06D /* TokenRepositoryImpl.swift */,
+			);
+			name = Repository;
+			path = "clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk/Repository";
+			sourceTree = "<group>";
+		};
+		E4801F62A6B08CD9B5410329F1A18FDE /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		0DF9F42E2CB4D5670C5428AF3C871098 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D30D09150ED9963E5CFB3B2F4D6F3FC0 /* CleverTapZeroPiiSDK-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8734D251A9179DB0AE2082E761148DF9 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				179A9E486E6DB0FD661FCF5A43BE9FF2 /* Pods-ZeroPIIObjCSample-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		5E37D4EB86A156CB16119A67014A936E /* CleverTapZeroPiiSDK */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F606AEC86C7E53825C154BEE857A3A1E /* Build configuration list for PBXNativeTarget "CleverTapZeroPiiSDK" */;
+			buildPhases = (
+				0DF9F42E2CB4D5670C5428AF3C871098 /* Headers */,
+				C95A9239FE3BA2184DBD998D2989C8FA /* Sources */,
+				0EE59ECB96ED55D1AF9259D2102F9823 /* Frameworks */,
+				BEE296508A52D4FC18857DC10F8645F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CleverTapZeroPiiSDK;
+			productName = CleverTapZeroPiiSDK;
+			productReference = D1C442E4185B2B479F0185B9755ED40E /* CleverTapZeroPiiSDK */;
+			productType = "com.apple.product-type.framework";
+		};
+		F657745035710B09757A66B108AF8C64 /* Pods-ZeroPIIObjCSample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EDEFD95EBF017A37C280286FBDE0C9AC /* Build configuration list for PBXNativeTarget "Pods-ZeroPIIObjCSample" */;
+			buildPhases = (
+				8734D251A9179DB0AE2082E761148DF9 /* Headers */,
+				9340D79FD8311D1E776F669185F3D7D3 /* Sources */,
+				5FED62C0C1D81EB8564373A8394B2191 /* Frameworks */,
+				C24373F2AE8F8531240E8D30AA346A76 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				757CC354A9C6AC8183F2AC29D4708B5A /* PBXTargetDependency */,
+			);
+			name = "Pods-ZeroPIIObjCSample";
+			productName = Pods_ZeroPIIObjCSample;
+			productReference = 64EE87753F1F1C0BA83E47FE93122677 /* Pods-ZeroPIIObjCSample */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 16.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9FB45F86717D525EA8616BABF828BBD0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5E37D4EB86A156CB16119A67014A936E /* CleverTapZeroPiiSDK */,
+				F657745035710B09757A66B108AF8C64 /* Pods-ZeroPIIObjCSample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BEE296508A52D4FC18857DC10F8645F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C24373F2AE8F8531240E8D30AA346A76 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9340D79FD8311D1E776F669185F3D7D3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B73006D865FD49243E5FA3FEF8AEAA89 /* Pods-ZeroPIIObjCSample-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C95A9239FE3BA2184DBD998D2989C8FA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA4D014968C273D68183FD98EBF9F4A6 /* AccessTokenProvider.swift in Sources */,
+				1313E6D466BF430DBF7B008812CA438D /* AuthRepository.swift in Sources */,
+				3324F0918AE30A0CC4060EB4EDF39B16 /* AuthRepositoryImpl.swift in Sources */,
+				042D1BBCC6037C750ABAD2C3ACF7575E /* CleverTapZeroPiiSDK-dummy.m in Sources */,
+				FCA8293939F1AD17BAD03B44F626FB25 /* Constants.swift in Sources */,
+				CA8D7B05FF7E236368239DFA5F37A946 /* EncryptionManager.swift in Sources */,
+				6B92BDB9934408F1F6B4594699A58B6E /* EncryptionResult.swift in Sources */,
+				6216E6838ABEFA62F29A01F6DFDA151D /* NetworkConfiguration.swift in Sources */,
+				91ACA0183DE20856A2F49E0A24329BFE /* NetworkEncryptionManager.swift in Sources */,
+				6EBBEF0FA109F6952DC12188BE7A618B /* NetworkManager.swift in Sources */,
+				2B18A0C2A0EB74ADC924F31526811DAA /* NetworkOperationType.swift in Sources */,
+				5B7AC10E03DECA26682641891B69D83B /* NetworkProvider.swift in Sources */,
+				D7AE4FAADE1D13764469722D8DA143DF /* NetworkRequestBuilder.swift in Sources */,
+				71822E92036D896FE7D6ED12FFB0E49F /* NetworkResponseHandler.swift in Sources */,
+				9FB3A7E3B0453D438D5531B3C6CBCBAF /* RetryPolicy.swift in Sources */,
+				064977BD35E7C6300855246F619851E8 /* TokenizeResults.swift in Sources */,
+				C3B0C449AA8DC784ACC5F3E80A41737D /* TokenModels.swift in Sources */,
+				86F20699BEC5D24F0ECACD22C8F21786 /* TokenRepository.swift in Sources */,
+				77A8FB13996539CFFF4675CFA41E3EEE /* TokenRepositoryImpl.swift in Sources */,
+				5564E61C9F371A597E7C4F55EABB95C3 /* TokenResults.swift in Sources */,
+				AC383292F7F6832C997CC2C83072B9B4 /* TypeConverter.swift in Sources */,
+				4BA0B7F4E04751400F08AA5AE5F1B1E1 /* ZeroPiiError.swift in Sources */,
+				29A4E97BC205632EB3CD734C660D9BFF /* ZeroPiiLogger.swift in Sources */,
+				B63F207FBFB393382BAAE35081857F74 /* ZeroPiiLoggerProtocol.swift in Sources */,
+				E49331EE1055784AB283A53DD53D6AB2 /* ZeroPiiSDK.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		757CC354A9C6AC8183F2AC29D4708B5A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CleverTapZeroPiiSDK;
+			target = 5E37D4EB86A156CB16119A67014A936E /* CleverTapZeroPiiSDK */;
+			targetProxy = 4AF5CFE45F9CCFED7F049DF00F1273C0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		08A4592FB433F6882683498BA77A0002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 56D5FBE96DEA62AA849765312DD6D6B3 /* CleverTapZeroPiiSDK.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "Target Support Files/CleverTapZeroPiiSDK/CleverTapZeroPiiSDK-prefix.pch";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Target Support Files/CleverTapZeroPiiSDK/CleverTapZeroPiiSDK-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/CleverTapZeroPiiSDK/CleverTapZeroPiiSDK.modulemap";
+				PRODUCT_MODULE_NAME = CleverTapZeroPiiSDK;
+				PRODUCT_NAME = CleverTapZeroPiiSDK;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		30E0B9EFD9A5C45D0D351231E81B30B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Release;
+		};
+		50345F67BF8A836F20C3C096B1C80053 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E0FAD2623111A9150E355C5E4D1B8CE0 /* CleverTapZeroPiiSDK.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "Target Support Files/CleverTapZeroPiiSDK/CleverTapZeroPiiSDK-prefix.pch";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Target Support Files/CleverTapZeroPiiSDK/CleverTapZeroPiiSDK-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/CleverTapZeroPiiSDK/CleverTapZeroPiiSDK.modulemap";
+				PRODUCT_MODULE_NAME = CleverTapZeroPiiSDK;
+				PRODUCT_NAME = CleverTapZeroPiiSDK;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		5258E4FEB935CFC493E3CCB10CB6361D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D82439FA534427727D4BEB691EB18033 /* Pods-ZeroPIIObjCSample.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-ZeroPIIObjCSample/Pods-ZeroPIIObjCSample-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-ZeroPIIObjCSample/Pods-ZeroPIIObjCSample.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		ED7BD53AFE0924535ACDFB49B14BF8F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 69A3E4D0241C0EBDFD086B861E5CB076 /* Pods-ZeroPIIObjCSample.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-ZeroPIIObjCSample/Pods-ZeroPIIObjCSample-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-ZeroPIIObjCSample/Pods-ZeroPIIObjCSample.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		F4FF6A0D1970CA9705974E3CB2134802 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F4FF6A0D1970CA9705974E3CB2134802 /* Debug */,
+				30E0B9EFD9A5C45D0D351231E81B30B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EDEFD95EBF017A37C280286FBDE0C9AC /* Build configuration list for PBXNativeTarget "Pods-ZeroPIIObjCSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5258E4FEB935CFC493E3CCB10CB6361D /* Debug */,
+				ED7BD53AFE0924535ACDFB49B14BF8F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F606AEC86C7E53825C154BEE857A3A1E /* Build configuration list for PBXNativeTarget "CleverTapZeroPiiSDK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				50345F67BF8A836F20C3C096B1C80053 /* Debug */,
+				08A4592FB433F6882683498BA77A0002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+}

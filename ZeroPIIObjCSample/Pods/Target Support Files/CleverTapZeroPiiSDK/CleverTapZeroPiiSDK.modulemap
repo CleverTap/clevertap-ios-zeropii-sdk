@@ -1,0 +1,6 @@
+framework module CleverTapZeroPiiSDK {
+  umbrella header "CleverTapZeroPiiSDK-umbrella.h"
+
+  export *
+  module * { export * }
+}
