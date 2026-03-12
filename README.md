@@ -133,20 +133,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Minimal — default log level (.off) and default retry policy (1 retry, exponential back-off)
         ZeroPiiSDK.initialize(
             tokenProvider: MyTokenProvider(),
-            apiUrl: "https://your-api-base-url.com/"
+            apiUrl: "https://your-api-base-url.com"
         )
 
         // With debug logging
         ZeroPiiSDK.initialize(
             tokenProvider: MyTokenProvider(),
-            apiUrl: "https://your-api-base-url.com/",
+            apiUrl: "https://your-api-base-url.com",
             logLevel: .debug
         )
 
         // With a custom retry policy
         ZeroPiiSDK.initialize(
             tokenProvider: MyTokenProvider(),
-            apiUrl: "https://your-api-base-url.com/",
+            apiUrl: "https://your-api-base-url.com",
             logLevel: .debug,
             retryPolicy: MyRetryPolicy()
         )
@@ -168,7 +168,7 @@ struct MyApp: App {
     init() {
         ZeroPiiSDK.initialize(
             tokenProvider: MyTokenProvider(),
-            apiUrl: "https://your-api-base-url.com/"
+            apiUrl: "https://your-api-base-url.com"
         )
     }
 
@@ -191,7 +191,7 @@ struct MyApp: App {
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     [ZeroPiiSDK initializeWithTokenProvider:[MyTokenProvider new]
-                                     apiUrl:@"https://your-api-base-url.com/"];
+                                     apiUrl:@"https://your-api-base-url.com"];
     return YES;
 }
 

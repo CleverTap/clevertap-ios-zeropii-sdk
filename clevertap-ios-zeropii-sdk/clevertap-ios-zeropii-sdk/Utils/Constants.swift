@@ -8,8 +8,8 @@
 import Foundation
 
 struct Constants {
-    static let tokenizeEndpoint: String = "api/tokenization/getToken"
-    static let batchTokenizeEndpoint: String = "api/tokenization/tokens/batch"
+    static let tokenizeEndpoint: String = "/ct-vault/api/v2/tokenize"
+    static let batchTokenizeEndpoint: String = "/ct-vault/api/v2/tokenize/batch"
 }
 
 /// String or number value

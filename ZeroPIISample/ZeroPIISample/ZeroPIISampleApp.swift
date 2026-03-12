@@ -86,7 +86,7 @@ struct ZeroPIISampleApp: App {
     init() {
         ZeroPiiSDK.initialize(
             tokenProvider: SampleTokenProvider(),
-            apiUrl: "https://vault.mangaforyou.com/ct-vault/",
+            apiUrl: "https://vault.mangaforyou.com",
             logLevel: .debug,
             retryPolicy: SampleRetryPolicy()
         )

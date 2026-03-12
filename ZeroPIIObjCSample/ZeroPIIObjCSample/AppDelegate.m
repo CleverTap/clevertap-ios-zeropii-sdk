@@ -73,7 +73,7 @@
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     [ZeroPiiSDK initializeWithTokenProvider:[SampleTokenProvider new]
-                                     apiUrl:@"https://vault.mangaforyou.com/ct-vault/"
+                                     apiUrl:@"https://vault.mangaforyou.com"
                                    logLevel:ZeroPiiLogLevelDebug
                                 retryPolicy:[SampleRetryPolicy new]];
     return YES;
