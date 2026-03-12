@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "summary": "CleverTap Zero PII SDK — tokenize sensitive PII data with AES-256-GCM encryption in transit.",
   "description": "CleverTap Zero PII SDK provides tokenization services for Personally Identifiable Information (PII).\nIt encrypts data in transit using AES-256-GCM (CryptoKit) and falls back gracefully to plain\ntokenization when encryption is unavailable or rejected by the backend. Compatible with\nSwift, SwiftUI, and Objective-C apps.",
-  "homepage": "https://github.com/CleverTap/clevertap-ios-vault-sdk",
+  "homepage": "https://github.com/CleverTap/clevertap-ios-zeropii-sdk",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
@@ -12,7 +12,7 @@
     "CleverTap": "sdk@clevertap.com"
   },
   "source": {
-    "git": "https://github.com/CleverTap/clevertap-ios-vault-sdk.git",
+    "git": "https://github.com/CleverTap/clevertap-ios-zeropii-sdk.git",
     "tag": "1.0.0"
   },
   "platforms": {

@@ -35,7 +35,7 @@ Or add it directly to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/CleverTap/clevertap-ios-vault-sdk.git", from: "1.0.0")
+    .package(url: "https://github.com/CleverTap/clevertap-ios-zeropii-sdk.git", from: "1.0.0")
 ],
 targets: [
     .target(
