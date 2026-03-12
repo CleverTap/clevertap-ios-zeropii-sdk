@@ -33,9 +33,9 @@ class SampleRetryPolicy: NSObject, RetryPolicy {
 /// using OAuth2 client credentials flow, mirroring the SDK's previous built-in auth.
 class SampleTokenProvider: NSObject, AccessTokenProvider {
 
-    private let authUrl = "https://auth-test.clevertap.net/auth/realms/master/protocol/openid-connect/token"
-    private let clientId = "navin-client"
-    private let clientSecret = "83EpGODDbeyepKaGRy1Srg4c4YVEFQG8"
+    private let authUrl = "YOUR_AUTH_URL"
+    private let clientId = "YOUR_CLIENT_ID"
+    private let clientSecret = "YOUR_CLIENT_SECRET"
 
     func fetchToken(completion: @escaping (AccessTokenInfo?, Error?) -> Void) {
         guard let url = URL(string: authUrl) else {
@@ -86,7 +86,7 @@ struct ZeroPIISampleApp: App {
     init() {
         ZeroPiiSDK.initialize(
             tokenProvider: SampleTokenProvider(),
-            apiUrl: "https://vault.mangaforyou.com",
+            apiUrl: "YOUR_API_URL",
             logLevel: .debug,
             retryPolicy: SampleRetryPolicy()
         )

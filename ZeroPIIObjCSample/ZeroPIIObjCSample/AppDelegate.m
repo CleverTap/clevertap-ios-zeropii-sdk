@@ -34,14 +34,14 @@
 @implementation SampleTokenProvider
 
 - (void)fetchTokenWithCompletion:(void (^)(AccessTokenInfo * _Nullable, NSError * _Nullable))completion {
-    NSURL *url = [NSURL URLWithString:@"https://auth-test.clevertap.net/auth/realms/master/protocol/openid-connect/token"];
+    NSURL *url = [NSURL URLWithString:@"YOUR_AUTH_URL"];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     request.HTTPMethod = @"POST";
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
 
     NSString *body = @"grant_type=client_credentials"
-                      "&client_id=navin-client"
-                      "&client_secret=83EpGODDbeyepKaGRy1Srg4c4YVEFQG8";
+                      "&client_id=YOUR_CLIENT_ID"
+                      "&client_secret=YOUR_ClIENT_SECRET";
     request.HTTPBody = [body dataUsingEncoding:NSUTF8StringEncoding];
 
     [[[NSURLSession sharedSession] dataTaskWithRequest:request
@@ -73,7 +73,7 @@
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     [ZeroPiiSDK initializeWithTokenProvider:[SampleTokenProvider new]
-                                     apiUrl:@"https://vault.mangaforyou.com"
+                                     apiUrl:@"YOUR_API_URL"
                                    logLevel:ZeroPiiLogLevelDebug
                                 retryPolicy:[SampleRetryPolicy new]];
     return YES;
