@@ -22,6 +22,7 @@ import Foundation
     internal var authRepository: AuthRepository!
     private var encryptionManager: EncryptionManager!
     private var logger: ZeroPiiLogger!
+    internal var coreSdkVersionRegistrar: CoreSdkVersionRegistrar!
 
     // MARK: - Singleton
 
@@ -74,6 +75,7 @@ import Foundation
         )
 
         TypeConverterRegistry.initialize()
+        coreSdkVersionRegistrar = CoreSdkVersionRegistrar(logger: logger)
         logger.debug("ZeroPiiSDK initialization complete", file: #file, line: #line)
     }
 
@@ -143,6 +145,8 @@ import Foundation
             }
             objc_sync_exit(self)
         }
+        // Runs on every initialize call, so a later call registers if Core had no instance the first time
+        _instance!.coreSdkVersionRegistrar.registerIfNeeded()
         return _instance!
     }
 
