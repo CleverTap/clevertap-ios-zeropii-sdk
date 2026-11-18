@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CleverTapZeroPiiSDK'
-  s.version          = '1.1.0'
+  s.version          = '2.0.0'
   s.summary          = 'CleverTap Zero PII SDK — tokenize sensitive PII data with AES-256-GCM encryption in transit.'
 
   s.description      = <<-DESC

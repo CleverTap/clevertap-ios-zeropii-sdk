@@ -1,6 +1,6 @@
 ## CleverTap ZeroPii SDK CHANGE LOG
 
-### Version 1.1.0
+### Version 2.0.0 (12 March 2026)
 
 #### Added
 
