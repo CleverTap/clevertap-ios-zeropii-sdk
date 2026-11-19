@@ -10,6 +10,10 @@
    * Apps built with the iOS 26 or 27 SDK must adopt the UIScene lifecycle. The sample apps (`ZeroPIISample`, `ZeroPIIObjCSample`) already use it. No ZeroPii feature is affected, because the SDK presents no UI and hooks no app lifecycle callbacks.
    * See [the iOS 27 Support doc](https://github.com/CleverTap/clevertap-ios-zeropii-sdk/blob/master/docs/iOS27Support.md) for the migration steps.
 
+#### Changed
+
+* Podspec and README now carry a CocoaPods sunset notice. CocoaPods trunk becomes read-only on December 2, 2026. Add `source 'https://github.com/CleverTap/podspecs.git'` and `source 'https://cdn.cocoapods.org/'` to the top of your Podfile to keep receiving updates. Existing installs are unaffected.
+
 ### Version 1.0.0 (12 March 2026)
 
 #### 🎉 Initial Release

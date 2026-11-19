@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
 
   s.source_files = 'clevertap-ios-zeropii-sdk/clevertap-ios-zeropii-sdk/**/*.swift'
 
-  # CryptoKit and Foundation are system frameworks available on iOS 15+; no explicit linkage needed.
+  # CryptoKit and Foundation are system frameworks available on iOS 13+; no explicit linkage needed.
   s.frameworks = 'Foundation'
 
   s.pod_target_xcconfig = {
