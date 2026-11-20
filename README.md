@@ -17,11 +17,13 @@ CleverTap ZeroPii SDK provides a secure way to tokenize Personally Identifiable 
 
 | | |
 |---|---|
-| **iOS** | 13.0+ |
+| **iOS** | 15.0+ |
 | **Swift** | 5.0+ |
 | **Xcode** | 15.0+ |
 
 The SDK has **no third-party dependencies**.
+
+> ⚠️ **Upgrading to Xcode 27 / iOS 27?** The minimum deployment target was raised from iOS 13 to **iOS 15**, because Xcode 27 no longer builds targets below iOS 15. See the [Xcode 27 / iOS 27 Support guide](/docs/iOS27Support.md) for the CocoaPods `post_install` snippet and the UIScene lifecycle requirement.
 
 ---
 
@@ -35,7 +37,7 @@ Or add it directly to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/CleverTap/clevertap-ios-zeropii-sdk.git", from: "1.0.0")
+    .package(url: "https://github.com/CleverTap/clevertap-ios-zeropii-sdk.git", from: "2.0.0")
 ],
 targets: [
     .target(
@@ -47,10 +49,20 @@ targets: [
 
 ### CocoaPods
 
+> **CocoaPods users:** CocoaPods trunk becomes read-only on December 2, 2026. Add these two
+> lines to the top of your Podfile to keep receiving CleverTap updates:
+>
+> ```ruby
+> source 'https://github.com/CleverTap/podspecs.git'
+> source 'https://cdn.cocoapods.org/'
+> ```
+>
+> Existing installs keep working with no change.
+
 Add to your `Podfile`:
 
 ```ruby
-pod 'CleverTapZeroPiiSDK', '~> 1.0'
+pod 'CleverTapZeroPiiSDK', '~> 2.0'
 ```
 
 Then run:
